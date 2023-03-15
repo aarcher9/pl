@@ -1,6 +1,0 @@
-%%%% -*- Mode: Prolog -*-
-
-cat(tom).
-cat(tom).
-cat(X).
-c
