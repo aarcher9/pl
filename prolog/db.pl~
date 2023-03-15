@@ -1,0 +1,13 @@
+%%%% -*- Mode: Prolog -*-
+
+% Non interactive execution:
+% $ swipl ... -g 'nl' -t halt  
+
+% Load file (-l will preserve colors):
+% $ swipl -l db.pl
+
+cat(tom).
+cat(boot).
+cat(jerry).
+mouse(jerry).
+chimera(X) :- cat(X), mouse(X).
