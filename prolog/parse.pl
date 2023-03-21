@@ -1,8 +1,6 @@
 %%%% -*- Mode: Prolog -*-
 
 % Scrittura di un programma che effettua il parsing di una stringa in un numero float.
-% RIFIUTA:
-% 
 
 
 
