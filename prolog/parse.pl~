@@ -4,6 +4,16 @@
 
 
 % ARCHI
+/*
+
+Modello:
+arc(p, a, _, q, a).
+arc(q, b, a, q, b).
+arc(q, b, b, q, b).
+arc(q, a, a, f, a).
+arc(q, a, b, f, a).
+
+*/
 
 arc(p, a, _, q, A).
 arc(q, b, A, q, B).
