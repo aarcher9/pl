@@ -28,6 +28,7 @@ initial(Label) :- arc(Start, Label, End), !, Start == p1.
 final(Label) :- arc(Start, Label, End), !, End == p6.
 
 
+
 accept([L | T]) :-
     arc(L),
     !,
