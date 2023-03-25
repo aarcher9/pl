@@ -3,7 +3,7 @@
 #include <string.h>
 #include <math.h>
 
-#define MAX_HEAP_SIZE 5
+#define MAX_HEAP_SIZE 7
 
 
 struct item {
@@ -22,20 +22,20 @@ int rightnk(int nodekey) {
     return (nodekey * 2 + 1);
 };
 
-int heapsize(struct item *heap) {
+int lastnk(struct item *heap) {
 
     int i = 0;
 
     while (i < MAX_HEAP_SIZE) {
         
-        if (heap[i].content == "\n") {
-            break;
+        if (heap[i].priority == -1) {
+            return i - 1;
         }
 
         i++;
     }
 
-    return i;
+    return i - 1;
 }
 
 
@@ -48,43 +48,38 @@ void swap(struct item *heap, int j, int k) {
 
 void heapify(struct item *heap, int nodekey) {
 
-    if (nodekey < heapsize(heap) - 1) {
+    if (nodekey <= lastnk(heap)) {
 
-        int candidateNodeKey = nodekey;
+        int candidate_nk = nodekey;
 
-        if (heap[leftnk(nodekey)].priority >= heap[rightnk(nodekey)].priority && leftnk(nodekey) < heapsize(heap) - 1) {
-            candidateNodeKey = leftnk(nodekey);
+        if (leftnk(nodekey) <= lastnk(heap) && heap[leftnk(nodekey)].priority >= heap[rightnk(nodekey)].priority) {
+            candidate_nk = leftnk(nodekey);
 
-        } else if (rightnk(nodekey) < heapsize(heap) - 1) {
-            candidateNodeKey = rightnk(nodekey);
+        } if (rightnk(nodekey) <= lastnk(heap) && heap[rightnk(nodekey)].priority > heap[candidate_nk].priority) {
+            candidate_nk = rightnk(nodekey);
         }
 
-        if (heap[candidateNodeKey].priority > heap[nodekey].priority) {
-            swap(heap, nodekey, candidateNodeKey);
-            heapify(heap, candidateNodeKey);
+        if (heap[candidate_nk].priority > heap[nodekey].priority) {
+
+            swap(heap, nodekey, candidate_nk);
+            heapify(heap, candidate_nk);
         }
     }
 };
 
 void buildHeap(struct item *heap) {
 
-    for (int i = heapsize(heap) - 1; i >= 0; i--) {
+    for (int i = lastnk(heap); i >= 0; i--) {
         heapify(heap, i);
     }
 };
 
 void delete(struct item *heap, int nodekey) {
-    swap(heap, nodekey, heapsize(heap) - 1);
-    heapify(heap, nodekey);
+
 };
 
 void add(struct item *heap, struct item node) {
 
-    // Assuming heap contains HEAP_SIZE - 1 items
-    // Probabily not the smartest way...
-    heap[heapsize(heap - 1)] = node;
-    swap(heap, 0, heapsize(heap - 1));
-    heapify(heap, 0);
 };
 
 
@@ -93,7 +88,7 @@ void printHeap(struct item *heap) {
     int i = 0;
     printf("[");
 
-    for (i = 0; i < heapsize(heap) - 1; i++) {
+    for (i = 0; i < lastnk(heap); i++) {
         printf("%i, ", heap[i].priority);
     }
 
@@ -101,9 +96,10 @@ void printHeap(struct item *heap) {
 };
 
 
+
 int main() {
 
-    struct item heap[5];
+    struct item heap[MAX_HEAP_SIZE];
 
 
     struct item a = {4, "a"};
@@ -111,21 +107,21 @@ int main() {
     struct item c = {3, "c"};
     struct item d = {5, "d"};
     struct item e = {1, "e"};
+    struct item f = {11, "s"};
+    struct item g = {6, "r"};
 
-    // heap[0] = a;
-    // heap[1] = b;
-    // heap[2] = c;
-    // heap[3] = d;
-    // heap[4] = e;
+    heap[0] = a;
+    heap[1] = b;
+    heap[2] = c;
+    heap[3] = d;
+    heap[4] = e;
+    heap[5] = f;
+    heap[6] = g;
 
-    printf("%i", heapsize(heap));
+    printHeap(heap);
 
-    // printHeap(heap);
-
-    // buildHeap(heap);
-    // printHeap(heap);
-
-
+    buildHeap(heap);
+    printHeap(heap);
 
 	
 	return 0; 
