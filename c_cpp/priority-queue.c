@@ -3,7 +3,7 @@
 #include <string.h>
 #include <math.h>
 
-#define MAX_HEAP_SIZE 7
+#define MAX_HEAP_SIZE 5
 
 
 struct item {
@@ -12,14 +12,14 @@ struct item {
 };
 
 
-int parentnk(int nodekey) {
-    return floor(nodekey / 2);
+int parentnk(int key) {
+    return floor((key + 1) / 2) - 1;
 };
-int leftnk(int nodekey) {
-    return (nodekey * 2);
+int leftnk(int key) {
+    return ((key + 1) * 2) - 1;
 };
-int rightnk(int nodekey) {
-    return (nodekey * 2 + 1);
+int rightnk(int key) {
+    return ((key + 1) * 2 + 1) - 1;
 };
 
 int lastnk(struct item *heap) {
@@ -38,51 +38,6 @@ int lastnk(struct item *heap) {
     return i - 1;
 }
 
-
-void swap(struct item *heap, int j, int k) {
-
-    struct item temp = heap[j];
-    heap[j] = heap[k];
-    heap[k] = temp;
-};
-
-void heapify(struct item *heap, int nodekey) {
-
-    if (nodekey <= lastnk(heap)) {
-
-        int candidate_nk = nodekey;
-
-        if (leftnk(nodekey) <= lastnk(heap) && heap[leftnk(nodekey)].priority >= heap[rightnk(nodekey)].priority) {
-            candidate_nk = leftnk(nodekey);
-
-        } if (rightnk(nodekey) <= lastnk(heap) && heap[rightnk(nodekey)].priority > heap[candidate_nk].priority) {
-            candidate_nk = rightnk(nodekey);
-        }
-
-        if (heap[candidate_nk].priority > heap[nodekey].priority) {
-
-            swap(heap, nodekey, candidate_nk);
-            heapify(heap, candidate_nk);
-        }
-    }
-};
-
-void buildHeap(struct item *heap) {
-
-    for (int i = lastnk(heap); i >= 0; i--) {
-        heapify(heap, i);
-    }
-};
-
-void delete(struct item *heap, int nodekey) {
-
-};
-
-void add(struct item *heap, struct item node) {
-
-};
-
-
 void printHeap(struct item *heap) {
 
     int i = 0;
@@ -93,6 +48,47 @@ void printHeap(struct item *heap) {
     }
 
     printf("%i]\n", heap[i].priority);
+};
+
+
+void swap(struct item *heap, int j, int k) {
+
+    struct item temp = heap[j];
+    heap[j] = heap[k];
+    heap[k] = temp;
+};
+
+void heapify(struct item *heap, int key) {
+
+    int maxKey = key;
+
+    if (leftnk(key) <= lastnk(heap) && heap[leftnk(key)].priority > heap[key].priority) {
+
+        maxKey = leftnk(key);
+
+    } if (rightnk(key) <= lastnk(heap) && heap[rightnk(key)].priority > heap[maxKey].priority) {
+
+        maxKey = rightnk(key);
+
+    } if (maxKey != key) {
+        swap(heap, key, maxKey);
+        heapify(heap, maxKey);
+    }
+};
+
+void buildHeap(struct item *heap) {
+
+    for (int i = lastnk(heap); i >= 0; i--) {
+        heapify(heap, i);
+    }
+};
+
+void delete(struct item *heap, int key) {
+
+};
+
+void add(struct item *heap, struct item node) {
+
 };
 
 
@@ -107,16 +103,16 @@ int main() {
     struct item c = {3, "c"};
     struct item d = {5, "d"};
     struct item e = {1, "e"};
-    struct item f = {11, "s"};
-    struct item g = {6, "r"};
+    // struct item f = {11, "s"};
+    // struct item g = {6, "r"};
 
     heap[0] = a;
     heap[1] = b;
     heap[2] = c;
     heap[3] = d;
     heap[4] = e;
-    heap[5] = f;
-    heap[6] = g;
+    // heap[5] = f;
+    // heap[6] = g;
 
     printHeap(heap);
 
