@@ -1,7 +1,5 @@
 %%%% -*- Mode: Prolog -*-
 
-% Eseguire con: '$ swipl -q -s stack_automata.pl'
-
 
 % ARCHI
 
