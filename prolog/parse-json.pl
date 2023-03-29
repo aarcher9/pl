@@ -4,8 +4,8 @@ initial(i).
 final(f).
 
 % Descrizione logica dei fatti 'arc'
-% arc(nodo, carattere in input, stack top attuale, nodo di arrivo, nuovo stack top)
-arc(i, "{", "", a, "{").
+% arc(nodo, carattere in input, stack attuale, nodo di arrivo, stack aggornato)
+arc(i, "{", [], a, STACK) :- append(["{"], [], STACK),
 arc(a, "[", "{", b, "[").
 arc(a, "{", "{", a, "{").
 arc(a, "}", "{", c, ""). % Caso: pop()
@@ -31,19 +31,18 @@ accept([], []).
 % "Overloading" di convenienza per la regola 'accept' in modo da nascondere più dettagli possibile all'esterno di questa zona.
 accept(LIST, []) :- 
     initial(NODE), !, 
-    accept(NODE, LIST, [_]).
+    accept(NODE, LIST, []).
 
 % CASO FINALE
 % Se l'input risulta vuoto e lo stack anche, sono arrivato alla fine con successo IFF il noto su cui mi trovo è quello finale.
 accept(NODE, [], []) :- final(NODE).
 
 
-% Regola di accettazione generica 
+% Regola di accettazione generica.
 % TODO: bisogna considerare il pop dallo stack
-accept(NODE, [I | INPUT_REST], [TOP | STACK]) :-
-    arc(NODE, I, TOP, END_NODE, X), !,
-    append([X], [TOP | STACK], NEW_STACK),
-    accept(END_NODE, INPUT_REST, NEW_STACK).
+accept(NODE, [I | INPUT_REST], STACK) :-
+    arc(NODE, I, STACK, END_NODE, UPDATED_STACK), !,
+    accept(END_NODE, INPUT_REST, UPDATED_STACK).
 
 
 
