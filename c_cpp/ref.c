@@ -6,17 +6,45 @@
 
 int main() {
 
-	int intero = 109;
-	int *puntatore = &intero;
+    /*
+    * &: richiede l'indirizzo della variabile
+    * *: se la variabile a cui applicato è un puntatore, richiede il bersaglio (eccetto nella definizione, ovvero quando dichiaro una varibile 'int *k' dove ha significato sintattico), se non è un puntatore, il compilatore lancia un errore.
+    */
 
-	printf("Sono un intero: %i \n", intero);
-	printf("Sono sempre lo stesso intero: %i \n", *&intero);
-	printf("Sono l'indirizzo dell' intero: %p \n", &intero);
+    // ===== Casi base =====
+	int intero = 200;
+	int* puntatore = &intero;
+    char parola[] = "ciao";
 
-	printf("Sono l'indirizzo che il puntatore indica: %p \n", puntatore);
-	printf("Sono il contenuto dell'indirizzo che il puntatore indica: %i \n", *puntatore);
-	printf("Sono il contenuto dell'indirizzo che il puntatore indica anche io: %i \n", **&puntatore);
-	printf("Sono l'indirizzo del puntatore: %p \n", &puntatore);
+    // per definizione
+    printf("A: %i\n", puntatore == &intero);
+    // incremento il bersaglio del puntatore
+    printf("B: %i\n", ++(*puntatore) == 201);
+
+    // per un array il puntatore è l'indirizzo del primo elemento
+    printf("C: %i\n", parola == &(parola[0]));
+    // se incremento il puntatore quindi, ottengo l'indirizzo del successivo elemento
+    printf("D: %i\n", (parola + 1) == &(parola[1]));
+    // come sopra ma confronto i valori e non gli indirizzi
+    printf("E: %i\n", *(parola + 1) == parola[1]);
+
+
+    // ===== Sitauzioni più complesse =====
+    intero = 200;
+    puntatore = &intero;
+    int** pp = &puntatore;
+    
+    // per definzione
+    printf("F: %i\n", pp == &puntatore);
+    // equivale a quanto sopra &* si "annullano"
+    printf("G: %i\n", &*pp == &puntatore);
+    // infatti...
+    printf("H: %i\n", &*pp == pp);
+    // esagerando in modo insensato
+    printf("I: %i\n", &*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*pp == pp);
+    // bersaglio del bersaglio del puntatore
+    printf("J: %i\n", **pp == 200);
+
 	
 	return 0; 
 }
