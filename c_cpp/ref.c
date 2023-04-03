@@ -22,9 +22,9 @@ int main() {
     printf("B: %i\n", ++(*puntatore) == 201);
 
     // per un array il puntatore è l'indirizzo del primo elemento
-    printf("C: %i\n", parola == &(parola[0]));
+    printf("C: %i\n", parola == &parola[0]);
     // se incremento il puntatore quindi, ottengo l'indirizzo del successivo elemento
-    printf("D: %i\n", (parola + 1) == &(parola[1]));
+    printf("D: %i\n", (parola + 1) == &parola[1]);
     // come sopra ma confronto i valori e non gli indirizzi
     printf("E: %i\n", *(parola + 1) == parola[1]);
 
@@ -44,6 +44,10 @@ int main() {
     printf("I: %i\n", &*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*&*pp == pp);
     // bersaglio del bersaglio del puntatore
     printf("J: %i\n", **pp == 200);
+
+
+    // Aritmetica dei puntatori =====
+    printf("K: %p, %p, %li\n", puntatore, (puntatore + 1), sizeof(int));
 
 	
 	return 0; 
