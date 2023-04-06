@@ -19,4 +19,8 @@ often prompts user to type something (e.g. when findall( , , ) is not used prolo
 **Run queries from file (does not print welcome message)**
 > $ swipl -l db.pl -g 'true' -g 'nl' < [FILE]
 
+**In C++**
+Compile
+> $ g++ [files.cpp] -o main; ./main
+
 

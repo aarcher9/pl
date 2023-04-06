@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/aarcher/Documents/pl/c_cpp",
-      "program": "/home/aarcher/Documents/pl/c_cpp/build/Debug/outDebug",
+      "cwd": "/Users/andrea/Documents/GitHub/pl/c_cpp",
+      "program": "/Users/andrea/Documents/GitHub/pl/c_cpp/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
