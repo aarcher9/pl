@@ -18,28 +18,28 @@ final(f).
 
 % Accettazione dei caratteri liberi.
 % Non ho bisogno di "poppare" perchè quando 'accept' chiama 'arc' uso la notazione delle liste [Testa | Coda].
-arc(N, ' ', BS, N, BS, JSON).
-arc(N, '\n', BS, N, BS, JSON).
-arc(N, '\t', BS, N, BS, JSON).
-arc(N, '\r', BS, N, BS, JSON).
+arc(N, ' ', BS, N, BS, IN, IN).
+arc(N, '\n', BS, N, BS, IN, IN).
+arc(N, '\t', BS, N, BS, IN, IN).
+arc(N, '\r', BS, N, BS, IN, IN).
 
 % Parentesi GRAFFE
-arc(i, '{', BS, c, UBS, JSON) :- push('{', BS, UBS).
-arc(c, '{', BS, c, UBS, JSON) :- push('{', BS, UBS).
-arc(c, '}', BS, c, UBS, JSON) :- pop(BS, UBS).
-arc(c, [], [], f, [], JSON).
+arc(i, '{', BS, c, UBS, IN, OUT) :- push('{', BS, UBS).
+arc(c, '{', BS, c, UBS, IN, OUT) :- push('{', BS, UBS).
+arc(c, '}', BS, c, UBS, IN, OUT) :- pop(BS, UBS).
+arc(c, [], [], f, [], IN, OUT).
 
 % Parentesi QUADRE
-arc(i, '[', BS, s, UBS, JSON) :- push('[', BS, UBS).
-arc(s, '[', BS, s, UBS, JSON) :- push('[', BS, UBS).
-arc(s, ']', BS, s, UBS, JSON) :- pop(BS, UBS).
-arc(s, [], [], f, []).
+arc(i, '[', BS, s, UBS, IN, OUT) :- push('[', BS, UBS).
+arc(s, '[', BS, s, UBS, IN, OUT) :- push('[', BS, UBS).
+arc(s, ']', BS, s, UBS, IN, OUT) :- pop(BS, UBS).
+arc(s, [], [], f, [], IN, OUT).
 
 % Archi di passaggio
-arc(c, '[', BS, s, UBS, JSON) :- push('[', BS, UBS).
-arc(s, '{', BS, c, UBS, JSON) :- push('{', BS, UBS).
-arc(s, '}', ['{' | TAIL], c, TAIL, JSON).
-arc(c, ']', ['[' | TAIL], s, TAIL, JSON).
+arc(c, '[', BS, s, UBS, IN, OUT) :- push('[', BS, UBS).
+arc(s, '{', BS, c, UBS, IN, OUT) :- push('{', BS, UBS).
+arc(s, '}', ['{' | TAIL], c, TAIL, IN, OUT).
+arc(c, ']', ['[' | TAIL], s, TAIL, IN, OUT).
 
 
 % Le regole sono ordinate in senso logico; la funzione principale chiama accept/2, se nullo esegue il fatto qui sotto. Se non nullo esegue il caso accept/2 non generico. Se va tutto bene questo chiama accept/3 e alla fine sempre se va tutto bene chiama accept/3 caso finale.
@@ -58,13 +58,13 @@ accept(LIST, []) :-
 
 % CASO DI CONTROLLO FINALE
 accept(NODE, [], []) :- 
-    arc(NODE, [], [], END_NODE, []), !, 
+    arc(NODE, [], [], END_NODE, [], IN, OUT), !, 
     final(END_NODE).
 
 
 % Regola di accettazione generica.
 accept(NODE, [I | INPUT_REST], STACK) :-
-    arc(NODE, I, STACK, END_NODE, UPDATED_STACK), !,
+    arc(NODE, I, STACK, END_NODE, UPDATED_STACK, IN, OUT), !,
     accept(END_NODE, INPUT_REST, UPDATED_STACK).
 
 
