@@ -53,9 +53,9 @@ accept([], []).
 
 % CASO INIZIALE GENERICO
 % "Overloading" di convenienza per la regola 'accept' in modo da nascondere più dettagli possibile all'esterno di questa zona.
-accept(LIST, []) :- 
+accept(LIST, [], JSON) :- 
     initial(NODE), !, 
-    accept(NODE, LIST, [], []).
+    accept(NODE, LIST, [], JSON).
 
 
 % Regola di accettazione generica.
@@ -67,7 +67,7 @@ accept(NODE, [CI | INPUT_REST], STACK, JSON) :-
 % CASO DI CONTROLLO FINALE
 accept(NODE, [], [], JSON) :- 
     arc(NODE, [], [], END_NODE, [], JSON, UPDATED_JSON), !,
-    write(UPDATED_JSON),
+    % write(UPDATED_JSON),
     final(END_NODE).
 
 
@@ -79,4 +79,5 @@ accept(NODE, [], [], JSON) :-
 
 brackets_match(STRING) :- 
     atom_chars(STRING, LIST),
-    accept(LIST, []).
+    accept(LIST, [], JSON), !,
+    write(JSON).
