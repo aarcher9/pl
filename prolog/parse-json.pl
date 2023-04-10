@@ -1,4 +1,5 @@
 %%%% -*- Mode: Prolog -*-
+% Regola generale importante! Se uso _ per una variabile poi ho difficoltà a stamparne il valore, perchè le variabili anonime vengono stampate con il come  _09090. Meglio usare una variabile normale e fare in modo che non sia singleton.
 
 push(ITEM, CURRENT_S, UPDATED_S) :- append([ITEM], CURRENT_S, UPDATED_S), !.
 pop([_ | TAIL], UPDATED_S) :- UPDATED_S = TAIL, !.
@@ -36,14 +37,14 @@ arc(c, ']', ['[' | TAIL], s, TAIL).
 */
 
 % Parentesi QUADRE
-arc(i, '[', BS, s, UBS, _, _) :- push('[', BS, UBS).
+arc(i, '[', BS, s, UBS, S_, S_) :- push('[', BS, UBS).
 arc(s, '[', BS, s, UBS, J, UJ) :- push('[', BS, UBS), push('ciao', J, UJ).
-arc(s, ']', BS, s, UBS, _, _) :- pop(BS, UBS).
-arc(s, [], [], f, [], _, _).
+arc(s, ']', BS, s, UBS, S_, S_) :- pop(BS, UBS).
+arc(s, [], [], f, [], S_, S_).
 
 
 
-% Le regole sono ordinate in senso di chiamata.
+% Le regole sono ordinate nel possibile senso di chiamata.
 
 % CASO INIZIALE NULLO
 % Se l'input risulta vuoto, lo stack anche è come se fossi sul nodo iniziale, quindi va tutto bene.
@@ -57,17 +58,17 @@ accept(LIST, []) :-
     accept(NODE, LIST, [], []).
 
 
-% CASO DI CONTROLLO FINALE
-accept(NODE, [], [], JSON) :- 
-    arc(NODE, [], [], END_NODE, [], JSON, UPDATED_JSON), !,
-    final(END_NODE).
-
-
 % Regola di accettazione generica.
 accept(NODE, [CI | INPUT_REST], STACK, JSON) :-
     arc(NODE, CI, STACK, END_NODE, UPDATED_STACK, JSON, UPDATED_JSON), !,
-    write(UPDATED_JSON),
     accept(END_NODE, INPUT_REST, UPDATED_STACK, UPDATED_JSON).
+
+
+% CASO DI CONTROLLO FINALE
+accept(NODE, [], [], JSON) :- 
+    arc(NODE, [], [], END_NODE, [], JSON, UPDATED_JSON), !,
+    write(UPDATED_JSON),
+    final(END_NODE).
 
 
 % ===== MAIN ===== %
@@ -75,7 +76,6 @@ accept(NODE, [CI | INPUT_REST], STACK, JSON) :-
 % Esempi
 % ACCETTA: {[][][{}{{[]}}]}{}[]
 % ACCETTA: {[] [] [{} {{[    ]}}]} {} []
-
 
 brackets_match(STRING) :- 
     atom_chars(STRING, LIST),
