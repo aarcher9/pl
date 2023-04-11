@@ -1,5 +1,6 @@
 %%%% -*- Mode: Prolog -*-
-% Regola generale importante! Se uso _ per una variabile poi ho difficoltà a stamparne il valore, perchè le variabili anonime vengono stampate con il come  _09090. Meglio usare una variabile normale e fare in modo che non sia singleton.
+% Regola generale importante! Se uso _ per una variabile poi ho difficoltà a stamparne il valore, perchè le variabili anonime vengono stampate con il come  _09090. Meglio usare una variabile normale e fare in modo che non sia singleton. Inoltre la variabile normale deve essere comunqua inizializzata o produrrà un effetto simile.
+
 
 push(ITEM, CURRENT_S, UPDATED_S) :- append([ITEM], CURRENT_S, UPDATED_S), !.
 pop([_ | TAIL], UPDATED_S) :- UPDATED_S = TAIL, !.
@@ -53,21 +54,20 @@ accept([], []).
 
 % CASO INIZIALE GENERICO
 % "Overloading" di convenienza per la regola 'accept' in modo da nascondere più dettagli possibile all'esterno di questa zona.
-accept(LIST, [], JSON) :- 
+accept(LIST, [], T, JSON) :- 
     initial(NODE), !, 
-    accept(NODE, LIST, [], JSON).
+    accept(NODE, LIST, [], T, JSON).
 
 
-% Regola di accettazione generica.
-accept(NODE, [CI | INPUT_REST], STACK, JSON) :-
-    arc(NODE, CI, STACK, END_NODE, UPDATED_STACK, JSON, UPDATED_JSON), !,
-    accept(END_NODE, INPUT_REST, UPDATED_STACK, UPDATED_JSON).
+% Regola di accettazione.
+accept(NODE, [CI | INPUT_REST], STACK, T, JSON) :-
+    arc(NODE, CI, STACK, END_NODE, UPDATED_STACK, T, NT), !,
+    accept(END_NODE, INPUT_REST, UPDATED_STACK, NT, JSON).
 
 
 % CASO DI CONTROLLO FINALE
-accept(NODE, [], [], JSON) :- 
-    arc(NODE, [], [], END_NODE, [], JSON, UPDATED_JSON), !,
-    % write(UPDATED_JSON),
+accept(NODE, [], [], T, JSON) :- 
+    arc(NODE, [], [], END_NODE, [], T, JSON), !,
     final(END_NODE).
 
 
@@ -79,5 +79,5 @@ accept(NODE, [], [], JSON) :-
 
 brackets_match(STRING) :- 
     atom_chars(STRING, LIST),
-    accept(LIST, [], JSON), !,
+    accept(LIST, [], [], JSON), !,
     write(JSON).
