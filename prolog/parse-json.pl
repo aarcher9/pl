@@ -8,6 +8,13 @@
 push(ITEM, CURRENT_S, UPDATED_S) :- append([ITEM], CURRENT_S, UPDATED_S), !.
 pop([_ | TAIL], UPDATED_S) :- UPDATED_S = TAIL, !.
 
+
+rlen([_ | T], C, Count) :- C is C + 1, write(C), rlen(T, C, Count), Count = C, write(C).
+len([], 0).
+len([_], 1).
+len(LIST, Length) :- rlen(LIST, 2, Length).
+
+
 initial(i).
 final(f).
 
