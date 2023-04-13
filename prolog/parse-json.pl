@@ -16,23 +16,11 @@ len([_ | T], Length) :- len(T, L), Length is L + 1.
 
 % @@@ %
 
-% sink_in(Sym, 0, L, NL) :- pushl(Sym, L, NL), !.
-% sink_in(Sym, Depth, L, NL) :- 
-%     D is Depth - 1, 
-%     sink_in(Sym, D, L, P), !, 
-%     NL = P, !.
-
-% pushld(Sym, [L], NL) :- pushl(Sym, L, NL), !.
-% pushld(Sym, [H | T], NL) :- 
-%     (pushld(Sym, T, Last) ; pushld(Sym, H, Last)), !, 
-%     push(H, Last, NL).
-
-pushld(Sym, [H | T], UL) :- 
-    ( pushld(Sym, T, UL) ; 
-        ( pushld(Sym, H, UL) ; 0 = 0 ),
-        ( pushl(Sym, H, UL), ! ; 0 = 0 ) 
-    ), !,
-    write(T), nl.
+pushld(Sym, [H | T], U) :- 
+    ( pushld(Sym, T, New); 
+        ( pushld(Sym, H, New); L = H, ! ), !,
+        pushl(Sym, L, New), ! ), !,
+    U = New.
 
 % @@@ %
 
