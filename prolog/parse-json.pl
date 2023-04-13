@@ -1,9 +1,10 @@
 %%%% -*- Mode: Prolog -*-
 
+% # R1:
+% Se uso _ per una variabile poi non riesco a stampare il valore delle variabili che compaiono insieme ad essa (ottengo il nome della variabile e.g.: _03113, invece che il suo valore). Meglio usare una variabile con nome inizializzata (ripeto, inizializzata). Se non lo sarà produrrà un effetto identico.
+
 
 % ========== ========== ========== ========== ========== %
-% Regola generale importante! Se uso _ per una variabile poi ho difficoltà a stamparne il valore, perchè le variabili anonime vengono stampate con il come  _09090. Meglio usare una variabile normale e fare in modo che non sia singleton. Inoltre la variabile normale deve essere comunqua inizializzata o produrrà un effetto simile.
-
 
 pushl(Item, L, NL) :- append(L, [Item], NL), !.
 push(ITEM, CURRENT_S, UPDATED_S) :- append([ITEM], CURRENT_S, UPDATED_S), !.
@@ -13,23 +14,33 @@ len([], 0).
 len([_ | T], Length) :- len(T, L), Length is L + 1.
 
 
-depth_pushl(Sym, 1, L, NL) :- pushl(Sym, L, NL), !.
-depth_pushl(Sym, Depth, L, NL) :- D is Depth - 1, depth_pushl(Sym, D, L, P), !, NL = [P], !.
+% @@@ % IN SOSPESO ----------
 
-findl(Sym, Depth, [L], Last) :- Last = [ciao].
-findl(Sym, Depth, [H | T], NL) :- findl(Sym, Depth, T, Last), !, push(H, Last, NL).
+sink_in(Sym, 0, L, NL) :- pushl(Sym, L, NL), !.
+sink_in(Sym, Depth, L, NL) :- 
+    D is Depth - 1, 
+    sink_in(Sym, D, L, P), !, 
+    NL = [P], !.
 
-initial(i).
-final(f).
+depth_pushl(Sym, Depth, [], Last) :- sink_in(Sym, Depth, [], Last).
+depth_pushl(Sym, Depth, [L], Last) :- sink_in(Sym, Depth, [L], Last).
+depth_pushl(Sym, Depth, [H | T], NL) :- 
+    depth_pushl(Sym, Depth, T, Last), !, 
+    push(H, Last, NL).
+
+% @@@ %
 
 
 % ========== ========== ========== ========== ========== %
+
 % Descrizione logica dei fatti 'arc'.
 % (nodo, carattere in input, stack attuale, nodo di arrivo, stack aggiornato, json, json aggiornato)
 % BS = brackets stack
 % UBS = updated brackets stack
 % La regola append() aggiunge in testa; controintuitivamente la testa (top) dello stack sta a sinistra.
 
+initial(i).
+final(f).
 
 % Accettazione dei caratteri liberi.
 arc(Node, ' ', BS, Node, BS, JSON, JSON).
@@ -40,30 +51,22 @@ arc(Node, '\r', BS, Node, BS, JSON, JSON).
 
 % Parentesi QUADRE
 arc(i, '[', BS, s, UBS, JSON, JSON) :- push('[', BS, UBS).
-arc(s, '[', BS, s, UBS, J, UJ) :- push('[', BS, UBS), push(['#'], J, UJ).
+
+arc(s, '[', BS, s, UBS, J, J) :- 
+    push('[', BS, UBS).
+
 arc(s, ']', BS, s, UBS, JSON, JSON) :- pop(BS, UBS).
 arc(s, [], [], f, [], JSON, JSON).
 
+% Stringhe
+arc(k0, '$', BS, s, UBS, JSON, JSON)
 
-/* DA AGGIORNARE
-% Parentesi GRAFFE
-arc(i, '{', BS, c, UBS) :- push('{', BS, UBS).
-arc(c, '{', BS, c, UBS) :- push('{', BS, UBS).
-arc(c, '}', BS, c, UBS) :- pop(BS, UBS).
-arc(c, [], [], f, []).
-
-% Archi di passaggio
-arc(c, '[', BS, s, UBS) :- push('[', BS, UBS).
-arc(s, '{', BS, c, UBS) :- push('{', BS, UBS).
-arc(s, '}', ['{' | TAIL], c, TAIL).
-arc(c, ']', ['[' | TAIL], s, TAIL).
-*/
 
 % ========== ========== ========== ========== ========== %
 % Le regole sono ordinate nel possibile senso di chiamata.
 
 % CASO INIZIALE NULLO
-% Se l'input risulta vuoto, lo stack anche è come se fossi sul nodo iniziale, quindi va tutto bene.
+% Se l'input risulta vuoto e lo stack anche è come se fossi sul nodo iniziale, quindi va tutto bene.
 accept([], []).
 
 
@@ -88,11 +91,9 @@ accept(NODE, [], [], T, JSON) :-
 
 % ===== MAIN ===== %
 
-% Esempi
-% ACCETTA: {[][][{}{{[]}}]}{}[]
-% ACCETTA: {[] [] [{} {{[    ]}}]} {} []
-
 json_parse(STRING) :- 
     atom_chars(STRING, LIST),
     accept(LIST, [], [], JSON), !,
     write(JSON).
+
+sr :- reconsult('parse-json.pl').
