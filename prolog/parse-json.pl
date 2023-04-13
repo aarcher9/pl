@@ -5,15 +5,16 @@
 % Regola generale importante! Se uso _ per una variabile poi ho difficoltà a stamparne il valore, perchè le variabili anonime vengono stampate con il come  _09090. Meglio usare una variabile normale e fare in modo che non sia singleton. Inoltre la variabile normale deve essere comunqua inizializzata o produrrà un effetto simile.
 
 
+pushl(Item, L, NL) :- append(L, [Item], NL), !.
 push(ITEM, CURRENT_S, UPDATED_S) :- append([ITEM], CURRENT_S, UPDATED_S), !.
-pop([_ | TAIL], UPDATED_S) :- UPDATED_S = TAIL, !.
+pop([_ | TAIL], TAIL).
 
-
-rlen([_ | T], C, Count) :- C is C + 1, write(C), rlen(T, C, Count), Count = C, write(C).
 len([], 0).
-len([_], 1).
-len(LIST, Length) :- rlen(LIST, 2, Length).
+len([_ | T], Length) :- len(T, L), Length is L + 1.
 
+
+depth_push(Sym, [], L, NL) :- pushl(Sym, L, NL).
+depth_push(Sym, [_ | D], L, NL) :- depth_push(Sym, D, L, [NL]).
 
 initial(i).
 final(f).
@@ -28,18 +29,17 @@ final(f).
 
 
 % Accettazione dei caratteri liberi.
-% Non ho bisogno di "poppare" perchè quando 'accept' chiama 'arc' uso la notazione delle liste [Testa | Coda].
-arc(N, ' ', BS, N, BS, S_, S_).
-arc(N, '\n', BS, N, BS, S_, S_).
-arc(N, '\t', BS, N, BS, S_, S_).
-arc(N, '\r', BS, N, BS, S_, S_).
+arc(Node, ' ', BS, Node, BS, JSON, JSON).
+arc(Node, '\n', BS, Node, BS, JSON, JSON).
+arc(Node, '\t', BS, Node, BS, JSON, JSON).
+arc(Node, '\r', BS, Node, BS, JSON, JSON).
 
 
 % Parentesi QUADRE
-arc(i, '[', BS, s, UBS, S_, S_) :- push('[', BS, UBS).
+arc(i, '[', BS, s, UBS, JSON, JSON) :- push('[', BS, UBS).
 arc(s, '[', BS, s, UBS, J, UJ) :- push('[', BS, UBS), push(['#'], J, UJ).
-arc(s, ']', BS, s, UBS, S_, S_) :- pop(BS, UBS).
-arc(s, [], [], f, [], S_, S_).
+arc(s, ']', BS, s, UBS, JSON, JSON) :- pop(BS, UBS).
+arc(s, [], [], f, [], JSON, JSON).
 
 
 /* DA AGGIORNARE
@@ -89,7 +89,7 @@ accept(NODE, [], [], T, JSON) :-
 % ACCETTA: {[][][{}{{[]}}]}{}[]
 % ACCETTA: {[] [] [{} {{[    ]}}]} {} []
 
-brackets_match(STRING) :- 
+json_parse(STRING) :- 
     atom_chars(STRING, LIST),
     accept(LIST, [], [], JSON), !,
     write(JSON).
