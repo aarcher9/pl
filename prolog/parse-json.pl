@@ -13,8 +13,11 @@ len([], 0).
 len([_ | T], Length) :- len(T, L), Length is L + 1.
 
 
-depth_push(Sym, [], L, NL) :- pushl(Sym, L, NL).
-depth_push(Sym, [_ | D], L, NL) :- depth_push(Sym, D, L, [NL]).
+depth_pushl(Sym, 1, L, NL) :- pushl(Sym, L, NL), !.
+depth_pushl(Sym, Depth, L, NL) :- D is Depth - 1, depth_pushl(Sym, D, L, P), !, NL = [P], !.
+
+findl(Sym, Depth, [L], Last) :- Last = [ciao].
+findl(Sym, Depth, [H | T], NL) :- findl(Sym, Depth, T, Last), !, push(H, Last, NL).
 
 initial(i).
 final(f).
