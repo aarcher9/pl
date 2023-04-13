@@ -14,19 +14,25 @@ len([], 0).
 len([_ | T], Length) :- len(T, L), Length is L + 1.
 
 
-% @@@ % IN SOSPESO ----------
+% @@@ %
 
-sink_in(Sym, 0, L, NL) :- pushl(Sym, L, NL), !.
-sink_in(Sym, Depth, L, NL) :- 
-    D is Depth - 1, 
-    sink_in(Sym, D, L, P), !, 
-    NL = [P], !.
+% sink_in(Sym, 0, L, NL) :- pushl(Sym, L, NL), !.
+% sink_in(Sym, Depth, L, NL) :- 
+%     D is Depth - 1, 
+%     sink_in(Sym, D, L, P), !, 
+%     NL = P, !.
 
-depth_pushl(Sym, Depth, [], Last) :- sink_in(Sym, Depth, [], Last).
-depth_pushl(Sym, Depth, [L], Last) :- sink_in(Sym, Depth, [L], Last).
-depth_pushl(Sym, Depth, [H | T], NL) :- 
-    depth_pushl(Sym, Depth, T, Last), !, 
-    push(H, Last, NL).
+% pushld(Sym, [L], NL) :- pushl(Sym, L, NL), !.
+% pushld(Sym, [H | T], NL) :- 
+%     (pushld(Sym, T, Last) ; pushld(Sym, H, Last)), !, 
+%     push(H, Last, NL).
+
+pushld(Sym, [H | T], UL) :- 
+    ( pushld(Sym, T, UL) ; 
+        ( pushld(Sym, H, UL) ; 0 = 0 ),
+        ( pushl(Sym, H, UL), ! ; 0 = 0 ) 
+    ), !,
+    write(T), nl.
 
 % @@@ %
 
@@ -59,7 +65,7 @@ arc(s, ']', BS, s, UBS, JSON, JSON) :- pop(BS, UBS).
 arc(s, [], [], f, [], JSON, JSON).
 
 % Stringhe
-arc(k0, '$', BS, s, UBS, JSON, JSON)
+% arc(s, '"', BS, k0, BS, V, PV)
 
 
 % ========== ========== ========== ========== ========== %
