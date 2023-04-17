@@ -17,13 +17,16 @@ len([_ | T], Length) :- len(T, L), Length is L + 1.
 % @@@ %
 
 % Il simbolo ; 'or' è lazy, se la prima parte risulta vera la seconda non viene eseguita
-pushld(Sym, [H | T], U) :- 
-    ( pushld(Sym, T, N); ( 
-        (pushld(Sym, H, N)); ( 
-                pushl(Sym, H, N)
+% Questo funziona
+findld(Sym, [H | T], Found, Substitute) :- 
+    ( findld(Sym, T, Found, Substitute); ( 
+        ( findld(Sym, H, Found, Substitute)); ( 
+                pushl(Sym, H, Substitute), !, Found = H
             )
-        ), write(H), H = N
-    ), !, U = N.
+        ), !
+    ), !.
+
+
 
 
 % @@@ %
@@ -87,11 +90,20 @@ accept(NODE, [], [], T, JSON) :-
     final(END_NODE).
 
 
-% ===== MAIN ===== %
+% ===== JSON Parse ===== %
 
 json_parse(STRING) :- 
     atom_chars(STRING, LIST),
     accept(LIST, [], [], JSON), !,
     write(JSON).
 
+% ===== Run ===== %
+
 sr :- reconsult('parse-json.pl').
+sep :- nl, write('===== + ====='), nl.
+app :- pushld('#', [[a, [d], [l, j]]], List), sep, write(List).
+% app :- findld('#', [[a, [d], [l, j]]], Found, Substitute), sep, write(Found), nl, write(Substitute).
+
+
+run :- sr, app.
+runtrace :- sr, trace, app.
