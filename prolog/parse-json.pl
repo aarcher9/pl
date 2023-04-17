@@ -26,9 +26,14 @@ findld(Sym, [H | T], Found, Substitute) :-
         ), !
     ), !.
 
-duplicate([H | T], Result) :- 
-    append(H, [], Result), write('ok'),
-    duplicate(H, Result).
+duplicate([H | T], Result) :-  
+    ( duplicate(H, Result);
+        ( 
+            % write(H)
+            nl
+        )
+    ), write(H), append([H], [], Result),
+    duplicate(T, Result).
 
 % replace([H | T], This, WithThis, Result) :- 
 
@@ -108,12 +113,12 @@ json_parse(STRING) :-
 
 sr :- reconsult('parse-json.pl').
 sep :- nl, write('===== + ====='), nl.
-% app :- 
-%     duplicate([a, [d], [l, j]], Result), write(Result).
+app :- 
+    duplicate([a, b, [d], [l, j]], Result), write(Result).
     % replaceld([[a, [d], [l, j]]], Result),
     % sep, write(Result).
 % app :- findld('#', [[a, [d], [l, j]]], Found, Substitute), sep, write(Found), nl, write(Substitute).
 
 
 run :- sr, app.
-runtrace :- sr, trace, app.
+runtrace :- sr, trace, app, notrace, nodebug.
