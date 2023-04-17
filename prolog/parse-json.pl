@@ -26,8 +26,15 @@ findld(Sym, [H | T], Found, Substitute) :-
         ), !
     ), !.
 
+duplicate([H | T], Result) :- 
+    append(H, [], Result), write('ok'),
+    duplicate(H, Result).
 
+% replace([H | T], This, WithThis, Result) :- 
 
+% replaceld(List, Result) :- 
+%     findld('#', List, Found, Substitute),
+%     replace(List, Found, Substitute, Result).
 
 % @@@ %
 
@@ -101,7 +108,10 @@ json_parse(STRING) :-
 
 sr :- reconsult('parse-json.pl').
 sep :- nl, write('===== + ====='), nl.
-app :- pushld('#', [[a, [d], [l, j]]], List), sep, write(List).
+% app :- 
+%     duplicate([a, [d], [l, j]], Result), write(Result).
+    % replaceld([[a, [d], [l, j]]], Result),
+    % sep, write(Result).
 % app :- findld('#', [[a, [d], [l, j]]], Found, Substitute), sep, write(Found), nl, write(Substitute).
 
 
