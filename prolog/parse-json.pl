@@ -7,8 +7,8 @@
 % ========== ========== ========== ========== ========== %
 
 pushl(Item, L, NL) :- append(L, [Item], NL), !.
-push(ITEM, CURRENT_S, UPDATED_S) :- append([ITEM], CURRENT_S, UPDATED_S), !.
-pop([_ | TAIL], TAIL).
+push(Item, L, NL) :- append([Item], L, NL), !.
+pop([_ | T], T).
 
 len([], 0).
 len([_ | T], Length) :- len(T, L), Length is L + 1.
@@ -16,11 +16,15 @@ len([_ | T], Length) :- len(T, L), Length is L + 1.
 
 % @@@ %
 
+% Il simbolo ; 'or' è lazy, se la prima parte risulta vera la seconda non viene eseguita
 pushld(Sym, [H | T], U) :- 
-    ( pushld(Sym, T, New); 
-        ( pushld(Sym, H, New); L = H, ! ), !,
-        pushl(Sym, L, New), ! ), !,
-    U = New.
+    ( pushld(Sym, T, N); ( 
+        (pushld(Sym, H, N)); ( 
+                pushl(Sym, H, N)
+            )
+        ), write(H), H = N
+    ), !, U = N.
+
 
 % @@@ %
 
