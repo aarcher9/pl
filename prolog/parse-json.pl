@@ -15,7 +15,8 @@ len([_ | T], Length) :- len(T, L), Length is L + 1.
 
 
 % @@@ %
-% Il simbolo ; 'or' è lazy, se la prima parte risulta vera la seconda non viene eseguita
+% il simbolo ; 'OR' è lazy, se la prima parte risulta vera la seconda non viene eseguita
+% per il simbolo ,'AND' se la prima parte risulta falsa la seconda non viene eseguita
 
 
 findld(Sym, [H | T], Found, Substitute) :- 
@@ -27,15 +28,10 @@ findld(Sym, [H | T], Found, Substitute) :-
     ), !.
 
 
-% unpack([]).
-% unpack([H | T]) :- 
-%     ( unpack(H); write(H) ),
-%     ( unpack(T) ).
-
 unpack([], Old, Old).
 unpack([H | T], Old, N) :- 
     ( unpack(H, Old, New); ( pushl(H, Old, New); true ) ),
-    ( unpack(T, New, N) ).
+    ( unpack(T, New, N) ), !.
 
 
 duplicate([H | T], Result) :- 
@@ -52,12 +48,19 @@ lrn([H | T]) :-
 visit_lrn([H | T]) :- lrn([H | T]); true.
 
 
-mirror([H | T]) :- 
-    ( mirror(T); (mirror(H); write(H)) ), mirror(T).
-
-
-
-% replace([H | T], This, WithThis, Result) :- 
+replace([], _, _, Temp, Temp).
+replace([H | T], This, WithThis, Temp, After) :-     
+    ( 
+        replace(H, This, WithThis, Temp, After); 
+        (
+            H \= This,
+            pushl(H, Temp, After)
+        )
+    ),
+    (
+        pushl(WithThis, After, A),
+        replace(T, This, WithThis, A, After)
+    ), !.
 
 % replaceld(List, Result) :- 
 %     findld('#', List, Found, Substitute),
