@@ -15,9 +15,9 @@ len([_ | T], Length) :- len(T, L), Length is L + 1.
 
 
 % @@@ %
-
 % Il simbolo ; 'or' è lazy, se la prima parte risulta vera la seconda non viene eseguita
-% Questo funziona
+
+
 findld(Sym, [H | T], Found, Substitute) :- 
     ( findld(Sym, T, Found, Substitute); ( 
         ( findld(Sym, H, Found, Substitute)); ( 
@@ -26,16 +26,36 @@ findld(Sym, [H | T], Found, Substitute) :-
         ), !
     ), !.
 
-duplicate([], Result).
+
+% unpack([]).
+% unpack([H | T]) :- 
+%     ( unpack(H); write(H) ),
+%     ( unpack(T) ).
+
+unpack([], Old, Old).
+unpack([H | T], Old, N) :- 
+    ( unpack(H, Old, New); ( pushl(H, Old, New); true ) ),
+    ( unpack(T, New, N) ).
+
+
 duplicate([H | T], Result) :- 
-    ( duplicate(H, R);
-        ( 
-            % write(H)
-            append([H], [], R)
-            % nl
-        )
-    ), write(R),
-    duplicate(T, Result).
+    ( duplicate(H, Result); 0 = 0 ),
+    ( duplicate(T, Result); 0 = 0 ), 
+    push(H, T, Result).
+
+
+% Left Right Node
+lrn([H | T]) :- 
+    ( lrn(H); ( write(H), nl ) ),
+    ( lrn(T); ( write(T), nl, false ) ).
+
+visit_lrn([H | T]) :- lrn([H | T]); true.
+
+
+mirror([H | T]) :- 
+    ( mirror(T); (mirror(H); write(H)) ), mirror(T).
+
+
 
 % replace([H | T], This, WithThis, Result) :- 
 
@@ -116,7 +136,7 @@ json_parse(STRING) :-
 sr :- reconsult('parse-json.pl').
 sep :- nl, write('===== + ====='), nl.
 app :- 
-    duplicate([a, b, [d], [l, j]], Result), sep, write(Result).
+    visitlnr([a, b, [d], [l, j]], Result), sep, write(Result).
     % replaceld([[a, [d], [l, j]]], Result),
     % sep, write(Result).
 % app :- findld('#', [[a, [d], [l, j]]], Found, Substitute), sep, write(Found), nl, write(Substitute).
