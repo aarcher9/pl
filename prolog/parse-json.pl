@@ -50,17 +50,10 @@ visit_lrn([H | T]) :- lrn([H | T]); true.
 
 replace([], _, _, Temp, Temp).
 replace([H | T], This, WithThis, Temp, After) :-     
-    ( 
-        replace(H, This, WithThis, Temp, After); 
-        (
-            H \= This,
-            pushl(H, Temp, After)
-        )
-    ),
-    (
-        pushl(WithThis, After, A),
-        replace(T, This, WithThis, A, After)
-    ), !.
+    ( H \= This, pushl(H, Temp, A), 
+        replace(H, This, WithThis, A, After) );
+    ( H == This, pushl(WithThis, Temp, A), 
+        replace(T, This, WithThis, A, After) ).
 
 % replaceld(List, Result) :- 
 %     findld('#', List, Found, Substitute),
