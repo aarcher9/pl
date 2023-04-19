@@ -60,13 +60,15 @@ simple_replace([H | T], This, WithThis, Temp, After) :-
     ), !.
 
 
-test(A, Ret) :- push(A, [], Ret).
-
 replace([], This, WithThis, []).
-replace(H, H, WithThis, WithThis) :- atom(H).
-replace(H, This, WithThis, H) :- atom(H).
+replace(H, H, WithThis, WithThis) :- atom(H), !.
+replace(H, This, WithThis, H) :- atom(H), !.
 
 replace([H | T], This, WithThis, Sol) :-
+    (
+        [H | T] == This,
+        Sol = WithThis
+    );
     (
         replace(H, This, WithThis, SH),
         replace(T, This, WithThis, ST),
