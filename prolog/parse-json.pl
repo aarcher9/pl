@@ -35,8 +35,8 @@ unpack([H | T], Old, N) :-
 
 
 duplicate([H | T], Result) :- 
-    ( duplicate(H, Result); 0 = 0 ),
-    ( duplicate(T, Result); 0 = 0 ), 
+    ( duplicate(H, Result); true ),
+    ( duplicate(T, Result); true ), 
     push(H, T, Result).
 
 
@@ -48,16 +48,52 @@ lrn([H | T]) :-
 visit_lrn([H | T]) :- lrn([H | T]); true.
 
 
-replace([], _, _, Temp, Temp).
-replace([H | T], This, WithThis, Temp, After) :-     
-    ( H \= This, pushl(H, Temp, A), 
-        replace(H, This, WithThis, A, After) );
-    ( H == This, pushl(WithThis, Temp, A), 
-        replace(T, This, WithThis, A, After) ).
+% replace method for lists without nesting. Works pretty well
+simple_replace([], _, _, Temp, Temp).
+simple_replace([H | T], This, WithThis, Temp, After) :-
+    ( 
+        ( 
+            ( H == This, pushl(WithThis, Temp, B) );
+            ( H \= This, pushl(H, Temp, B) )
+        ), 
+        ( simple_replace(T, This, WithThis, B, After) )
+    ), !.
 
-% replaceld(List, Result) :- 
-%     findld('#', List, Found, Substitute),
-%     replace(List, Found, Substitute, Result).
+
+replace([], _, _, Temp, Temp).
+replace([H | T], This, WithThis, Temp, After) :-
+    ( 
+        ( 
+            % ( H == This, pushl(WithThis, Temp, B) );
+            % ( H \= This, (
+            %     replace(H, This, WithThis, Temp, K) -> (
+           
+            %         write(K)
+            %         % pushl(K, Temp, B)
+            %     ); (
+            %         write(H)
+            %         % pushl(H, Temp, B)
+            %     )
+            % ) ),
+            % replace(T, This, WithThis, B, After)
+
+            ( H \= This, ( replace(H, This, WithThis, Temp, K) -> (
+                    % write(K), nl,
+                    % pushl(K, Temp, B), write(B), nl,
+                    write(K),
+                    replace(T, This, WithThis, Temp, After)
+                );
+                (
+                    % write('\n'), 
+                    % write(H), nl,
+                    % pushl(H, Temp, U), write(U), nl,
+                    write(H),
+                    replace(T, This, WithThis, Temp, After)
+                )
+            ) )
+        )
+    ), !.
+
 
 % @@@ %
 
