@@ -60,49 +60,18 @@ simple_replace([H | T], This, WithThis, Temp, After) :-
     ), !.
 
 
-replace([], _, _, []).
-replace(A, This, WithThis, R) :- 
-    atom(A), 
-    ( A == This, R = WithThis );         
-    ( A \= This, R = A ).
+test(A, Ret) :- push(A, [], Ret).
+
+replace([], This, WithThis, []).
+replace(H, H, WithThis, WithThis) :- atom(H).
+replace(H, This, WithThis, H) :- atom(H).
 
 replace([H | T], This, WithThis, Sol) :-
     (
-        [H | T] == This,
-        Sol = WithThis
-    );
-    (
-        ( replace(H, This, WithThis, SH) ), 
-        ( replace(T, This, WithThis, ST) ),
-        write(SH), nl
-
-        % ( replace(H, This, WithThis, SH); (
-        %     ( H == This, Sol = WithThis ); 
-        %     ( H \= This, Sol = H )
-        % ) ), 
-        % (( H == This, SH = WithThis ); 
-        % ( H \= This, SH = H )),
-        % ( replace(T, This, WithThis, ST) ),
-        % write(SH), nl
-
-
-        % ( replace(H, This, WithThis, SH); (
-        %     ( H == This, SH = WithThis ); 
-        %     ( H \= This, SH = H )
-        % ) ), 
-        % write(SH), nl,
-        % ( replace(T, This, WithThis, ST) )
-
-        % ( atom(SH), atom(ST) -> (
-            % pushl(SH, [], A), 
-            % pushl(ST, A, Sol)
-        % ); true )
-        % write(SH), write(' '), write(ST), nl
-        % pushl(SH, [], A), 
-        % pushl(ST, A, Sol)
-        
-
-    ).
+        replace(H, This, WithThis, SH),
+        replace(T, This, WithThis, ST),
+        push(SH, ST, Sol)
+    ), !.
 
 
 % @@@ %
