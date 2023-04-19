@@ -60,9 +60,9 @@ simple_replace([H | T], This, WithThis, Temp, After) :-
     ), !.
 
 
-replace([], This, WithThis, []).
+replace([], _, _, []).
 replace(H, H, WithThis, WithThis) :- atom(H), !.
-replace(H, This, WithThis, H) :- atom(H), !.
+replace(H, _, _, H) :- atom(H), !.
 
 replace([H | T], This, WithThis, Sol) :-
     (
