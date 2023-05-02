@@ -24,3 +24,8 @@ Compile
 > $ g++ [files.cpp] -o main; ./main
 
 
+**LISP**
+> sbcl --noinform < main.lisp &
+to abort execution use right arrow.
+
+
