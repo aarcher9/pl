@@ -24,7 +24,7 @@ child(mario, mina).
 % "Trovami tutti gli X tali che cat(X) e mettimeli in Result"
 
 
-% Questo riempie Result come previsto.
+% Questo riempie Cats come previsto.
 findall(X, cat(X), Cats).
 
 
