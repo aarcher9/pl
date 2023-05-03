@@ -1,4 +1,6 @@
-;; (defun append(a, b) 
-;;     (if (nil a)))
+(defun append-lists(a b) 
+    (if (null a)
+        b
+        (cons (car a) (append-lists (cdr a) b))))
 
-;; (append (list 1 2 3) (list 4 5 6))
+(append (list 1 2 3) (list 4 5 6))
