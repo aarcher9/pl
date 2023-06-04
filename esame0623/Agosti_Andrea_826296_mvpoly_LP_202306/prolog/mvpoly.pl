@@ -9,14 +9,14 @@
 
 % == [ Utilities ] == %
 % Shortcut per ricaricare il file con la console SWI aperta.
-rel :- notrace, nodebug, reconsult("mvpoly.pl").
+rel :- notrace, nodebug, reconsult('mvpoly.pl').
 
 % Procedura (predicato) di append leggermente modificata per catchare autonomamente le eccezioni. Appende ad una lista una seconda lista o una stringa, o anche atomo.
 push(Element, List, New) :- append([Element], List, New).
 push([H | T], List, New) :- append([H | T], List, New).
 
-% Rimuove i "" (stringhe vuote) dalla lista.
-clean_push("", L, L).
+% Rimuove i '' (stringhe vuote) dalla lista.
+clean_push('', L, L).
 clean_push(Item, List, Out) :- push(Item, List, Out).
 
 % == == %
@@ -25,9 +25,9 @@ clean_push(Item, List, Out) :- push(Item, List, Out).
 /*
 
 % == [ Divisione in stringhe di monomi ] == %
-% Divide la stringa in input in monomi. Se splitto lasciando "" nel 3 parametro i segni '-' doppi non vengono considerati come uno solo. Questo dovrebbe fare in modo che il programma torni false se il polinomio inserito non è correttamente scritto.
+% Divide la stringa in input in monomi. Se splitto lasciando '' nel 3 parametro i segni '-' doppi non vengono considerati come uno solo. Questo dovrebbe fare in modo che il programma torni false se il polinomio inserito non è correttamente scritto.
 split_polynomial(Expression, MonomialsList) :-
-        split_string(Expression, "-", "-", [H | T]),
+        split_string(Expression, '-', '-', [H | T]),
         reinsert_minus(T, Tail),
         push(H, Tail, PolynomialList),
         strip_pluses(PolynomialList, Nested),
@@ -35,7 +35,7 @@ split_polynomial(Expression, MonomialsList) :-
         remove_empty_items(Dirty, MonomialsList).
 
 
-% Fa in modo che la lista venga pulita da eventuali "" avanzati.
+% Fa in modo che la lista venga pulita da eventuali '' avanzati.
 remove_empty_items([], []).
 remove_empty_items([H | T], Out) :-
         remove_empty_items(T, Tail),
@@ -45,19 +45,19 @@ remove_empty_items([H | T], Out) :-
 % Splitta l'espressione basandosi sui segni '-'.
 clean_minuses([], []).
 clean_minuses([H | T], Out) :- 
-        split_string(H, "-", "-", A),
+        split_string(H, '-', '-', A),
         clean_minuses(T, B),
         push(A, B, Out).
 
 strip_minuses(Expression, Out) :- 
-        split_string(Expression, "-", "-", O),
+        split_string(Expression, '-', '-', O),
         clean_minuses(O, Out).
 
 
-% Rimuove i segni "+" dalla lista di polinomi una lista di monomi.
+% Rimuove i segni '+' dalla lista di polinomi una lista di monomi.
 strip_pluses([], []).
 strip_pluses([H | T], Out) :- 
-        split_string(H, "+", "+", A),
+        split_string(H, '+', '+', A),
         strip_pluses(T, B),
         push(A, B, Out).
 
@@ -70,7 +70,7 @@ reinsert_minus([], []).
 
 reinsert_minus([H | T], Out) :-
         reinsert_minus(T, Tail),
-        atom_concat("-", H, Head),
+        atom_concat('-', H, Head),
         push(Head, Tail, Out).
 
 % == == %
@@ -82,25 +82,65 @@ reinsert_minus([H | T], Out) :-
 is_digit(Char) :- atom_codes(Char, [H | _]), H >= 48, H =< 57.
 is_var_symbol(Char) :- atom_codes(Char, [H | _]), H >= 97, H =< 122.
 
-% Per uno stack l'append fa eseguito "al contrario" in modo che usando la notazione [Head | Tail] lo stack top sia sempre la Head.
+% Per uno stack l'append fa eseguito 'al contrario' in modo che usando la notazione [Head | Tail] lo stack top sia sempre la Head.
 % stack_push(Item, Stack, New) :- push(Stack, [Item], New).
 
 
 % Funzionde delta del PDA che riconosce un monomio.
-delta("a", "+", "b", [], []).
-delta("a", "-", "b", [], NS) :- push("-", [], NS).
+initial('a').
+final('c').
+final('d').
 
-delta("b", D, "c", [], NS) :- is_digit(D), push(D, [], NS).
-delta("b", D, "c", ["-"], NS) :- is_digit(D), push(D, ["-"], NS).
+delta('a', '+', 'b', [], []).
+delta('a', '-', 'b', [], NS) :- push('-', [], NS).
 
-delta("c", D, "c", [H | Tail], NS) :- is_digit(D), push(D, [H | Tail], NS).
+delta('a', D, 'c', [], NS) :- is_digit(D), push(D, [], NS).
+
+delta('b', D, 'c', [], NS) :- is_digit(D), push(D, [], NS).
+delta('b', D, 'c', ['-'], NS) :- is_digit(D), push(D, ['-'], NS).
+
+delta('c', D, 'c', [H | Tail], NS) :- 
+        is_digit(D),
+        is_digit(H),
+        push(D, [H | Tail], NS).
+
+delta('c', V, 'd', [H | Tail], NS) :- 
+        is_var_symbol(V),
+        is_digit(H),
+        push(V, [H | Tail], NS).
+
+delta('d', V, 'd', [H | Tail], NS) :- 
+        is_var_symbol(V),
+        is_var_symbol(H),
+        push(V, [H | Tail], NS).
+
+delta('d', '^', 'e', [H | Tail], NS) :- 
+        is_var_symbol(H),
+        push('^', [H | Tail], NS).
+
+delta('e', D, 'c', [H | Tail], NS) :-
+        is_digit(D),
+        H == '^',
+        push(D, [H | Tail], NS).
 
 
 % Parser dei monomi.
-% as_monomial(Expression, Monomial) :-
-%         atom_chars(Espression, L).
+% Caso generico.
+pda(State, [X | Postfix], S, Out) :-
+        delta(State, X, NewState, S, NS),
+        pda(NewState, Postfix, NS, Out).
+
+% Caso finale.
+pda(State, [], [H | T], [H | T]) :- 
+        final(State),
+        (is_var_symbol(H) ; is_digit(H)).
+
+
+as_monomial(Expression, Monomial) :-
+        atom_chars(Expression, L),
+        pda('a', L, [], Monomial).
 
 
 % == == %
 
-test_as_monomial(ML) :- as_monomial("-3xy^3", ML).
+test_as_monomial(ML) :- as_monomial('-3xy^3', ML).
