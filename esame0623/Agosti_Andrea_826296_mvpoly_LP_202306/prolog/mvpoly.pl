@@ -34,57 +34,67 @@ initial('a').
 final('c').
 final('d').
 
-delta('a', '+', 'b', [], []).
-delta('a', '-', 'b', [], NS) :- push('-', [], NS).
+% ===
+delta('a', '+', 'c', [], [], [], []).
+delta('a', '-', 'b', [], [], [], NT) :- 
+        push('-', [], NT).
 
-delta('a', D, 'c', [], NS) :- is_digit(D), push(D, [], NS).
+delta('a', D, 'c', [], [], [], NT) :- 
+        is_digit(D), 
+        push(D, [], NT).
 
-delta('b', D, 'c', [], NS) :- is_digit(D), push(D, [], NS).
-delta('b', D, 'c', ['-'], NS) :- is_digit(D), push(D, ['-'], NS).
+% ===
+delta('b', D, 'c', [], [], ['-'], NT) :- 
+        is_digit(D), 
+        push(D, ['-'], NT).
 
-delta('c', D, 'c', [H | Tail], NS) :- 
+% ===
+delta('c', D, 'c', [], [], [H | Tail], NT) :- 
         is_digit(D),
         is_digit(H),
-        push(D, [H | Tail], NS).
+        push(D, [H | Tail], NT).
 
-delta('c', V, 'd', [H | Tail], NS) :- 
+% Scarico del token stack.
+delta('c', V, 'd', S, NS, [H | Tail], NT) :- 
         is_var_symbol(V),
         is_digit(H),
-        push(V, [H | Tail], NS).
+        push(V, [], NT),
+        push([H | Tail], S, NS).
 
-delta('d', V, 'd', [H | Tail], NS) :- 
+% ===
+% Scarico del token stack.
+delta('d', V, 'd', S, NS, [H | Tail], NT) :- 
         is_var_symbol(V),
         is_var_symbol(H),
-        push(V, [H | Tail], NS).
+        push(V, [], NT),
+        push([H | Tail], S, NS).
 
-delta('d', '^', 'e', [H | Tail], NS) :- 
-        is_var_symbol(H),
-        push('^', [H | Tail], NS).
+delta('d', '^', 'e', S, S, [H | Tail], [H | Tail]) :- 
+        is_var_symbol(H).
 
-delta('e', D, 'c', [H | Tail], NS) :-
+% ===
+delta('e', D, 'c', S, S, [H | Tail], NT) :-
         is_digit(D),
-        H == '^',
-        push(D, [H | Tail], NS).
+        push(D, [H | Tail], NT).
 
 
 % Parser dei monomi.
 % Caso generico.
-pda(State, [X | Postfix], S, Out) :-
-        delta(State, X, NewState, S, NS),
-        pda(NewState, Postfix, NS, Out).
+pda(State, [X | Postfix], S, OS, T, OT) :-
+        delta(State, X, NewState, S, NS, T, NT),
+        pda(NewState, Postfix, NS, OS, NT, OT).
 
 % Caso finale.
-pda(State, [], [H | T], [H | T]) :- 
+pda(State, [], S, NS, [H | T], [H | T]) :- 
         final(State),
-        (is_var_symbol(H) ; is_digit(H)).
+        push([H | T], S, NS).
 
 % Predicato high-level per il parsing dei monomi.
 as_monomial(Expression, Monomial) :-
         atom_chars(Expression, L),
-        pda('a', L, [], Specular),
-        reverse(Specular, Monomial).
+        pda('a', L, [], Monomial, [], _).
 
 
 % == == %
 
-test_as_monomial(ML) :- as_monomial('-3xy^3', ML).
+test_as_monomial(ML) :- as_monomial('-3xy^3z', ML).
