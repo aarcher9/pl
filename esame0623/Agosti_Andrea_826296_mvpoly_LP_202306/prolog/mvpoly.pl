@@ -23,7 +23,7 @@ clean_push(Item, List, Out) :- push(Item, List, Out).
 
 
 
-% == [ Divisione ] == %
+% == [ Divisione in stringhe di monomi ] == %
 % Divide la stringa in input in monomi. Se splitto lasciando "" nel 3 parametro i segni '-' doppi non vengono considerati come uno solo. Questo dovrebbe fare in modo che il programma torni false se il polinomio inserito non è correttamente scritto.
 split_polynomial(Expression, MonomialsList) :-
         split_string(Expression, "-", "-", [H | T]),
