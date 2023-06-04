@@ -29,10 +29,20 @@ is_digit(Char) :- atom_codes(Char, [H | _]), H >= 48, H =< 57.
 is_var_symbol(Char) :- atom_codes(Char, [H | _]), H >= 97, H =< 122.
 
 
+% Fa il reverse di una lista nestata al massimo di un livello di profondità.
+mirror_monomial_stack([], []).
+mirror_monomial_stack([H | T], Mirrored) :- 
+        mirror_monomial_stack(T, M),
+        reverse(H, Temp),
+        append(M, [Temp], Mirrored).
+
+
 % Funzionde delta del PDA che riconosce un monomio.
 initial('a').
 final('c').
 final('d').
+
+% La logica è quella di creare una funzione delta che oltre a comportarsi come una delta 'ordinaria' per il PDA opera anche la traduzione in "oggetto" del monomio. L'automata ha infatti due stack (4 passati come argomento per via della struttura di prolog che non prevede modifiche dirette di oggetti come le liste), uno per conservare i token (le parti del monomio inscindibili) e l'altro per "scaricarli" e conservare l'oggetto finale.
 
 % ===
 delta('a', '+', 'c', [], [], [], []).
@@ -92,9 +102,13 @@ pda(State, [], S, NS, [H | T], [H | T]) :-
 % Predicato high-level per il parsing dei monomi.
 as_monomial(Expression, Monomial) :-
         atom_chars(Expression, L),
-        pda('a', L, [], Monomial, [], _).
+        pda('a', L, [], MM, [], _),
+        mirror_monomial_stack(MM, Monomial).
 
 
 % == == %
 
 test_as_monomial(ML) :- as_monomial('-3xy^3z', ML).
+% test_as_monomial(ML) :- as_monomial('-3xy^3z', ML).
+% test_as_monomial(ML) :- as_monomial('-3xy^3z', ML).
+% test_as_monomial(ML) :- as_monomial('-36k^67', ML).
