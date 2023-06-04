@@ -22,6 +22,7 @@ clean_push(Item, List, Out) :- push(Item, List, Out).
 % == == %
 
 
+/*
 
 % == [ Divisione in stringhe di monomi ] == %
 % Divide la stringa in input in monomi. Se splitto lasciando "" nel 3 parametro i segni '-' doppi non vengono considerati come uno solo. Questo dovrebbe fare in modo che il programma torni false se il polinomio inserito non è correttamente scritto.
@@ -74,11 +75,32 @@ reinsert_minus([H | T], Out) :-
 
 % == == %
 
+*/
+
+% == [ Parsing monomi ] == %
+% Si suppone che arrivi un carattere alla volta.
+is_digit(Char) :- atom_codes(Char, [H | _]), H >= 48, H =< 57.
+is_var_symbol(Char) :- atom_codes(Char, [H | _]), H >= 97, H =< 122.
+
+% Per uno stack l'append fa eseguito "al contrario" in modo che usando la notazione [Head | Tail] lo stack top sia sempre la Head.
+% stack_push(Item, Stack, New) :- push(Stack, [Item], New).
 
 
-test_split_polynomials(ML) :- split_polynomial("-3x++----++-4++6y-8-12+3z", ML).
-% test_cleanout(E) :- remove_empty_items(["", "d", "", "ci", ""], E).
+% Funzionde delta del PDA che riconosce un monomio.
+delta("a", "+", "b", [], []).
+delta("a", "-", "b", [], NS) :- push("-", [], NS).
 
-% as_monomial(Expression, Monomial).
-% as_polynomial(Expression, Polynomial) :- 
-%         atom_chars(Expression, Buffer).
+delta("b", D, "c", [], NS) :- is_digit(D), push(D, [], NS).
+delta("b", D, "c", ["-"], NS) :- is_digit(D), push(D, ["-"], NS).
+
+delta("c", D, "c", [H | Tail], NS) :- is_digit(D), push(D, [H | Tail], NS).
+
+
+% Parser dei monomi.
+% as_monomial(Expression, Monomial) :-
+%         atom_chars(Espression, L).
+
+
+% == == %
+
+test_as_monomial(ML) :- as_monomial("-3xy^3", ML).
