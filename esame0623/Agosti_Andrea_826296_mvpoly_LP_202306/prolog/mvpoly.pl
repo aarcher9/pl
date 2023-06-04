@@ -59,10 +59,11 @@ delta('b', D, 'c', [], [], ['-'], NT) :-
         push(D, ['-'], NT).
 
 % ===
-delta('c', D, 'c', [], [], [H | Tail], NT) :- 
+delta('c', D, 'c', S, S, [H | Tail], NT) :- 
         is_digit(D),
         is_digit(H),
-        push(D, [H | Tail], NT).
+        atom_concat(H, D, Number),
+        push(Number, Tail, NT).
 
 % Scarico del token stack.
 delta('c', V, 'd', S, NS, [H | Tail], NT) :- 
@@ -106,9 +107,8 @@ as_monomial(Expression, Monomial) :-
         mirror_monomial_stack(MM, Monomial).
 
 
-% == == %
-
+% Alcuni test di controllo.
 test_as_monomial(ML) :- as_monomial('-3xy^3z', ML).
-% test_as_monomial(ML) :- as_monomial('-3xy^3z', ML).
-% test_as_monomial(ML) :- as_monomial('-3xy^3z', ML).
-% test_as_monomial(ML) :- as_monomial('-36k^67', ML).
+% test_as_monomial(ML) :- as_monomial('-36k^68', ML).
+
+% == == %
