@@ -62,10 +62,10 @@ delta('0', X, 'vars', [], [['1', '+']], [], [X]) :-
         is_var_symbol(X).
 
 % Coefficiente -1 implicito.
-delta('sign', X, 'vars', [], [['1', '-']], ['-'], [X]) :- 
+delta('sign', X, 'vars', [], [['1', '-']], ['-'], ['1', X]) :- 
         is_var_symbol(X).
 
-delta('sign', X, 'vars', [], [['1', '+']], ['+'], [X]) :- 
+delta('sign', X, 'vars', [], [['1', '+']], ['+'], ['1', X]) :- 
         is_var_symbol(X).
 
 delta('sign', X, 'digits', [], [], T, NT) :- 
@@ -77,20 +77,21 @@ delta('digits', X, 'digits', S, S, [H | Tail], NT) :-
         is_digit(H),
         push(X, [H | Tail], NT).
 
-delta('digits', V, 'vars', S, NS, [H | Tail], NT) :- 
+delta('digits', V, 'vars', S, NS, [H | Tail], ['1', V]) :- 
+        is_var_symbol(V), 
+        is_digit(H),
+        push([H | Tail], S, NS).
+
+delta('vars', V, 'vars', S, NS, [H | Tail], ['1', V]) :- 
         is_var_symbol(V),
         is_digit(H),
-        push(V, [], NT),
         push([H | Tail], S, NS).
 
-delta('vars', V, 'vars', S, NS, [H | Tail], NT) :- 
-        is_var_symbol(V),
-        is_var_symbol(H),
-        push(V, [], NT),
-        push([H | Tail], S, NS).
+delta('vars', '^', 'exp', S, S, ['1' | Tail], ['1' | Tail]).
 
-delta('vars', '^', 'exp', S, S, [H | Tail], [H | Tail]) :- 
-        is_var_symbol(H).
+delta('exp', X, 'digits', S, S, ['1' | Tail], NT) :-
+        is_digit(X),
+        push(X, Tail, NT).
 
 delta('exp', X, 'digits', S, S, [H | Tail], NT) :-
         is_digit(X),
@@ -120,18 +121,21 @@ monomial_list(Expression, MonomialList) :-
 test_all_monomial_list() :-
         monomial_list('3x', A), write(A), nl, !,
         monomial_list('-3x', B), write(B), nl, !, 
-        monomial_list('-x()', C), write(C), nl, !,
+        monomial_list('-x', C), write(C), nl, !,
         monomial_list('+x', D), write(D), nl, !,
         monomial_list('+3', E), write(E), nl, !,
         monomial_list('-3', E1), write(E1), nl, !,
         monomial_list('3', E2), write(E2), nl, !,
-        monomial_list('-3x', F), write(F), nl, !,
         monomial_list('-36k^68', G), write(G), nl, !,
         monomial_list('-3xy^3z', H), write(H), nl, !.
 
 % == == %
 
 
-% == [ Costruzione struttura dati adatta monomi ] == %
+% == [ Costruzione struttura dati adatta per i monomi ] == %
+% Ora i monomi parsati hanno una struttura standard (la stessa "interfaccia"), quella costruita dal parser PDA.
+
+% m(Coefficient, TotalDegree, VarsPowers).
+% v(Power, VarSymbol).
 
 % == == %
