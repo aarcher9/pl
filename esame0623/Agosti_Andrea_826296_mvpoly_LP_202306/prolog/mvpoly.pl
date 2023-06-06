@@ -7,6 +7,9 @@
 % C-x h C-M-\ usare il comando per reindentare tutto il file con Emacs.
 
 
+% Il codice rispetta la seguente struttura: ogni delimitata sezione esegue un certo passaggio della computazione richiamando UNA sola funzione dello "strato" superiore, tipicamente l'ultima definita, ovvero come se fosse il controller di quella sezione. Assomiglia molto ad una divisione in "classi" di compiti in un linguaggio ad oggetti. La sezione delle utilities invece raccoglie predicato di generale uso, che possono essere richiamati casualmente nel codice.
+
+
 % == [ Utilities ] == %
 % Shortcut per ricaricare il file con la console SWI aperta.
 rel :- notrace, nodebug, reconsult('mvpoly.pl').
@@ -23,7 +26,7 @@ clean_push(Item, List, Out) :- push(Item, List, Out).
 
 
 
-% == [ Parsing monomi ] == %
+% == [ PARSER ] == %
 % Le cifre arrivano una per volta, verranno poi assemblate.
 is_digit(Char) :- 
         atom_codes(Char, [H | _]), 
@@ -110,20 +113,10 @@ as_monomial_list(Expression, MonomialList) :-
         initial(S),
         pda(S, L, [], MonomialList, [], _).
 
-
-
-% TEST: Alcuni test di controllo.
-test_parser() :-
-        test_A(['3x', '-3x', '-x', '+x', 'x', '+3', '-3', '3', '-36k^68', '-3xy^35z']).
-
-test_A([]).
-test_A([H | T]) :-
-        as_monomial_list(H, A), write(A), nl, nl, !,
-        test_A(T).
 % == == %
 
 
-% == [ Costruiamo la struttura dati voluta ] == %
+% == [ BUILDER ] == %
 % Ora i monomi parsati hanno tutti una struttura standard comune (la stessa "interfaccia"), quella costruita dal parser PDA.
 % Una volta resa come voluto implementeremo le operazioni per manipolare quella (successivamente).
 
@@ -147,7 +140,7 @@ pack_vars([[VarSymbol | ExpDigits] | Others], [[VarSymbol, Exp] | O]) :-
         atom_number(AtomsExp, Exp),
         pack_vars(Others, O).
 
-pack_monomial_digits(ML, [Coeff | Vars]) :-
+pack_monomial(ML, [Coeff | Vars]) :-
         mirror_monomial_list(ML, [NH | NT]),
         pack_coefficient(NH, [Coeff | _ ]),
         pack_vars(NT, MirroredVars),
@@ -165,12 +158,50 @@ build_vars([[Power, VarSymbol] | T], D, ND, [v(Power, VarSymbol) | O]) :-
 % Costruiamo una struttura dati simile a quella voluta. L'input è una lista contenente liste che rappresentano  con in numeri "impacchettati" piuttosto che come sequenze di caratteri.
 as_non_standard_monomial(Expression, m(Coeff, TotalDegree, VarsPowers)) :-
         as_monomial_list(Expression, MonomialList),
-        pack_monomial_digits(MonomialList, [Coeff | Vars]),
+        pack_monomial(MonomialList, [Coeff | Vars]),
         build_vars(Vars, 0, TotalDegree, VarsPowers).
 
+% == == %
 
 
-% TEST: Alcuni test anche qui.
+
+% == [ SORTER & COLLAPSER ] == %
+% Riordina i monomi secondo l'ordine richiesto. Non è responsabile dell'unione di termini simili. Viene chiaramente prima ordinato rispetto alla potenza (chiave: 1) poi rispetto alla variabile (chiave: 2). Dalla documentazione l'algoritmo di sorting è il merge sort, quindi stabile, per questo motivo è possibile ottenere l'output desiderato. Il predicato si può usare sia su degli oggetti senza i duplicati per variabile sia che su oggetti con.
+sort_vars([v(P, VS) | Tail], [v(Power, VarSymbol) | T]) :-
+        sort(1, @=<, [v(P, VS) | Tail], [v(P2_, VS2_) | T2_]),
+        sort(2, @=<, [v(P2_, VS2_) | T2_], [v(Power, VarSymbol) | T]).
+
+
+% Minimizzazione del monomio (i termini simili vengono condensati). Il monomio viene preventivamente ordinato per consentire una facilità di approccio al problema.
+collapse_vars([v(P1_, VarSymbol) | [v(P2_, VarSymbol) | T]], [v(P, VarSymbol) | T]) :-
+        P is P1_ + P2_.
+
+
+% collapse_monomial(Expression, m(C, Deg, [v(Power, VarSymbol) | T])) :-
+%         as_non_standard_monomial(Expression),
+%         sort_vars(Expression, m(C, Deg, [v(P1, VS1) | [v(NP1, NVS1) | T]])),
+%         collapse_vars().
+
+% == == %
+
+
+
+
+
+
+
+
+% == [ TEST ] == %
+% Test per il parser.
+test_parser() :-
+        test_A(['3x', '-3x', '-x', '+x', 'x', '+3', '-3', '3', '-36k^68', '-3xy^35z']).
+
+test_A([]).
+test_A([H | T]) :-
+        as_monomial_list(H, A), write(A), nl, nl, !,
+        test_A(T).
+
+% Test per il builder.
 test_builder() :-
         test_B(['-3xy^35z', '-36k^68', '-3', '0']).
 
@@ -178,9 +209,3 @@ test_B([]).
 test_B([H | T]) :-
         as_non_standard_monomial(H, NSM), write(NSM), nl, nl, !,
         test_B(T).
-% == == %
-
-
-% == [ Riordinare in forma standard ] == %
-
-% == == %
