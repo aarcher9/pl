@@ -102,31 +102,33 @@ pda(State, [], S, NS, T, T) :-
         final(State),
         push(T, S, NS).
 
+
 % Predicato high-level per il parsing dei monomi. Rappresenta il monomio in una struttura affine a quanto voluto dal testo dell'esame. La lista risultate rappresenta una versione specchiata dell'input per via della facile gestione della lista come uno stack usando la notazione testa-coda, mettendo quindi l'input meno recente (quello più a destra nell'input) a sinistra.
-monomial_list(Expression, MonomialList) :-
+% L'input è una atomo (una sequenza di caratteri).
+as_monomial_list(Expression, MonomialList) :-
         atom_chars(Expression, L),
         initial(S),
         pda(S, L, [], MonomialList, [], _).
 
 
+
 % TEST: Alcuni test di controllo.
-test_monomial_list([]).
-test_monomial_list([H | T]) :-
-        monomial_list(H, A), write(A), nl, nl, !,
-        test_monomial_list(T).
+test_parser() :-
+        test_A(['3x', '-3x', '-x', '+x', 'x', '+3', '-3', '3', '-36k^68', '-3xy^35z']).
 
-test_all_monomial_list() :-
-        test_monomial_list(['3x', '-3x', '-x', '+x', 'x', '+3', '-3', '3', '-36k^68', '-3xy^35z']).
-
+test_A([]).
+test_A([H | T]) :-
+        as_monomial_list(H, A), write(A), nl, nl, !,
+        test_A(T).
 % == == %
 
 
 % == [ Costruiamo la struttura dati voluta ] == %
-% Ora i monomi parsati hanno una struttura standard (la stessa "interfaccia"), quella costruita dal parser PDA.
-% Una volta resa come voluto implementeremo le operazioni per manipolare quella.
+% Ora i monomi parsati hanno tutti una struttura standard comune (la stessa "interfaccia"), quella costruita dal parser PDA.
+% Una volta resa come voluto implementeremo le operazioni per manipolare quella (successivamente).
 
 
-% Fa il reverse di una lista nestata al massimo di un livello di profondità, una lista con la struttura definita dal parser.
+% Fa il reverse di una lista nestata al massimo di un livello di profondità, una lista con la struttura definita dal parser (MonomialList).
 mirror_monomial_list([], []).
 mirror_monomial_list([H | T], Mirrored) :- 
         mirror_monomial_list(T, M),
@@ -153,34 +155,33 @@ pack_monomial_digits(ML, [Coeff | Vars]) :-
         reverse(V, Vars).
 
 
-% Data la lista di variabili calcola il grado totale e ritorna la struttura dati voluta.
+% Data la lista di variabili calcola il grado totale e ritorna la struttura dati voluta (o almeno, simile, poiché non è ancora ordinata).
 build_vars([], D, D, []).
 build_vars([[Power, VarSymbol] | T], D, ND, [v(Power, VarSymbol) | O]) :-
         C is Power + D,
         build_vars(T, C, ND, O).
 
 
-% Costruiamo la struttura dati voluta.
-as_non_standard_monomial([Coeff | Vars], m(Coeff, TotalDegree, VarsPowers)) :-
+% Costruiamo una struttura dati simile a quella voluta. L'input è una lista contenente liste che rappresentano  con in numeri "impacchettati" piuttosto che come sequenze di caratteri.
+as_non_standard_monomial(Expression, m(Coeff, TotalDegree, VarsPowers)) :-
+        as_monomial_list(Expression, MonomialList),
+        pack_monomial_digits(MonomialList, [Coeff | Vars]),
         build_vars(Vars, 0, TotalDegree, VarsPowers).
 
 
+
 % TEST: Alcuni test anche qui.
-test_as_non_standard_monomial([]).
-test_as_non_standard_monomial([H | T]) :-
-        monomial_list(H, ML), write(H), nl, !,
+test_builder() :-
+        test_B(['-3xy^35z', '-36k^68', '-3']).
+
+test_B([]).
+test_B([H | T]) :-
+        as_monomial_list(H, ML), write(H), nl, !,
         pack_monomial_digits(ML, Packed), write(Packed), nl, !,
-        as_non_standard_monomial(Packed, NSM), write(NSM), nl, nl, !,
-        test_as_non_standard_monomial(T).
-
-
-test_all_as_non_standard_monomial() :-
-        test_as_non_standard_monomial(['-3xy^35z', '-36k^68', '-3']).
-
+        build_non_standard_form(Packed, NSM), write(NSM), nl, nl, !,
+        test_B(T).
 % == == %
 
 
 % == [ x ] == %
-
-
 % == == %
