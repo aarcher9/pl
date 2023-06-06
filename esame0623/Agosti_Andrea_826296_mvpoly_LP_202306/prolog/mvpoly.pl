@@ -149,7 +149,7 @@ pack_vars([[VarSymbol | ExpDigits] | Others], [[VarSymbol, Exp] | O]) :-
 
 pack_monomial_digits(ML, [Coeff | Vars]) :-
         mirror_monomial_list(ML, [NH | NT]),
-        pack_coefficient(NH, Coeff),
+        pack_coefficient(NH, [Coeff | _ ]),
         pack_vars(NT, MirroredVars),
         mirror_monomial_list(MirroredVars, V),
         reverse(V, Vars).
@@ -172,13 +172,11 @@ as_non_standard_monomial(Expression, m(Coeff, TotalDegree, VarsPowers)) :-
 
 % TEST: Alcuni test anche qui.
 test_builder() :-
-        test_B(['-3xy^35z', '-36k^68', '-3']).
+        test_B(['-3xy^35z', '-36k^68', '-3', '0']).
 
 test_B([]).
 test_B([H | T]) :-
-        as_monomial_list(H, ML), write(H), nl, !,
-        pack_monomial_digits(ML, Packed), write(Packed), nl, !,
-        build_non_standard_form(Packed, NSM), write(NSM), nl, nl, !,
+        as_non_standard_monomial(H, NSM), write(NSM), nl, nl, !,
         test_B(T).
 % == == %
 
