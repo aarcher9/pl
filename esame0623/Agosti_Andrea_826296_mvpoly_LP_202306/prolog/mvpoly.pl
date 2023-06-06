@@ -183,5 +183,6 @@ test_B([H | T]) :-
 % == == %
 
 
-% == [ x ] == %
+% == [ Riordinare in forma standard ] == %
+
 % == == %
