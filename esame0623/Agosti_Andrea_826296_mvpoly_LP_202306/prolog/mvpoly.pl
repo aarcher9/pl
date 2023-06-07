@@ -123,25 +123,34 @@ pda(State, [], S, NS, T, T) :-
         push(T, S, NS).
 
 
+% 
+raw_parser(AtomicExpr, MonomialAtomicList) :-
+        atom_chars(AtomicExpr, L),
+        initial(S),
+        pda(S, L, [], MonomialAtomicList, [], _).
+
 % Predicato high-level per il parsing dei monomi. Rappresenta il monomio in una struttura affine a quanto voluto dal testo dell'esame. La lista risultate rappresenta una versione specchiata dell'input per via della facile gestione della lista come uno stack usando la notazione testa-coda, mettendo quindi l'input meno recente (quello più a destra nell'input) a sinistra.
 % L'input è una atomo (una sequenza di caratteri). Se l'input passato è di tipo compound viene convertito in atomo per poterci lavorare.
-as_monomial_list(Expression, MonomialList) :-
-        ((term_to_atom(Expression, AtomExpr), atom_chars(AtomExpr, L)) ; atom_chars(Expression, L)),
-        initial(S),
-        pda(S, L, [], MonomialList, [], _).
+
+as_monomial_atomic_list(Expression, MonomialAtomicList) :-
+        term_to_atom(Expression, AtomicExpr),
+        raw_parser(AtomicExpr, MonomialAtomicList).
+
+as_monomial_atomic_list(AtomicExpr, MonomialAtomicList) :-
+        raw_parser(AtomicExpr, MonomialAtomicList).
 
 % == == %
 
 
 % == [ BUILDER ] == %
 % Ora i monomi parsati hanno tutti una struttura standard comune (la stessa "interfaccia"), quella costruita dal parser PDA.
-% Una volta resa come voluto implementeremo le operazioni per manipolare quella (successivamente).
+% Una volta resa come voluto implementeremo le operazioni per manipolare quella (successivamente). Ha anche il compito di rendere numeri gli atomi che rappresentano numeri.
 
 
-% Fa il reverse di una lista nestata al massimo di un livello di profondità, una lista con la struttura definita dal parser (MonomialList).
-mirror_monomial_list([], []).
-mirror_monomial_list([H | T], Mirrored) :- 
-        mirror_monomial_list(T, M),
+% Fa il reverse di una lista nestata al massimo di un livello di profondità, una lista con la struttura definita dal parser (MonomialAtomicList).
+mirror_monomial_atomic_list([], []).
+mirror_monomial_atomic_list([H | T], Mirrored) :- 
+        mirror_monomial_atomic_list(T, M),
         reverse(H, Temp),
         append(M, [Temp], Mirrored).
 
@@ -157,11 +166,11 @@ pack_vars([[VarSymbol | ExpDigits] | Others], [[VarSymbol, Exp] | O]) :-
         atom_number(AtomsExp, Exp),
         pack_vars(Others, O).
 
-pack_monomial(ML, [Coeff | Vars]) :-
-        mirror_monomial_list(ML, [NH | NT]),
+pack_monomial_atomic_list(ML, [Coeff | Vars]) :-
+        mirror_monomial_atomic_list(ML, [NH | NT]),
         pack_coefficient(NH, [Coeff | _ ]),
         pack_vars(NT, MirroredVars),
-        mirror_monomial_list(MirroredVars, V),
+        mirror_monomial_atomic_list(MirroredVars, V),
         reverse(V, Vars).
 
 
@@ -174,8 +183,8 @@ build_vars([[Power, VarSymbol] | T], D, ND, [v(Power, VarSymbol) | O]) :-
 
 % Costruiamo una struttura dati simile a quella voluta. L'input è una lista contenente liste che rappresentano  con in numeri "impacchettati" piuttosto che come sequenze di caratteri.
 as_non_standard_monomial(Expression, m(Coeff, TotalDegree, VarsPowers)) :-
-        as_monomial_list(Expression, MonomialList),
-        pack_monomial(MonomialList, [Coeff | Vars]),
+        as_monomial_atomic_list(Expression, MonomialAtomicList),
+        pack_monomial_atomic_list(MonomialAtomicList, [Coeff | Vars]),
         build_vars(Vars, 0, TotalDegree, VarsPowers).
 
 % == == %
@@ -189,16 +198,10 @@ sort_vars([v(P, VS) | Tail], [v(Power, VarSymbol) | T]) :-
         sort(2, @=<, [v(P2_, VS2_) | T2_], [v(Power, VarSymbol) | T]).
 
 
-% TODO
 % Minimizzazione del monomio (i termini simili vengono condensati). Il monomio viene preventivamente ordinato per consentire una facilità di approccio al problema.
 collapse_vars([v(P1_, VarSymbol) | [v(P2_, VarSymbol) | T]], [v(P, VarSymbol) | T]) :-
-        P is P1_ + P2_.
-
-
-% collapse_monomial(Expression, m(C, Deg, [v(Power, VarSymbol) | T])) :-
-%         as_non_standard_monomial(Expression),
-%         sort_vars(Expression, m(C, Deg, [v(P1, VS1) | [v(NP1, NVS1) | T]])),
-%         collapse_vars().
+        P is P1_ + P2_,
+        collapse_vars([v(P2_, VarSymbol) | T], [v(P, VarSymbol) | T]).
 
 % == == %
 
@@ -216,13 +219,13 @@ test_parser() :-
 
 test_A([]).
 test_A([H | T]) :-
-        as_monomial_list(H, A), write(A), nl, nl, !,
+        as_monomial_atomic_list(H, A), write(A), nl, nl, !,
         test_A(T).
 
 
 % Test per il builder.
 test_builder() :-
-        test_B(['-3 * x * y^35 * z', '-36 * k^68', '-3', '0']).
+        test_B(['-3 * x * a * y^35 * z', '-36 * k^68', '-3', '0']).
 
 test_B([]).
 test_B([H | T]) :-
