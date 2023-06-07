@@ -72,13 +72,27 @@ delta('digits', X, 'digits', S, S, [H | Tail], NT) :-
         is_digit(H),
         push(X, [H | Tail], NT).
 
-delta('digits', V, 'vars', S, NS, [H | Tail], ['1', V]) :- 
-        is_var_symbol(V), 
+% ---
+delta('digits', ' ', 'mult', S, NS, [H | Tail], []) :-
         is_digit(H),
         push([H | Tail], S, NS).
 
-delta('vars', V, 'vars', S, NS, [H | Tail], ['1', V]) :- 
-        is_var_symbol(V),
+% delta('mult', '*', 'mult', S, NS, T, T).
+% delta('mult', ' ', 'vars', S, NS, T, T).
+
+% delta('digits', X, 'vars', S, NS, [H | Tail], ['1', X]) :- 
+%         is_var_symbol(X), 
+%         is_digit(H),
+%         push([H | Tail], S, NS).
+
+% ----
+delta('mult', '*', 'mult', S, S, T, T).
+delta('mult', ' ', 'vars', S, S, T, T).
+
+delta('vars', X, 'vars', S, S, [], ['1', X]) :- 
+        is_var_symbol(X).
+
+delta('vars', ' ', 'mult', S, NS, [H | Tail], []) :-
         is_digit(H),
         push([H | Tail], S, NS).
 
@@ -172,6 +186,7 @@ sort_vars([v(P, VS) | Tail], [v(Power, VarSymbol) | T]) :-
         sort(2, @=<, [v(P2_, VS2_) | T2_], [v(Power, VarSymbol) | T]).
 
 
+% TODO
 % Minimizzazione del monomio (i termini simili vengono condensati). Il monomio viene preventivamente ordinato per consentire una facilità di approccio al problema.
 collapse_vars([v(P1_, VarSymbol) | [v(P2_, VarSymbol) | T]], [v(P, VarSymbol) | T]) :-
         P is P1_ + P2_.
@@ -194,12 +209,13 @@ collapse_vars([v(P1_, VarSymbol) | [v(P2_, VarSymbol) | T]], [v(P, VarSymbol) | 
 % == [ TEST ] == %
 % Test per il parser.
 test_parser() :-
-        test_A(['3x', '-3x', '-x', '+x', 'x', '+3', '-3', '3', '-36k^68', '-3xy^35z']).
+        test_A(['3 * x', '-3 * x', '-x', '+x', 'x', '+3', '-3', '3', '-36 * k^68', '-3 * x * y^35 * z', '0', '-0']).
 
 test_A([]).
 test_A([H | T]) :-
         as_monomial_list(H, A), write(A), nl, nl, !,
         test_A(T).
+
 
 % Test per il builder.
 test_builder() :-
