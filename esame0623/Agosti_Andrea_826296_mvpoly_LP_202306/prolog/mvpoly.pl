@@ -12,7 +12,7 @@
 
 % == [ Utilities ] == %
 % Shortcut per ricaricare il file con la console SWI aperta.
-rel :- notrace, nodebug, reconsult('mvpoly.pl').
+r :- notrace, nodebug, reconsult('mvpoly.pl').
 
 % Procedura (predicato) di append leggermente modificata per catchare autonomamente le eccezioni. Appende ad una lista una seconda lista o una stringa, o anche atomo.
 push(Element, List, New) :- append([Element], List, New).
@@ -199,14 +199,15 @@ sort_vars([v(P, VS) | Tail], [v(Power, VarSymbol) | T]) :-
 
 
 % Minimizzazione del monomio (i termini simili vengono condensati). Il monomio viene preventivamente ordinato per consentire una facilità di approccio al problema.
-collapse_vars([v(P1_, VarSymbol) | [v(P2_, VarSymbol) | T]], [v(P, VarSymbol) | T]) :-
+collapse_vars([H | T], [H | T]).
+collapse_vars([v(P1_, VarSymbol) | [v(P2_, VarSymbol) | T]], [v(P, VarSymbol) | Out]) :-
         P is P1_ + P2_,
-        collapse_vars([v(P2_, VarSymbol) | T], [v(P, VarSymbol) | T]).
+        collapse_vars([v(P, VarSymbol) | T], Out).
 
-as_monomial(Expression, m(Coeff, TotalDegree, SortedVP)) :-
+as_monomial(Expression, m(Coeff, TotalDegree, CollapsedVP)) :-
         as_non_standard_monomial(Expression, m(Coeff, TotalDegree, VarsPowers)),
-        sort_vars(VarsPowers, SortedVP).
-        % collapse_vars(SortedVP, CollapsedVP).
+        sort_vars(VarsPowers, SortedVP),
+        collapse_vars(SortedVP, CollapsedVP).
 % == == %
 
 
@@ -241,7 +242,7 @@ test_B([H | T]) :-
 
 % Test per il sorter/collapser.
 test_collapser() :-
-        test_B(['-3 * x * x^3 * y * a^2 * a']).
+        test_C(['-3 * x * x^3 * y * a^2 * a']).
 
 test_C([]).
 test_C([H | T]) :-
