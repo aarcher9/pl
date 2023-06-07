@@ -72,23 +72,20 @@ delta('digits', X, 'digits', S, S, [H | Tail], NT) :-
         is_digit(H),
         push(X, [H | Tail], NT).
 
-
-% Consente di accettare la sintassi se tra l'operatore * NON ci sono spazi.
-delta('digits', '*', 'mult', S, NS, [H | Tail], []) :-
-        is_digit(H),
-        push([H | Tail], S, NS).
-
-delta('mult', X, 'vars', S, S, [], ['1', X]) :- 
-        is_var_symbol(X).
-
-
-% Consente di accettare la sintassi se tra l'operatore * ci sono spazi.
-delta('mult', '*', 'mult', S, S, T, T).
-delta('mult', ' ', 'vars', S, S, T, T).
-
 delta('digits', ' ', 'mult', S, NS, [H | Tail], []) :-
         is_digit(H),
         push([H | Tail], S, NS).
+
+% 
+delta('digits', '*', 'mult', S, NS, [H | Tail], []) :-
+        is_digit(H),
+        push([H | Tail], S, NS).
+%
+delta('mult', X, 'vars', S, S, [], ['1', X]) :- 
+        is_var_symbol(X).
+
+delta('mult', '*', 'mult', S, S, T, T).
+delta('mult', ' ', 'vars', S, S, T, T).
 
 delta('vars', ' ', 'mult', S, NS, [H | Tail], []) :-
         is_digit(H),
@@ -97,7 +94,10 @@ delta('vars', ' ', 'mult', S, NS, [H | Tail], []) :-
 delta('vars', X, 'vars', S, S, [], ['1', X]) :- 
         is_var_symbol(X).
 
-
+%
+delta('vars', '*', 'vars', S, NS, [H | Tail], []) :- 
+        is_digit(H),
+        push([H | Tail], S, NS).
 
 delta('vars', '^', 'exp', S, S, ['1' | Tail], ['1' | Tail]).
 
@@ -203,6 +203,10 @@ collapse_vars([v(P1_, VarSymbol) | [v(P2_, VarSymbol) | T]], [v(P, VarSymbol) | 
         P is P1_ + P2_,
         collapse_vars([v(P2_, VarSymbol) | T], [v(P, VarSymbol) | T]).
 
+as_monomial(Expression, m(Coeff, TotalDegree, SortedVP)) :-
+        as_non_standard_monomial(Expression, m(Coeff, TotalDegree, VarsPowers)),
+        sort_vars(VarsPowers, SortedVP).
+        % collapse_vars(SortedVP, CollapsedVP).
 % == == %
 
 
@@ -213,13 +217,15 @@ collapse_vars([v(P1_, VarSymbol) | [v(P2_, VarSymbol) | T]], [v(P, VarSymbol) | 
 
 
 % == [ TEST ] == %
+% Dal momento che alcuni predicati, se non tutti si basano sul backtracking usare il cut ! nei test potrebbe farli fallire anche quando non dovrebbero. Prestare attenzione!
+
 % Test per il parser.
 test_parser() :-
         test_A(['3 * x', '-3 * x', '-x', '+x', 'x', '+3', '-3', '3', '-36 * k^68', '-3 * x * y^35 * z', '0', '-0']).
 
 test_A([]).
 test_A([H | T]) :-
-        as_monomial_atomic_list(H, A), write(A), nl, nl, !,
+        as_monomial_atomic_list(H, A), write(A), nl, nl,
         test_A(T).
 
 
@@ -229,5 +235,15 @@ test_builder() :-
 
 test_B([]).
 test_B([H | T]) :-
-        as_non_standard_monomial(H, NSM), write(NSM), nl, nl, !,
+        as_non_standard_monomial(H, NSM), write(NSM), nl, nl,
         test_B(T).
+
+
+% Test per il sorter/collapser.
+test_collapser() :-
+        test_B(['-3 * x * x^3 * y * a^2 * a']).
+
+test_C([]).
+test_C([H | T]) :-
+        as_monomial(H, m(_, _, CollapsedVP)), write(CollapsedVP), nl, nl,
+        test_C(T).
