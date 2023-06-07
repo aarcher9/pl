@@ -72,29 +72,32 @@ delta('digits', X, 'digits', S, S, [H | Tail], NT) :-
         is_digit(H),
         push(X, [H | Tail], NT).
 
-% ---
+
+% Consente di accettare la sintassi se tra l'operatore * NON ci sono spazi.
+delta('digits', '*', 'mult', S, NS, [H | Tail], []) :-
+        is_digit(H),
+        push([H | Tail], S, NS).
+
+delta('mult', X, 'vars', S, S, [], ['1', X]) :- 
+        is_var_symbol(X).
+
+
+% Consente di accettare la sintassi se tra l'operatore * ci sono spazi.
+delta('mult', '*', 'mult', S, S, T, T).
+delta('mult', ' ', 'vars', S, S, T, T).
+
 delta('digits', ' ', 'mult', S, NS, [H | Tail], []) :-
         is_digit(H),
         push([H | Tail], S, NS).
 
-% delta('mult', '*', 'mult', S, NS, T, T).
-% delta('mult', ' ', 'vars', S, NS, T, T).
-
-% delta('digits', X, 'vars', S, NS, [H | Tail], ['1', X]) :- 
-%         is_var_symbol(X), 
-%         is_digit(H),
-%         push([H | Tail], S, NS).
-
-% ----
-delta('mult', '*', 'mult', S, S, T, T).
-delta('mult', ' ', 'vars', S, S, T, T).
+delta('vars', ' ', 'mult', S, NS, [H | Tail], []) :-
+        is_digit(H),
+        push([H | Tail], S, NS).
 
 delta('vars', X, 'vars', S, S, [], ['1', X]) :- 
         is_var_symbol(X).
 
-delta('vars', ' ', 'mult', S, NS, [H | Tail], []) :-
-        is_digit(H),
-        push([H | Tail], S, NS).
+
 
 delta('vars', '^', 'exp', S, S, ['1' | Tail], ['1' | Tail]).
 
@@ -121,9 +124,9 @@ pda(State, [], S, NS, T, T) :-
 
 
 % Predicato high-level per il parsing dei monomi. Rappresenta il monomio in una struttura affine a quanto voluto dal testo dell'esame. La lista risultate rappresenta una versione specchiata dell'input per via della facile gestione della lista come uno stack usando la notazione testa-coda, mettendo quindi l'input meno recente (quello più a destra nell'input) a sinistra.
-% L'input è una atomo (una sequenza di caratteri).
+% L'input è una atomo (una sequenza di caratteri). Se l'input passato è di tipo compound viene convertito in atomo per poterci lavorare.
 as_monomial_list(Expression, MonomialList) :-
-        atom_chars(Expression, L),
+        ((term_to_atom(Expression, AtomExpr), atom_chars(AtomExpr, L)) ; atom_chars(Expression, L)),
         initial(S),
         pda(S, L, [], MonomialList, [], _).
 
@@ -219,7 +222,7 @@ test_A([H | T]) :-
 
 % Test per il builder.
 test_builder() :-
-        test_B(['-3xy^35z', '-36k^68', '-3', '0']).
+        test_B(['-3 * x * y^35 * z', '-36 * k^68', '-3', '0']).
 
 test_B([]).
 test_B([H | T]) :-
