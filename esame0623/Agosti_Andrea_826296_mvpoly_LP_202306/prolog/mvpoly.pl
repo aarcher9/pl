@@ -26,7 +26,7 @@ clean_push(Item, List, Out) :- push(Item, List, Out).
 
 
 
-% == [ PARSER ] == %
+% == [ PARSER MONOMI ] == %
 % Le cifre arrivano una per volta, verranno poi assemblate.
 is_digit(Char) :- 
         atom_codes(Char, [H | _]), 
@@ -39,7 +39,7 @@ is_var_symbol(Char) :-
         H >= 97, H =< 122.
 
 
-% Funzionde delta del PDA che riconosce un monomio.
+% Funzione delta del PDA che riconosce un monomio.
 initial('0').
 final('digits').
 final('vars').
@@ -124,7 +124,7 @@ pda(State, [], S, NS, T, T) :-
 
 
 % 
-raw_parser(AtomicExpr, MonomialAtomicList) :-
+raw_monomial_parser(AtomicExpr, MonomialAtomicList) :-
         atom_chars(AtomicExpr, L),
         initial(S),
         pda(S, L, [], MonomialAtomicList, [], _).
@@ -134,10 +134,10 @@ raw_parser(AtomicExpr, MonomialAtomicList) :-
 
 as_monomial_atomic_list(Expression, MonomialAtomicList) :-
         term_to_atom(Expression, AtomicExpr),
-        raw_parser(AtomicExpr, MonomialAtomicList).
+        raw_monomial_parser(AtomicExpr, MonomialAtomicList).
 
 as_monomial_atomic_list(AtomicExpr, MonomialAtomicList) :-
-        raw_parser(AtomicExpr, MonomialAtomicList).
+        raw_monomial_parser(AtomicExpr, MonomialAtomicList).
 
 % == == %
 
@@ -219,6 +219,11 @@ as_monomial(Expression, m(Coeff, TotalDegree, CollapsedVP)) :-
 
 
 
+% == [ PARSER POLINOMI ] == %
+% Abbiamo già la funzione di parsing dei monomi che svolge la quasi totalità del lavoro. Ci basta implementare un sistema di suddivisione della stringhe in sottostringhe che potenzialmente rappresentano un polinomio, una specie di pre-parser.
+
+
+% == == %
 
 
 
@@ -227,8 +232,8 @@ as_monomial(Expression, m(Coeff, TotalDegree, CollapsedVP)) :-
 % == [ TEST ] == %
 % Dal momento che alcuni predicati, se non tutti si basano sul backtracking usare il cut ! nei test potrebbe farli fallire anche quando non dovrebbero. Prestare attenzione!
 
-% Test per il parser.
-test_parser() :-
+% Test per il parser dei monomi.
+test_monomial_parser() :-
         test_A(['3 * x', '-3 * x', '-x', '+x', 'x', '+3', '-3', '3', '-36 * k^68', '-3 * x * y^35 * z', '0', '-0']).
 
 test_A([]).
@@ -249,9 +254,9 @@ test_B([H | T]) :-
 
 % Test per il sorter/collapser.
 test_collapser() :-
-        test_C(['-3 * x * x^3 * y * a^2 * a']).
+        test_C(['-3 * x * x^3 * y * a^2 * a * y^8']).
 
 test_C([]).
 test_C([H | T]) :-
-        as_monomial(H, m(_, _, CollapsedVP)), write(CollapsedVP), nl, nl,
+        as_monomial(H, Monomial), write(Monomial), nl, nl,
         test_C(T).
