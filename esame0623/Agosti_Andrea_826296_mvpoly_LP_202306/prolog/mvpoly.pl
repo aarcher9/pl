@@ -124,6 +124,7 @@ as_monomial_atomic_list(Expression, MonomialAtomicList) :-
         term_to_atom(Expression, AtomicExpr),
         raw_monomial_parser(AtomicExpr, MonomialAtomicList).
 
+% In caso volessi fornire un atomo come input...
 as_monomial_atomic_list(AtomicExpr, MonomialAtomicList) :-
         raw_monomial_parser(AtomicExpr, MonomialAtomicList).
 
