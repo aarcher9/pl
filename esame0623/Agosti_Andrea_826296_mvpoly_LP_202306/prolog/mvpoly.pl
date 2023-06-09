@@ -26,7 +26,7 @@ clean_push(Item, List, Out) :- push(Item, List, Out).
 
 
 
-% == [ PARSER MONOMI ] == %
+% == [ PARSER ] == %
 % Le cifre arrivano una per volta, verranno poi assemblate.
 is_digit(Char) :- 
         atom_codes(Char, [H | _]), 
@@ -72,24 +72,12 @@ delta('digits', X, 'digits', S, S, [H | Tail], NT) :-
         is_digit(H),
         push(X, [H | Tail], NT).
 
-delta('digits', ' ', 'mult', S, NS, [H | Tail], []) :-
+
+% % Permette l'utilizzo di * senza spazi. I tipi 'compound che vengono passati come espressione non contano gli spazi.'
+delta('digits', '*', 'vars', S, NS, [H | Tail], []) :-
         is_digit(H),
         push([H | Tail], S, NS).
 
-% 
-delta('digits', '*', 'mult', S, NS, [H | Tail], []) :-
-        is_digit(H),
-        push([H | Tail], S, NS).
-%
-delta('mult', X, 'vars', S, S, [], ['1', X]) :- 
-        is_var_symbol(X).
-
-delta('mult', '*', 'mult', S, S, T, T).
-delta('mult', ' ', 'vars', S, S, T, T).
-
-delta('vars', ' ', 'mult', S, NS, [H | Tail], []) :-
-        is_digit(H),
-        push([H | Tail], S, NS).
 
 delta('vars', X, 'vars', S, S, [], ['1', X]) :- 
         is_var_symbol(X).
@@ -130,7 +118,7 @@ raw_monomial_parser(AtomicExpr, MonomialAtomicList) :-
         pda(S, L, [], MonomialAtomicList, [], _).
 
 % Predicato high-level per il parsing dei monomi. Rappresenta il monomio in una struttura affine a quanto voluto dal testo dell'esame. La lista risultate rappresenta una versione specchiata dell'input per via della facile gestione della lista come uno stack usando la notazione testa-coda, mettendo quindi l'input meno recente (quello più a destra nell'input) a sinistra.
-% L'input è una atomo (una sequenza di caratteri). Se l'input passato è di tipo compound viene convertito in atomo per poterci lavorare.
+% L'input è un compound in cui gli spazi non contano.
 
 as_monomial_atomic_list(Expression, MonomialAtomicList) :-
         term_to_atom(Expression, AtomicExpr),
@@ -220,7 +208,6 @@ as_monomial(Expression, m(Coeff, TotalDegree, CollapsedVP)) :-
 
 
 % == [ PARSER POLINOMI ] == %
-% Abbiamo già la funzione di parsing dei monomi che svolge la quasi totalità del lavoro. Ci basta implementare un sistema di suddivisione della stringhe in sottostringhe che potenzialmente rappresentano un polinomio, una specie di pre-parser.
 
 
 % == == %
@@ -232,9 +219,9 @@ as_monomial(Expression, m(Coeff, TotalDegree, CollapsedVP)) :-
 % == [ TEST ] == %
 % Dal momento che alcuni predicati, se non tutti si basano sul backtracking usare il cut ! nei test potrebbe farli fallire anche quando non dovrebbero. Prestare attenzione!
 
-% Test per il parser dei monomi.
-test_monomial_parser() :-
-        test_A(['3 * x', '-3 * x', '-x', '+x', 'x', '+3', '-3', '3', '-36 * k^68', '-3 * x * y^35 * z', '0', '-0']).
+% Test per il parser.
+test_parser() :-
+        test_A([3*x, -3*x, -x, +x, x, +3, -3, 3, -36*k^68, -3*x*y^35*z, 0, -0]).
 
 test_A([]).
 test_A([H | T]) :-
@@ -244,7 +231,7 @@ test_A([H | T]) :-
 
 % Test per il builder.
 test_builder() :-
-        test_B(['-3 * x * a * y^35 * z', '-36 * k^68', '-3', '0']).
+        test_B([-3*x*a*y^35*z, -36*k^68, -3, 0]).
 
 test_B([]).
 test_B([H | T]) :-
@@ -254,7 +241,7 @@ test_B([H | T]) :-
 
 % Test per il sorter/collapser.
 test_collapser() :-
-        test_C(['-3 * x * x^3 * y * a^2 * a * y^8']).
+        test_C([-3*x*x^3*y*a^2*a*y^8]).
 
 test_C([]).
 test_C([H | T]) :-
