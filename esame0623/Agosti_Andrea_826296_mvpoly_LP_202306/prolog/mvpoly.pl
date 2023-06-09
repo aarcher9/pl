@@ -198,12 +198,19 @@ sort_vars([v(P, VS) | Tail], [v(Power, VarSymbol) | T]) :-
         sort(2, @=<, [v(P2_, VS2_) | T2_], [v(Power, VarSymbol) | T]).
 
 
-% Minimizzazione del monomio (i termini simili vengono condensati). Il monomio viene preventivamente ordinato per consentire una facilità di approccio al problema.
-collapse_vars([H | T], [H | T]).
-collapse_vars([v(P1_, VarSymbol) | [v(P2_, VarSymbol) | T]], [v(P, VarSymbol) | Out]) :-
-        P is P1_ + P2_,
-        collapse_vars([v(P, VarSymbol) | T], Out).
+% Minimizzazione del monomio (i termini simili vengono condensati). Il monomio viene preventivamente ordinato per consentire una facilità di approccio al problema. La logica è quella di applicare la ricorsivitài in modo da arrivare al fondo lista e risalire compattando i termini simili. Si può assumere che sia corretto solo se i termini sono stati ordinati.
+collapse_vars([], []).
+collapse_vars([H | []], [H | []]).
 
+collapse_vars([v(A, Var) | T], [v(P, Var) | Tail]) :-
+        collapse_vars(T, [v(B, Var) | Tail]),
+        P is A + B.
+
+collapse_vars([v(A, X) | T], [v(A, X) | [v(B, Y) | Tail]]) :-
+        collapse_vars(T, [v(B, Y) | Tail]).
+
+
+% Predicato high level per la strutturazione.
 as_monomial(Expression, m(Coeff, TotalDegree, CollapsedVP)) :-
         as_non_standard_monomial(Expression, m(Coeff, TotalDegree, VarsPowers)),
         sort_vars(VarsPowers, SortedVP),
