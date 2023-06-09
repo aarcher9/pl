@@ -52,20 +52,22 @@ delta('0', '-', 'sign', [], [], [], ['-']).
 delta('0', X, 'digits', [], [], [], [X, '+']) :- 
         is_digit(X).
 
-% Coefficiente 1 implicito.
 delta('0', X, 'vars', [], [['1', '+']], [], [X]) :- 
         is_var_symbol(X).
 
-% Coefficiente -1 implicito.
 delta('sign', X, 'vars', [], [['1', '-']], ['-'], ['1', X]) :- 
         is_var_symbol(X).
 
 delta('sign', X, 'vars', [], [['1', '+']], ['+'], ['1', X]) :- 
         is_var_symbol(X).
 
-delta('sign', X, 'digits', [], [], T, NT) :- 
-        is_digit(X),
-        push(X, T, NT).
+% delta('sign', X, 'digits', S, S, ['-'], ['-', X]) :- 
+%         is_digit(X).
+% delta('sign', X, 'digits', S, S, ['+'], ['+', X]) :- 
+%         is_digit(X).
+delta('sign', X, 'digits', [], [], T, [X | T]) :- 
+        is_digit(X).
+        % push(X, T, NT).
 
 delta('digits', X, 'digits', S, S, [H | Tail], NT) :- 
         is_digit(X),
@@ -82,7 +84,6 @@ delta('digits', '*', 'vars', S, NS, [H | Tail], []) :-
 delta('vars', X, 'vars', S, S, [], ['1', X]) :- 
         is_var_symbol(X).
 
-%
 delta('vars', '*', 'vars', S, NS, [H | Tail], []) :- 
         is_digit(H),
         push([H | Tail], S, NS).
