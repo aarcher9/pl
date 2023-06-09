@@ -73,7 +73,7 @@ delta('digits', X, 'digits', S, S, [H | Tail], NT) :-
         push(X, [H | Tail], NT).
 
 
-% % Permette l'utilizzo di * senza spazi. I tipi 'compound che vengono passati come espressione non contano gli spazi.'
+% Reminder: Permette l'utilizzo di * senza spazi. I tipi 'compound che vengono passati come espressione non contano gli spazi.'
 delta('digits', '*', 'vars', S, NS, [H | Tail], []) :-
         is_digit(H),
         push([H | Tail], S, NS).
