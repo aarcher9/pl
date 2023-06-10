@@ -67,31 +67,26 @@ delta('sign', X, 'digits', [], [], ['-'], [X, '-']) :-
 delta('sign', X, 'digits', [], [], ['+'], [X, '+']) :- 
         is_digit(X).
 
-delta('digits', X, 'digits', S, S, [H | Tail], NT) :- 
+delta('digits', X, 'digits', S, S, [H | Tail], [X, H | Tail]) :- 
         is_digit(X),
-        is_digit(H),
-        push(X, [H | Tail], NT).
+        is_digit(H).
 
-delta('digits', '*', 'vars', S, NS, [H | Tail], []) :-
-        is_digit(H),
-        push([H | Tail], S, NS).
+delta('digits', '*', 'vars', S, [[H | Tail] | S], [H | Tail], []) :-
+        is_digit(H).
 
 delta('vars', X, 'vars', S, S, [], ['1', X]) :- 
         is_var_symbol(X).
 
-delta('vars', '*', 'vars', S, NS, [H | Tail], []) :- 
-        is_digit(H),
-        push([H | Tail], S, NS).
+delta('vars', '*', 'vars', S, [[H | Tail] | S], [H | Tail], []) :- 
+        is_digit(H).
 
 delta('vars', '^', 'exp', S, S, ['1' | Tail], ['1' | Tail]).
 
-delta('exp', X, 'digits', S, S, ['1' | Tail], NT) :-
-        is_digit(X),
-        push(X, Tail, NT).
+delta('exp', X, 'digits', S, S, ['1' | Tail], [X | Tail]) :-
+        is_digit(X).
 
-delta('exp', X, 'digits', S, S, [H | Tail], NT) :-
-        is_digit(X),
-        push(X, [H | Tail], NT).
+delta('exp', X, 'digits', S, S, [H | Tail], [X, H | Tail]) :-
+        is_digit(X).
 
 
 
