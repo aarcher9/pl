@@ -39,12 +39,12 @@ is_var_symbol(Char) :-
         H >= 97, H =< 122.
 
 
-% Funzione delta del PDA che riconosce un monomio.
+% Funzione delta del PDA.
 initial('0').
 final('digits').
 final('vars').
 
-% La logica è quella di creare una funzione delta che oltre a comportarsi come una delta 'ordinaria' per il PDA opera anche la traduzione in "oggetto" del monomio. L'automata ha infatti due stack (4 passati come argomento per via della struttura di prolog che non prevede modifiche dirette di oggetti come le liste), uno per conservare i token (le parti del monomio inscindibili) e l'altro per "scaricarli" e conservare l'oggetto finale.
+% La logica è quella di creare una funzione delta che oltre a comportarsi come una delta 'ordinaria' per il PDA opera anche la traduzione in "oggetto" del monomio. L'automa ha infatti due stack (4 passati come argomento per via della struttura di prolog che non prevede modifiche dirette di oggetti come le liste), uno per conservare i token (le parti del monomio inscindibili) e l'altro per "scaricarli" e conservare l'oggetto finale.
 
 delta('0', '-', 'sign', [], [], [], ['-']).
 delta('0', '+', 'sign', [], [], [], ['+']).
@@ -55,7 +55,7 @@ delta('0', X, 'digits', [], [], [], [X, '+']) :-
 delta('0', X, 'vars', [], [['1', '+']], [], ['1', X]) :- 
         is_var_symbol(X).
 
-delta('sign', X, 'vars', _, [['1', '-']], ['-'], ['1', X]) :- 
+delta('sign', X, 'vars', S, [['1', '-'] | S], ['-'], ['1', X]) :- 
         is_var_symbol(X).
 
 delta('sign', X, 'vars', S, [['1', '+'] | S], ['+'], ['1', X]) :- 
@@ -75,13 +75,15 @@ delta('digits', '*', 'vars', S, [[H | Tail] | S], [H | Tail], []) :-
         is_digit(H).
 
 % ---
-% delta('digits', X, 'digits', S, S, ['+'], [X, '+']) :- 
-%         is_digit(X).
-
+% I predicati seguenti intercettano qualunque segno che non sia quello di inizio polinomio.
 delta('vars', '+', 'sign', S, [[H | Tail] | S], [H | Tail], ['+']) :-
+        is_digit(H).
+delta('vars', '-', 'sign', S, [[H | Tail] | S], [H | Tail], ['-']) :-
         is_digit(H).
 
 delta('digits', '+', 'sign', S, [[H | Tail] | S], [H | Tail], ['+']) :-
+        is_digit(H).
+delta('digits', '-', 'sign', S, [[H | Tail] | S], [H | Tail], ['-']) :-
         is_digit(H).
 % ---
 
@@ -101,7 +103,7 @@ delta('exp', X, 'digits', S, S, [H | Tail], [X, H | Tail]) :-
 
 
 
-% Parser dei monomi.
+% Parser.
 % Caso generico.
 pda(State, [X | Postfix], S, OS, T, OT) :-
         delta(State, X, NewState, S, NS, T, NT),
@@ -113,22 +115,17 @@ pda(State, [], S, NS, T, T) :-
         push(T, S, NS).
 
 
-% 
-raw_monomial_parser(AtomicExpr, MonomialAtomicList) :-
+% Starta l'automa.
+parser(AtomicExpr, Result) :-
         atom_chars(AtomicExpr, L),
         initial(S),
-        pda(S, L, [], MonomialAtomicList, [], _).
+        pda(S, L, [], Result, [], _).
 
-% Predicato high-level per il parsing dei monomi. Rappresenta il monomio in una struttura affine a quanto voluto dal testo dell'esame. La lista risultate rappresenta una versione specchiata dell'input per via della facile gestione della lista come uno stack usando la notazione testa-coda, mettendo quindi l'input meno recente (quello più a destra nell'input) a sinistra.
+% Predicato high-level per il parsing. Rappresenta il monomio in una struttura affine a quanto voluto dal testo dell'esame. La lista risultate rappresenta una versione specchiata dell'input per via della facile gestione della lista come uno stack usando la notazione testa-coda, mettendo quindi l'input meno recente (quello più a destra nell'input) a sinistra.
 % L'input è un compound in cui gli spazi non contano.
-
-as_monomial_atomic_list(Expression, MonomialAtomicList) :-
+polynomial_to_tokens(Expression, Result) :-
         term_to_atom(Expression, AtomicExpr),
-        raw_monomial_parser(AtomicExpr, MonomialAtomicList).
-
-% In caso volessi fornire un atomo come input...
-% as_monomial_atomic_list(AtomicExpr, MonomialAtomicList) :-
-%         raw_monomial_parser(AtomicExpr, MonomialAtomicList).
+        parser(AtomicExpr, Result).
 
 % == == %
 
@@ -174,7 +171,7 @@ build_vars([[Power, VarSymbol] | T], D, ND, [v(Power, VarSymbol) | O]) :-
 
 % Costruiamo una struttura dati simile a quella voluta. L'input è una lista contenente liste che rappresentano  con in numeri "impacchettati" piuttosto che come sequenze di caratteri.
 as_non_standard_monomial(Expression, m(Coeff, TotalDegree, VarsPowers)) :-
-        as_monomial_atomic_list(Expression, MonomialAtomicList),
+        polynomial_to_tokens(Expression, MonomialAtomicList),
         pack_monomial_atomic_list(MonomialAtomicList, [Coeff | Vars]),
         build_vars(Vars, 0, TotalDegree, VarsPowers).
 
@@ -232,7 +229,7 @@ test_parser() :-
 
 test_A([]).
 test_A([H | T]) :-
-        as_monomial_atomic_list(H, A),
+        polynomial_to_tokens(H, A),
         write(H), write('\t\t'), write(A), nl,
         test_A(T).
 
