@@ -75,15 +75,15 @@ delta('digits', '*', 'vars', S, [[H | Tail] | S], [H | Tail], []) :-
         is_digit(H).
 
 % ---
-% I predicati seguenti intercettano qualunque segno che non sia quello di inizio polinomio.
-delta('vars', '+', 'sign', S, [[H | Tail] | S], [H | Tail], ['+']) :-
+% I predicati seguenti intercettano qualunque segno che non sia quello di inizio polinomio. Il carattere % indica l'inizio di un altro monomio.
+delta('vars', '+', 'sign', S, ['%', [H | Tail] | S], [H | Tail], ['+']) :-
         is_digit(H).
-delta('vars', '-', 'sign', S, [[H | Tail] | S], [H | Tail], ['-']) :-
+delta('vars', '-', 'sign', S, ['%', [H | Tail] | S], [H | Tail], ['-']) :-
         is_digit(H).
 
-delta('digits', '+', 'sign', S, [[H | Tail] | S], [H | Tail], ['+']) :-
+delta('digits', '+', 'sign', S, ['%', [H | Tail] | S], [H | Tail], ['+']) :-
         is_digit(H).
-delta('digits', '-', 'sign', S, [[H | Tail] | S], [H | Tail], ['-']) :-
+delta('digits', '-', 'sign', S, ['%', [H | Tail] | S], [H | Tail], ['-']) :-
         is_digit(H).
 % ---
 
@@ -115,14 +115,14 @@ pda(State, [], S, NS, T, T) :-
         push(T, S, NS).
 
 
-% Starta l'automa.
+% Inizia l'automa.
 parser(AtomicExpr, Result) :-
         atom_chars(AtomicExpr, L),
         initial(S),
         pda(S, L, [], Result, [], _).
 
-% Predicato high-level per il parsing. Rappresenta il monomio in una struttura affine a quanto voluto dal testo dell'esame. La lista risultate rappresenta una versione specchiata dell'input per via della facile gestione della lista come uno stack usando la notazione testa-coda, mettendo quindi l'input meno recente (quello più a destra nell'input) a sinistra.
-% L'input è un compound in cui gli spazi non contano.
+% Predicato high-level per il parsing. La lista risultate rappresenta una versione specchiata dell'input per via della facile gestione della lista come uno stack usando la notazione testa-coda, mettendo quindi l'input meno recente (quello più a destra nell'input) a sinistra.
+% L'input è un COMPOUND in cui gli spazi non contano.
 polynomial_to_tokens(Expression, Result) :-
         term_to_atom(Expression, AtomicExpr),
         parser(AtomicExpr, Result).
@@ -130,20 +130,34 @@ polynomial_to_tokens(Expression, Result) :-
 % == == %
 
 
+% == [ GROUPER ] == %
+% L'oggetto risultante dal parsing contiene un insieme di tokens che vanno raggruppati in monomi (il segnale è il marker utilizzato nel PDA).
+group_monomials(Tokens, Result) :-
+        find_monomials(Tokens, Result).
+
+% find_monomials([], [], [], _).
+% find_monomials(['%' | T], S, S, [C | Others]) :-
+%         find_monomials(T, [], C, Others).
+
+% find_monomials([Term | T], S, [Term | S], [C | Others]) :-
+%         find_monomials(T, [Term | S], C, Others).
+
+% == == %
+
+
 % == [ BUILDER ] == %
-% Ora i monomi parsati hanno tutti una struttura standard comune (la stessa "interfaccia"), quella costruita dal parser PDA.
-% Una volta resa come voluto implementeremo le operazioni per manipolare quella (successivamente). Ha anche il compito di rendere numeri gli atomi che rappresentano numeri.
+% Si occupa di raggruppare i token nestati nel risulato del parser e di convertirli in numeri (utilizzando predicati come atom_number/2).
 
 
-% Fa il reverse di una lista nestata al massimo di un livello di profondità, una lista con la struttura definita dal parser (MonomialAtomicList).
-mirror_monomial_atomic_list([], []).
-mirror_monomial_atomic_list([H | T], Mirrored) :- 
-        mirror_monomial_atomic_list(T, M),
+% Fa il reverse di una lista di tokens nestata al massimo di un livello di profondità.
+mirror_tokens([], []).
+mirror_tokens([H | T], Mirrored) :- 
+        mirror_tokens(T, M),
         reverse(H, Temp),
         append(M, [Temp], Mirrored).
 
 
-% Rendo l'oggetto più fedele alla realtà, unendo le cifre e rispettivi segni, che al momento sono spearati, in veri e propri numeri.
+% I seguenti predicati uniscono le cifre e rispettivi segni, che al momento sono spearati in tokens appunto, in numeri.
 pack_coefficient(L, [Coefficient]) :- 
         atomic_list_concat(L, Atom),
         atom_number(Atom, Coefficient).
@@ -154,15 +168,15 @@ pack_vars([[VarSymbol | ExpDigits] | Others], [[VarSymbol, Exp] | O]) :-
         atom_number(AtomsExp, Exp),
         pack_vars(Others, O).
 
-pack_monomial_atomic_list(ML, [Coeff | Vars]) :-
-        mirror_monomial_atomic_list(ML, [NH | NT]),
+pack_tokens(ML, [Coeff | Vars]) :-
+        mirror_tokens(ML, [NH | NT]),
         pack_coefficient(NH, [Coeff | _ ]),
         pack_vars(NT, MirroredVars),
-        mirror_monomial_atomic_list(MirroredVars, V),
+        mirror_tokens(MirroredVars, V),
         reverse(V, Vars).
 
 
-% Data la lista di variabili calcola il grado totale e ritorna la struttura dati voluta (o almeno, simile, poiché non è ancora ordinata).
+% Data la lista calcola il grado totale e ritorna la struttura dati voluta (o almeno, simile, poiché non è ancora ordinata).
 build_vars([], D, D, []).
 build_vars([[Power, VarSymbol] | T], D, ND, [v(Power, VarSymbol) | O]) :-
         C is Power + D,
@@ -172,7 +186,7 @@ build_vars([[Power, VarSymbol] | T], D, ND, [v(Power, VarSymbol) | O]) :-
 % Costruiamo una struttura dati simile a quella voluta. L'input è una lista contenente liste che rappresentano  con in numeri "impacchettati" piuttosto che come sequenze di caratteri.
 as_non_standard_monomial(Expression, m(Coeff, TotalDegree, VarsPowers)) :-
         polynomial_to_tokens(Expression, MonomialAtomicList),
-        pack_monomial_atomic_list(MonomialAtomicList, [Coeff | Vars]),
+        pack_tokens(MonomialAtomicList, [Coeff | Vars]),
         build_vars(Vars, 0, TotalDegree, VarsPowers).
 
 % == == %
