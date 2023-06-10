@@ -46,13 +46,13 @@ final('vars').
 
 % La logica è quella di creare una funzione delta che oltre a comportarsi come una delta 'ordinaria' per il PDA opera anche la traduzione in "oggetto" del monomio. L'automata ha infatti due stack (4 passati come argomento per via della struttura di prolog che non prevede modifiche dirette di oggetti come le liste), uno per conservare i token (le parti del monomio inscindibili) e l'altro per "scaricarli" e conservare l'oggetto finale.
 
-delta('0', '+', 'sign', [], [], [], ['+']).
 delta('0', '-', 'sign', [], [], [], ['-']).
+delta('0', '+', 'sign', [], [], [], ['+']).
 
 delta('0', X, 'digits', [], [], [], [X, '+']) :- 
         is_digit(X).
 
-delta('0', X, 'vars', [], [['1', '+']], [], [X]) :- 
+delta('0', X, 'vars', [], [['1', '+']], [], ['1', X]) :- 
         is_var_symbol(X).
 
 delta('sign', X, 'vars', [], [['1', '-']], ['-'], ['1', X]) :- 
@@ -61,25 +61,20 @@ delta('sign', X, 'vars', [], [['1', '-']], ['-'], ['1', X]) :-
 delta('sign', X, 'vars', [], [['1', '+']], ['+'], ['1', X]) :- 
         is_var_symbol(X).
 
-% delta('sign', X, 'digits', S, S, ['-'], ['-', X]) :- 
-%         is_digit(X).
-% delta('sign', X, 'digits', S, S, ['+'], ['+', X]) :- 
-%         is_digit(X).
-delta('sign', X, 'digits', [], [], T, [X | T]) :- 
+delta('sign', X, 'digits', [], [], ['-'], [X, '-']) :- 
         is_digit(X).
-        % push(X, T, NT).
+
+delta('sign', X, 'digits', [], [], ['+'], [X, '+']) :- 
+        is_digit(X).
 
 delta('digits', X, 'digits', S, S, [H | Tail], NT) :- 
         is_digit(X),
         is_digit(H),
         push(X, [H | Tail], NT).
 
-
-% Reminder: Permette l'utilizzo di * senza spazi. I tipi 'compound che vengono passati come espressione non contano gli spazi.'
 delta('digits', '*', 'vars', S, NS, [H | Tail], []) :-
         is_digit(H),
         push([H | Tail], S, NS).
-
 
 delta('vars', X, 'vars', S, S, [], ['1', X]) :- 
         is_var_symbol(X).
@@ -126,8 +121,8 @@ as_monomial_atomic_list(Expression, MonomialAtomicList) :-
         raw_monomial_parser(AtomicExpr, MonomialAtomicList).
 
 % In caso volessi fornire un atomo come input...
-as_monomial_atomic_list(AtomicExpr, MonomialAtomicList) :-
-        raw_monomial_parser(AtomicExpr, MonomialAtomicList).
+% as_monomial_atomic_list(AtomicExpr, MonomialAtomicList) :-
+%         raw_monomial_parser(AtomicExpr, MonomialAtomicList).
 
 % == == %
 
@@ -221,31 +216,39 @@ as_monomial(Expression, m(Coeff, TotalDegree, CollapsedVP)) :-
 % == [ TEST ] == %
 % Dal momento che alcuni predicati, se non tutti si basano sul backtracking usare il cut ! nei test potrebbe farli fallire anche quando non dovrebbero. Prestare attenzione!
 
+m1([3*x, -3*x, -x, +x, x, +3, -3, 3, -36*k^68, -3*x*y^35*z, 0, -0]).
+m2([-3*x*a*y^35*z, -36*k^68, -3, 0]).
+m3([-3*x*x^3*y*a^2*a*y^8]).
+
 % Test per il parser.
 test_parser() :-
-        test_A([3*x, -3*x, -x, +x, x, +3, -3, 3, -36*k^68, -3*x*y^35*z, 0, -0]).
+        m1(Monomials),
+        test_A(Monomials).
 
 test_A([]).
 test_A([H | T]) :-
-        as_monomial_atomic_list(H, A), write(A), nl, nl,
+        as_monomial_atomic_list(H, A), write(A), nl,
         test_A(T).
 
 
 % Test per il builder.
 test_builder() :-
-        test_B([-3*x*a*y^35*z, -36*k^68, -3, 0]).
+        m1(Monomials),
+        test_B(Monomials).
 
 test_B([]).
 test_B([H | T]) :-
-        as_non_standard_monomial(H, NSM), write(NSM), nl, nl,
+        as_non_standard_monomial(H, NSM), 
+        write(H), write(' <=> '), write(NSM), nl,
         test_B(T).
 
 
 % Test per il sorter/collapser.
 test_collapser() :-
-        test_C([-3*x*x^3*y*a^2*a*y^8]).
+        m3(Monomials),
+        test_C(Monomials).
 
 test_C([]).
 test_C([H | T]) :-
-        as_monomial(H, Monomial), write(Monomial), nl, nl,
+        as_monomial(H, Monomial), write(Monomial), nl,
         test_C(T).
