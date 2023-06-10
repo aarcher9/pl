@@ -178,6 +178,7 @@ as_non_standard_monomial(Expression, m(Coeff, TotalDegree, VarsPowers)) :-
 
 % == [ SORTER & COLLAPSER ] == %
 % Riordina i monomi secondo l'ordine richiesto. Non è responsabile dell'unione di termini simili. Viene chiaramente prima ordinato rispetto alla potenza (chiave: 1) poi rispetto alla variabile (chiave: 2). Dalla documentazione l'algoritmo di sorting è il merge sort, quindi stabile, per questo motivo è possibile ottenere l'output desiderato. Il predicato si può usare sia su degli oggetti senza i duplicati per variabile sia che su oggetti con.
+sort_vars([], []).
 sort_vars([v(P, VS) | Tail], [v(Power, VarSymbol) | T]) :-
         sort(1, @=<, [v(P, VS) | Tail], [v(P2_, VS2_) | T2_]),
         sort(2, @=<, [v(P2_, VS2_) | T2_], [v(Power, VarSymbol) | T]).
@@ -215,10 +216,8 @@ as_monomial(Expression, m(Coeff, TotalDegree, CollapsedVP)) :-
 
 % == [ TEST ] == %
 % Dal momento che alcuni predicati, se non tutti si basano sul backtracking usare il cut ! nei test potrebbe farli fallire anche quando non dovrebbero. Prestare attenzione!
+m1([3*x, -3*x, -x, +x, x, +3, -3, 3, -36*k^68, -3*x*y^35*z, 0, -0, -3*x*x^3*y*a^2*a*y^8, -3*x*a*y^35*z]).
 
-m1([3*x, -3*x, -x, +x, x, +3, -3, 3, -36*k^68, -3*x*y^35*z, 0, -0]).
-m2([-3*x*a*y^35*z, -36*k^68, -3, 0]).
-m3([-3*x*x^3*y*a^2*a*y^8]).
 
 % Test per il parser.
 test_parser() :-
@@ -227,7 +226,8 @@ test_parser() :-
 
 test_A([]).
 test_A([H | T]) :-
-        as_monomial_atomic_list(H, A), write(A), nl,
+        as_monomial_atomic_list(H, A),
+        write(H), write('\t\t'), write(A), nl,
         test_A(T).
 
 
@@ -239,16 +239,17 @@ test_builder() :-
 test_B([]).
 test_B([H | T]) :-
         as_non_standard_monomial(H, NSM), 
-        write(H), write(' <=> '), write(NSM), nl,
+        write(H), write('\t\t'), write(NSM), nl,
         test_B(T).
 
 
 % Test per il sorter/collapser.
 test_collapser() :-
-        m3(Monomials),
+        m1(Monomials),
         test_C(Monomials).
 
 test_C([]).
 test_C([H | T]) :-
-        as_monomial(H, Monomial), write(Monomial), nl,
+        as_monomial(H, Monomial),
+        write(H), write('\t\t'), write(Monomial), nl,
         test_C(T).
