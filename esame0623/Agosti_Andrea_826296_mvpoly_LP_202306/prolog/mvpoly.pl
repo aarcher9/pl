@@ -55,16 +55,16 @@ delta('0', X, 'digits', [], [], [], [X, '+']) :-
 delta('0', X, 'vars', [], [['1', '+']], [], ['1', X]) :- 
         is_var_symbol(X).
 
-delta('sign', X, 'vars', [], [['1', '-']], ['-'], ['1', X]) :- 
+delta('sign', X, 'vars', _, [['1', '-']], ['-'], ['1', X]) :- 
         is_var_symbol(X).
 
-delta('sign', X, 'vars', [], [['1', '+']], ['+'], ['1', X]) :- 
+delta('sign', X, 'vars', _, [['1', '+']], ['+'], ['1', X]) :- 
         is_var_symbol(X).
 
-delta('sign', X, 'digits', [], [], ['-'], [X, '-']) :- 
+delta('sign', X, 'digits', S, S, ['-'], [X, '-']) :- 
         is_digit(X).
 
-delta('sign', X, 'digits', [], [], ['+'], [X, '+']) :- 
+delta('sign', X, 'digits', S, S, ['+'], [X, '+']) :- 
         is_digit(X).
 
 delta('digits', X, 'digits', S, S, [H | Tail], [X, H | Tail]) :- 
