@@ -123,7 +123,7 @@ parser(AtomicExpr, Result) :-
 
 % Predicato high-level per il parsing. La lista risultate rappresenta una versione specchiata dell'input per via della facile gestione della lista come uno stack usando la notazione testa-coda, mettendo quindi l'input meno recente (quello più a destra nell'input) a sinistra.
 % L'input è un COMPOUND in cui gli spazi non contano.
-polynomial_to_tokens(Expression, Result) :-
+tokenizer(Expression, Result) :-
         term_to_atom(Expression, AtomicExpr),
         parser(AtomicExpr, Result).
 
@@ -131,16 +131,26 @@ polynomial_to_tokens(Expression, Result) :-
 
 
 % == [ GROUPER ] == %
+find_monomials([], S, S, [S]).
+
+find_monomials([Term | T], [], Term, Out) :-
+        find_monomials(T, Term, _, Out).
+
+
+% find_monomials(['%' | T], [[S] | []], [], [[S] | Out]) :-
+%         write('here'),
+%         find_monomials(T, [], _, Out).
+
+find_monomials(['%' | T], S, S, [S | Out]) :-
+        find_monomials(T, [], _, Out).
+
+find_monomials([Term | T], S, [S | [Term]], Out) :-
+        find_monomials(T, [S | [Term]], _, Out).
+
 % L'oggetto risultante dal parsing contiene un insieme di tokens che vanno raggruppati in monomi (il segnale è il marker utilizzato nel PDA).
-group_monomials(Tokens, Result) :-
-        find_monomials(Tokens, Result).
-
-% find_monomials([], [], [], _).
-% find_monomials(['%' | T], S, S, [C | Others]) :-
-%         find_monomials(T, [], C, Others).
-
-% find_monomials([Term | T], S, [Term | S], [C | Others]) :-
-%         find_monomials(T, [Term | S], C, Others).
+grouper(Expression, Result) :-
+        tokenizer(Expression, Tokens),
+        find_monomials(Tokens, [], _, Result).
 
 % == == %
 
@@ -183,11 +193,18 @@ build_vars([[Power, VarSymbol] | T], D, ND, [v(Power, VarSymbol) | O]) :-
         build_vars(T, C, ND, O).
 
 
-% Costruiamo una struttura dati simile a quella voluta. L'input è una lista contenente liste che rappresentano  con in numeri "impacchettati" piuttosto che come sequenze di caratteri.
-as_non_standard_monomial(Expression, m(Coeff, TotalDegree, VarsPowers)) :-
-        polynomial_to_tokens(Expression, MonomialAtomicList),
-        pack_tokens(MonomialAtomicList, [Coeff | Vars]),
-        build_vars(Vars, 0, TotalDegree, VarsPowers).
+% Crea per ogni gruppo di token un oggetto monomio.
+creator([], []).
+creator([TokensGroup | T], [m(C, Deg, VarsPowers) | Result]) :-
+        pack_tokens(TokensGroup, [C | Vars]),
+        build_vars(Vars, 0, Deg, VarsPowers),
+        creator(T, Result).
+
+
+% Costruiamo una struttura dati simile a quella voluta. L'input è una lista contenente liste che rappresentano con in numeri "impacchettati" piuttosto che come sequenze di caratteri.
+builder(Expression, Objects) :-
+        grouper(Expression, TokensGroups), 
+        creator(TokensGroups, Objects).
 
 % == == %
 
@@ -212,58 +229,57 @@ collapse_vars([v(A, Var) | T], [v(P, Var) | Tail]) :-
 collapse_vars([v(A, X) | T], [v(A, X) | [v(B, Y) | Tail]]) :-
         collapse_vars(T, [v(B, Y) | Tail]).
 
+% Opera l'effettivo sorting e collassamento delle variabili uguali.
+sorter_collapser([], []).
+sorter_collapser([m(C, Deg, VarsPowers) | T], [m(C, Deg, Coll) | Result]) :-
+        sort_vars(VarsPowers, Sorted),
+        collapse_vars(Sorted, Coll),
+        sorter_collapser(T, Result).
 
 % Predicato high level per la strutturazione.
-as_monomial(Expression, m(Coeff, TotalDegree, CollapsedVP)) :-
-        as_non_standard_monomial(Expression, m(Coeff, TotalDegree, VarsPowers)),
-        sort_vars(VarsPowers, SortedVP),
-        collapse_vars(SortedVP, CollapsedVP).
-% == == %
-
-
-
-% == [ PARSER POLINOMI ] == %
-
+as_monomials(Expression, Result) :-
+        builder(Expression, Objects),
+        sorter_collapser(Objects, Result).
 
 % == == %
-
-
 
 
 
 % == [ TEST ] == %
 % Dal momento che alcuni predicati, se non tutti si basano sul backtracking usare il cut ! nei test potrebbe farli fallire anche quando non dovrebbero. Prestare attenzione!
-m1([3*x, -3*x, -x, +x, x, +3, -3, 3, -36*k^68, -3*x*y^35*z, 0, -0, -3*x*x^3*y*a^2*a*y^8, -3*x*a*y^35*z]).
+p1([3*x, -3*x, -x, +x, x, +3, -3, 3, -36*k^68, -3*x*y^35*z, 0, -0, -3*x*x^3*y*a^2*a*y^8, -3*x*a*y^35*z]).
+
+p2([3*x, -3*x, -x, +x, x, +3, -3, 3, -36*k^68, -3*x*y^35*z, 0, -0, -3*x*x^3*y*a^2*a*y^8, -3*x*a*y^35*z]).
 
 
 % Test per il parser.
 test_parser() :-
-        m1(Monomials),
-        test_A(Monomials).
+        p1(Polynomials),
+        test_A(Polynomials).
 
 test_A([]).
 test_A([H | T]) :-
-        polynomial_to_tokens(H, A),
+        tokenizer(H, A),
         write(H), write('\t\t'), write(A), nl,
         test_A(T).
 
 
 % Test per il builder.
 test_builder() :-
-        m1(Monomials),
-        test_B(Monomials).
+        p1(Polynomials),
+        test_B(Polynomials).
 
 test_B([]).
 test_B([H | T]) :-
-        as_non_standard_monomial(H, NSM), 
+        builder(H, NSM), 
         write(H), write('\t\t'), write(NSM), nl,
         test_B(T).
 
 
 % Test per il sorter/collapser.
 test_collapser() :-
-        m1(Monomials),
-        test_C(Monomials).
+        p1(Polynomials),
+        test_C(Polynomials).
 
 test_C([]).
 test_C([H | T]) :-
