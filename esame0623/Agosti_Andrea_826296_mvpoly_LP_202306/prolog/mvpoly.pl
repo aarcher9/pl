@@ -136,16 +136,24 @@ find_monomials([], S, S, [S]).
 find_monomials([Term | T], [], Term, Out) :-
         find_monomials(T, Term, _, Out).
 
-
-% find_monomials(['%' | T], [[S] | []], [], [[S] | Out]) :-
-%         write('here'),
-%         find_monomials(T, [], _, Out).
-
 find_monomials(['%' | T], S, S, [S | Out]) :-
         find_monomials(T, [], _, Out).
 
 find_monomials([Term | T], S, [S | [Term]], Out) :-
         find_monomials(T, [S | [Term]], _, Out).
+
+
+% Wrappa in una lista i monomi speciali 3, 5, 89,... ovvero composti da solo numero.
+wrap_singlets([[X, Y]], [[X, Y]]) :- 
+        atom(X),
+        write(X).
+
+wrap_singlets([[X, Y] | T], [[[X, Y]] | Out]) :-
+        % write(T), nl,
+        wrap_singlets(T, Out).
+
+wrap_singlets([H | T], [H | Out]) :-
+        wrap_singlets(T, Out).
 
 % L'oggetto risultante dal parsing contiene un insieme di tokens che vanno raggruppati in monomi (il segnale è il marker utilizzato nel PDA).
 grouper(Expression, Result) :-
