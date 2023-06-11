@@ -138,6 +138,10 @@ mirror_tokens([H | T], Mirrored) :-
         reverse(H, Temp),
         append(M, [Temp], Mirrored).
 
+
+% Rimuove le liste vuote.
+
+
 % Raggruppa in monomi.
 find_monomials([], T, _, S, [T | S]).
 find_monomials([], [], _, S, [S]).
@@ -153,7 +157,8 @@ find_monomials([H | Tail], T, [H | T], S, NS) :-
 grouper(Expression, Reversed) :-
         tokenizer(Expression, Tokens),
         find_monomials(Tokens, [], _, [], Result),
-        mirror_tokens(Result, Reversed).
+        findall([H | T], member([H | T], Result), Clean),
+        mirror_tokens(Clean, Reversed).
 
 % == == %
 
@@ -199,7 +204,6 @@ creator([TokensGroup | T], [m(C, Deg, VarsPowers) | Result]) :-
 % Costruiamo una struttura dati simile a quella voluta. L'input è una lista contenente liste che rappresentano con in numeri "impacchettati" piuttosto che come sequenze di caratteri.
 builder(Expression, Objects) :-
         grouper(Expression, TokensGroups),
-        write(TokensGroups), nl,
         creator(TokensGroups, Objects).
 
 % == == %
@@ -245,7 +249,7 @@ as_monomials(Expression, Result) :-
 % Dal momento che alcuni predicati, se non tutti si basano sul backtracking usare il cut ! nei test potrebbe farli fallire anche quando non dovrebbero. Prestare attenzione!
 p1([3*x, -3*x, -x, +x, x, +3, -3, 3, -36*k^68, -3*x*y^35*z, 0, -0, -3*x*x^3*y*a^2*a*y^8, -3*x*a*y^35*z]).
 
-p2([-3*x*y^35*z, 3 + 7]).
+p2([-3*x*y^35*z, 3*x + 4*r]).
 
 
 % Test per il parser.
