@@ -131,6 +131,14 @@ tokenizer(Expression, Result) :-
 
 
 % == [ GROUPER ] == %
+% Fa il reverse di una lista di tokens nestata al massimo di un livello di profondità.
+mirror_tokens([], []).
+mirror_tokens([H | T], Mirrored) :- 
+        mirror_tokens(T, M),
+        reverse(H, Temp),
+        append(M, [Temp], Mirrored).
+
+% Raggruppa in monomi.
 find_monomials([], T, _, S, [T | S]).
 find_monomials([], [], _, S, [S]).
 
@@ -142,23 +150,16 @@ find_monomials([H | Tail], T, [H | T], S, NS) :-
         
 
 % L'oggetto risultante dal parsing contiene un insieme di tokens che vanno raggruppati in monomi (il segnale è il marker utilizzato nel PDA).
-grouper(Expression, Result) :-
+grouper(Expression, Reversed) :-
         tokenizer(Expression, Tokens),
-        find_monomials(Tokens, [], _, [], Result).
+        find_monomials(Tokens, [], _, [], Result),
+        mirror_tokens(Result, Reversed).
 
 % == == %
 
 
 % == [ BUILDER ] == %
 % Si occupa di raggruppare i token nestati nel risulato del parser e di convertirli in numeri (utilizzando predicati come atom_number/2).
-
-
-% Fa il reverse di una lista di tokens nestata al massimo di un livello di profondità.
-mirror_tokens([], []).
-mirror_tokens([H | T], Mirrored) :- 
-        mirror_tokens(T, M),
-        reverse(H, Temp),
-        append(M, [Temp], Mirrored).
 
 
 % I seguenti predicati uniscono le cifre e rispettivi segni, che al momento sono spearati in tokens appunto, in numeri.
