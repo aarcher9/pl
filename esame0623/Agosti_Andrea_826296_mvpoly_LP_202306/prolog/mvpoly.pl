@@ -131,29 +131,27 @@ tokenizer(Expression, Result) :-
 
 
 % == [ GROUPER ] == %
+% Wrappa anche i monomi 3, 5, 89,... ovvero composti da solo numero, che sarebbero altrimenti liberi nella lista generando errori succesivi. X è ancora un atomo (numero), Y è il segno (compound).
+% find_monomials([], [X, Y], [X, Y], [[[X, Y]]]) :-
+%         atom(X).
+
+% find_monomials(['%' | T], [X, Y], [[X, Y]], [[[X, Y]] | Out]) :-
+%         atom(X),
+%         find_monomials(T, [], _, Out).
+
+% Wrap generico.
 find_monomials([], S, S, [S]).
 
 find_monomials([Term | T], [], Term, Out) :-
         find_monomials(T, Term, _, Out).
-
+        
 find_monomials(['%' | T], S, S, [S | Out]) :-
+        write(S), nl,
         find_monomials(T, [], _, Out).
 
-find_monomials([Term | T], S, [S | [Term]], Out) :-
-        find_monomials(T, [S | [Term]], _, Out).
+find_monomials([Term | T], S, [S, Term], Out) :-
+        find_monomials(T, [S, Term], _, Out).
 
-
-% Wrappa in una lista i monomi speciali 3, 5, 89,... ovvero composti da solo numero.
-wrap_singlets([[X, Y]], [[X, Y]]) :- 
-        atom(X),
-        write(X).
-
-wrap_singlets([[X, Y] | T], [[[X, Y]] | Out]) :-
-        % write(T), nl,
-        wrap_singlets(T, Out).
-
-wrap_singlets([H | T], [H | Out]) :-
-        wrap_singlets(T, Out).
 
 % L'oggetto risultante dal parsing contiene un insieme di tokens che vanno raggruppati in monomi (il segnale è il marker utilizzato nel PDA).
 grouper(Expression, Result) :-
@@ -211,7 +209,8 @@ creator([TokensGroup | T], [m(C, Deg, VarsPowers) | Result]) :-
 
 % Costruiamo una struttura dati simile a quella voluta. L'input è una lista contenente liste che rappresentano con in numeri "impacchettati" piuttosto che come sequenze di caratteri.
 builder(Expression, Objects) :-
-        grouper(Expression, TokensGroups), 
+        grouper(Expression, TokensGroups),
+        write(TokensGroups), nl,
         creator(TokensGroups, Objects).
 
 % == == %
@@ -257,7 +256,7 @@ as_monomials(Expression, Result) :-
 % Dal momento che alcuni predicati, se non tutti si basano sul backtracking usare il cut ! nei test potrebbe farli fallire anche quando non dovrebbero. Prestare attenzione!
 p1([3*x, -3*x, -x, +x, x, +3, -3, 3, -36*k^68, -3*x*y^35*z, 0, -0, -3*x*x^3*y*a^2*a*y^8, -3*x*a*y^35*z]).
 
-p2([3*x, -3*x, -x, +x, x, +3, -3, 3, -36*k^68, -3*x*y^35*z, 0, -0, -3*x*x^3*y*a^2*a*y^8, -3*x*a*y^35*z]).
+p2([-3*x*y^35*z]).
 
 
 % Test per il parser.
@@ -274,7 +273,7 @@ test_A([H | T]) :-
 
 % Test per il builder.
 test_builder() :-
-        p1(Polynomials),
+        p2(Polynomials),
         test_B(Polynomials).
 
 test_B([]).
