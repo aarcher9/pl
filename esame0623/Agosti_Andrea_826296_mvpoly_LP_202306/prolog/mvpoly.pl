@@ -226,11 +226,11 @@ collapse_vars([v(A, X) | T], [v(A, X) | [v(B, Y) | Tail]]) :-
 
 % Opera l'effettivo sorting e collassamento delle variabili uguali.
 % L'input è l'output del BUILDER.
-monomial_reorderer([], []).
-monomial_reorderer([m(C, Deg, VP) | T], [m(C, Deg, Collapsed) | Result]) :-
+monomials_reorderer([], []).
+monomials_reorderer([m(C, Deg, VP) | T], [m(C, Deg, Collapsed) | Result]) :-
         sort_vars(VP, Sorted),
         collapse_vars(Sorted, Collapsed),
-        monomial_reorderer(T, Result).
+        monomials_reorderer(T, Result).
 
 % == == %
 
@@ -247,7 +247,22 @@ polynomial_reorderer(I, Sorted) :-
 % == == %
 
 
-% == [ Predicati High-Level (richiesti dal testo) ] == %
+% == [ OPERATIONS ] == %
+% Procedure di supporto per le operazioni fra polinomi/monomi.
+
+% Moltiplicazione fra monomi.
+monomials_product(m(C1, TD1, VP1), m(C2, TD2, VP2), Res) :-
+        C is C1 * C2,
+        TD is TD1 + TD2,
+        append(VP1, VP2, VP),
+        monomials_reorderer([m(C, TD, VP)], [Res | []]).
+
+
+
+% == == %
+
+
+%%%%%%%%%% Predicati High-Level (richiesti dal testo) %%%%%%%%%%
 
 
 %
@@ -293,14 +308,19 @@ variables(Poly, Variables) :-
         sort(0, @<, Raw, Variables).
 
 
-% TODO ordinare la lista come dovrebbe essere per il polinomio.
+%
 monomials(Poly, Poly) :-
         is_polynomial(Poly).
 
 
-% TODO
-max_degree(Poly, _) :-
-        is_polynomial(Poly).
+%
+min_degree([m(_, Degree, _) | _], Degree) :-
+        is_polynomial([m(_, Degree, _) | _]).
+
+% 
+max_degree(Poly, Degree) :-
+        is_polynomial(Poly),
+        sort(1, @=>, Poly, [m(_, Degree, _) | _]).
 
 
 % Dal momento che il PDA è unico per monomi e polinomi, normalmente il risultato sarebbe una lista di monomi, se mi aspetto di parsare un monomio mi basta prendere il primo elemento.
@@ -308,14 +328,14 @@ as_monomial(Expression, Monomial) :-
         tokenizer(Expression, Tokens),
         grouper(Tokens, Grouped),
         builder(Grouped, Build),
-        monomial_reorderer(Build, [Monomial | _]).
+        monomials_reorderer(Build, [Monomial | _]).
 
-% TODO ordinare il polinomio.
+%
 as_polynomial(Expression, Polynomial) :-
         tokenizer(Expression, Tokens),
         grouper(Tokens, Grouped),
         builder(Grouped, Build),
-        monomial_reorderer(Build, SM),
+        monomials_reorderer(Build, SM),
         polynomial_reorderer(SM, Polynomial).
 
 % == == %
@@ -339,6 +359,8 @@ as_polynomial(Expression, Polynomial) :-
 % ?- p4(P), test__as_polynomial(P).
 
 % Alcune prove.
+m1(3*x*y^4, 4*s*y^1).
+
 p1([3*x, -3*x, -x, +x, x, +3, -3, 3, -36*k^68, -3*x*y^35*z, 0, -0, -3*x*x^3*y*a^2*a*y^8, -3*x*a*y^35*z]).
 p2([-3*x*y^35*z, 3*x + 4*r, -3*x*a*y^35*z]).
 p3([3*x + 4*r]).
@@ -365,3 +387,9 @@ test__variables([H | T]) :-
         as_polynomial(H, Polynomial),
         variables(Polynomial, Variables), write(Variables), nl,
         test__variables(T).
+
+test__monomials_product() :-
+        m1(E1, E2),
+        as_monomial(E1, M1), write(M1), nl,
+        as_monomial(E2, M2), write(M2), nl,
+        monomials_product(M1, M2, M), write(M), nl.
