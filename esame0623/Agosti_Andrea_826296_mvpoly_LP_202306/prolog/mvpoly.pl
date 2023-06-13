@@ -205,7 +205,7 @@ builder([TokensGroup | T], [m(C, Deg, VarsPowers) | Result]) :-
 
 
 
-% == [ REORDERER ] == %
+% == [ MONOMIAL REORDERER ] == %
 % Riordina i monomi secondo l'ordine richiesto. L'oggetto viene prima ordinato rispetto alla potenza (chiave: 1) poi rispetto alla variabile (chiave: 2). Dalla documentazione l'algoritmo di sorting è il merge sort, quindi stabile.
 sort_vars([], []).
 sort_vars([v(P, VS) | Tail], [v(Power, VarSymbol) | T]) :-
@@ -236,11 +236,76 @@ reorderer([m(C, Deg, VP) | T], [m(C, Deg, Collapsed) | Result]) :-
 % == == %
 
 
+
+% == [ POLYNOMIAL REORDERER ] == %
+
+% == == %
+
+
 % == [ Predicati High-Level (richiesti dal testo) ] == %
 
-is_monomial() :-
+
+%
+is_monomial(m(_C, TD, VPs)) :-
+        integer(TD),
+        TD >= 0,
+        is_list(VPs).
 
 
+%
+is_varpower(v(Power, VarSymbol)) :-
+        integer(Power),
+        Power >= 0,
+        atom(VarSymbol).
+
+
+%
+is_polynomial(poly(Monomials)) :-
+        is_list(Monomials),
+        foreach(member(M, Monomials), is_monomial(M)).
+
+
+% TODO type checking?
+coefficients([], []).
+coefficients([m(C, _, _) | T], [C | Coefficients]) :-
+        coefficients(T, Coefficients).
+
+
+%
+find_variables([], []).
+
+find_variables([v(_, VS) | VT], [VS | Variables]) :-
+        find_variables(VT, Variables).
+
+find_variables([m(_, _, Vars) | MT], [V | M]) :-
+        find_variables(Vars, V),
+        find_variables(MT, M).
+
+% A causa della lista in lista dovuta ai predicati la spacchettiamo prima di sortarla.
+variables(Poly, Variables) :-
+        is_polynomial(Poly),
+        find_variables(Poly, [Raw | []]),
+        sort(0, @<, Raw, Variables).
+
+
+% TODO ordinare la lista come dovrebbe essere per il polinomio.
+monomials(Poly, Poly) :-
+        is_polynomial(Poly).
+
+
+%
+max_degree(Poly, Degree) :-
+        is_polynomial(Poly),
+
+
+% Dal momento che il PDA è unico per monomi e polinomi, normalmente il risultato sarebbe una lista di monomi, se mi aspetto di parsare un monomio mi basta prendere il primo elemento.
+as_monomial(Expression, Monomial) :-
+        tokenizer(Expression, Tokens),
+        grouper(Tokens, Grouped),
+        builder(Grouped, Build),
+        reorderer(Build, [Monomial | _]).
+
+% TODO ordinare il polinomio.
 as_polynomial(Expression, Polynomial) :-
         tokenizer(Expression, Tokens),
         grouper(Tokens, Grouped),
@@ -263,8 +328,32 @@ as_polynomial(Expression, Polynomial) :-
 
 
 % == [ TEST ] == %
-% Dal momento che alcuni predicati, se non tutti si basano sul backtracking usare il cut ! nei test potrebbe farli fallire anche quando non dovrebbero. Prestare attenzione!
+% Dal momento che alcuni predicati, se non tutti si basano sul backtracking usare il cut ! nei test potrebbe farli fallire anche quando non dovrebbero. Prestare attenzione! Inoltre alcune volte per qualche problema con le iterazioni forse, alcuni input falliscono il test, ma lo passano se testati singolarmente.
+% Esempio per interrogare un test da CLI: 
+% ?- p4(P), test__as_polynomial(P).
 
 % Alcune prove.
 p1([3*x, -3*x, -x, +x, x, +3, -3, 3, -36*k^68, -3*x*y^35*z, 0, -0, -3*x*x^3*y*a^2*a*y^8, -3*x*a*y^35*z]).
 p2([-3*x*y^35*z, 3*x + 4*r, -3*x*a*y^35*z]).
+p3([3*x + 4*r]).
+p4([-3*x*a*y^35*z, 3*x]).
+
+
+test__as_polynomial([]).
+test__as_polynomial([H | T]) :-
+        as_polynomial(H, Polynomial), write(Polynomial), nl,
+        test__as_polynomial(T).
+
+
+test__coefficients([]).
+test__coefficients([H | T]) :-
+        as_polynomial(H, Polynomial),
+        coefficients(Polynomial, Coefficients), write(Coefficients), nl,
+        test__coefficients(T).
+
+
+test__variables([]).
+test__variables([H | T]) :-
+        as_polynomial(H, Polynomial),
+        variables(Polynomial, Variables), write(Variables), nl,
+        test__variables(T).
