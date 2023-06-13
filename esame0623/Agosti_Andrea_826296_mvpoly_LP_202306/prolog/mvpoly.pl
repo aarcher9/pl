@@ -7,7 +7,7 @@
 % C-x h C-M-\ usare il comando per reindentare tutto il file con Emacs.
 
 
-% Il codice rispetta la seguente struttura: ogni delimitata sezione esegue un certo passaggio della computazione richiamando UNA sola funzione dello "strato" superiore, tipicamente l'ultima definita, ovvero come se fosse il controller di quella sezione. Assomiglia molto ad una divisione in "classi" di compiti in un linguaggio ad oggetti. La sezione delle utilities invece raccoglie predicato di generale uso, che possono essere richiamati casualmente nel codice.
+% Il codice rispetta all'incirca la seguente struttura/architettura: ogni delimitata sezione esegue un certo passaggio della computazione richiamando UNA sola funzione dello "strato" superiore, tipicamente l'ultima definita, ovvero come se fosse il controller/tester di quella sezione. La sezione delle utilities invece raccoglie predicato di generale uso, che possono essere richiamati casualmente nel codice.
 
 
 % == [ Utilities ] == %
@@ -27,7 +27,7 @@ clean_push(Item, List, Out) :- push(Item, List, Out).
 
 
 % == [ PARSER ] == %
-% Le cifre arrivano una per volta, verranno poi assemblate.
+% Le cifre arrivano una per volta, verranno poi unite e convertite in tipo numero.
 is_digit(Char) :- 
         atom_codes(Char, [H | _]), 
         (H >= 48, H =< 57).
@@ -44,7 +44,8 @@ initial('0').
 final('digits').
 final('vars').
 
-% La logica è quella di creare una funzione delta che oltre a comportarsi come una delta 'ordinaria' per il PDA opera anche la traduzione in "oggetto" del monomio. L'automa ha infatti due stack (4 passati come argomento per via della struttura di prolog che non prevede modifiche dirette di oggetti come le liste), uno per conservare i token (le parti del monomio inscindibili) e l'altro per "scaricarli" e conservare l'oggetto finale.
+
+% La delta agisce su due stack, uno che raccoglie i blocchi di monomi parsati e l'altro che raccoglie temporaneamente il monomio corrente per poi scaricarlo sul primo.
 
 delta('0', '-', 'sign', [], [], [], ['-']).
 delta('0', '+', 'sign', [], [], [], ['+']).
@@ -121,7 +122,7 @@ parser(AtomicExpr, Result) :-
         initial(S),
         pda(S, L, [], Result, [], _).
 
-% Predicato high-level per il parsing. La lista risultate rappresenta una versione specchiata dell'input per via della facile gestione della lista come uno stack usando la notazione testa-coda, mettendo quindi l'input meno recente (quello più a destra nell'input) a sinistra.
+% Predicato high-level per il parsing.
 % L'input è un COMPOUND in cui gli spazi non contano.
 tokenizer(Expression, Result) :-
         term_to_atom(Expression, AtomicExpr),
@@ -139,9 +140,6 @@ mirror_tokens([H | T], Mirrored) :-
         append(M, [Temp], Mirrored).
 
 
-% Rimuove le liste vuote.
-
-
 % Raggruppa in monomi.
 find_monomials([], T, _, S, [T | S]).
 find_monomials([], [], _, S, [S]).
@@ -153,7 +151,7 @@ find_monomials([H | Tail], T, [H | T], S, NS) :-
         find_monomials(Tail, [H | T], _, S, NS).
         
 
-% L'oggetto risultante dal parsing contiene un insieme di tokens che vanno raggruppati in monomi (il segnale è il marker utilizzato nel PDA).
+% L'oggetto risultante dal parsing contiene un insieme di tokens che sono raggruppati in monomi (il segnale è il marker utilizzato nel PDA).
 grouper(Expression, Reversed) :-
         tokenizer(Expression, Tokens),
         find_monomials(Tokens, [], _, [], Result),
@@ -211,14 +209,14 @@ builder(Expression, Objects) :-
 
 
 % == [ SORTER & COLLAPSER ] == %
-% Riordina i monomi secondo l'ordine richiesto. Non è responsabile dell'unione di termini simili. Viene chiaramente prima ordinato rispetto alla potenza (chiave: 1) poi rispetto alla variabile (chiave: 2). Dalla documentazione l'algoritmo di sorting è il merge sort, quindi stabile, per questo motivo è possibile ottenere l'output desiderato. Il predicato si può usare sia su degli oggetti senza i duplicati per variabile sia che su oggetti con.
+% Riordina i monomi secondo l'ordine richiesto. L'oggetto viene prima ordinato rispetto alla potenza (chiave: 1) poi rispetto alla variabile (chiave: 2). Dalla documentazione l'algoritmo di sorting è il merge sort, quindi stabile.
 sort_vars([], []).
 sort_vars([v(P, VS) | Tail], [v(Power, VarSymbol) | T]) :-
         sort(1, @=<, [v(P, VS) | Tail], [v(P2_, VS2_) | T2_]),
         sort(2, @=<, [v(P2_, VS2_) | T2_], [v(Power, VarSymbol) | T]).
 
 
-% Minimizzazione del monomio (i termini simili vengono condensati). Il monomio viene preventivamente ordinato per consentire una facilità di approccio al problema. La logica è quella di applicare la ricorsivitài in modo da arrivare al fondo lista e risalire compattando i termini simili. Si può assumere che sia corretto solo se i termini sono stati ordinati.
+% Minimizzazione del monomio (i termini simili vengono condensati). Il monomio viene preventivamente ordinato per consentire una facilità di approccio al problema.
 collapse_vars([], []).
 collapse_vars([H | []], [H | []]).
 
@@ -236,12 +234,30 @@ sorter_collapser([m(C, Deg, VarsPowers) | T], [m(C, Deg, Coll) | Result]) :-
         collapse_vars(Sorted, Coll),
         sorter_collapser(T, Result).
 
-% Predicato high level per la strutturazione.
-as_monomials(Expression, Result) :-
-        builder(Expression, Objects),
-        sorter_collapser(Objects, Result).
+
+% Predicato high level per la strutturazione dei monomi.
+reorderer(Expression, Result) :-
+        builder(Expression, Raw),
+        sorter_collapser(Raw, Result).
 
 % == == %
+
+
+% == [ Predicati High-Level (richiesti dal testo) ] == %
+
+
+% == == %
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -249,7 +265,7 @@ as_monomials(Expression, Result) :-
 % Dal momento che alcuni predicati, se non tutti si basano sul backtracking usare il cut ! nei test potrebbe farli fallire anche quando non dovrebbero. Prestare attenzione!
 p1([3*x, -3*x, -x, +x, x, +3, -3, 3, -36*k^68, -3*x*y^35*z, 0, -0, -3*x*x^3*y*a^2*a*y^8, -3*x*a*y^35*z]).
 
-p2([-3*x*y^35*z, 3*x + 4*r]).
+p2([-3*x*y^35*z, 3*x + 4*r, -3*x*a*y^35*z]).
 
 
 % Test per il parser.
