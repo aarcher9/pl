@@ -208,10 +208,9 @@ builder([TokensGroup | T], [m(C, Deg, VarsPowers) | Result]) :-
 % == [ MONOMIAL REORDERER ] == %
 % Riordina i monomi secondo l'ordine richiesto. L'oggetto viene prima ordinato rispetto alla potenza (chiave: 1) poi rispetto alla variabile (chiave: 2). Dalla documentazione l'algoritmo di sorting è il merge sort, quindi stabile.
 sort_vars([], []).
-sort_vars([v(P, VS) | Tail], [v(Power, VarSymbol) | T]) :-
-        sort(1, @=<, [v(P, VS) | Tail], [v(P2_, VS2_) | T2_]),
-        sort(2, @=<, [v(P2_, VS2_) | T2_], [v(Power, VarSymbol) | T]).
-
+sort_vars(I, Sorted) :-
+        sort(1, @=<, I, R),
+        sort(2, @=<, R, Sorted).
 
 % Minimizzazione del monomio (i termini simili vengono condensati). Il monomio viene preventivamente ordinato per consentire una facilità di approccio al problema.
 collapse_vars([], []).
@@ -227,17 +226,23 @@ collapse_vars([v(A, X) | T], [v(A, X) | [v(B, Y) | Tail]]) :-
 
 % Opera l'effettivo sorting e collassamento delle variabili uguali.
 % L'input è l'output del BUILDER.
-reorderer([], []).
-reorderer([m(C, Deg, VP) | T], [m(C, Deg, Collapsed) | Result]) :-
+monomial_reorderer([], []).
+monomial_reorderer([m(C, Deg, VP) | T], [m(C, Deg, Collapsed) | Result]) :-
         sort_vars(VP, Sorted),
         collapse_vars(Sorted, Collapsed),
-        reorderer(T, Result).
+        monomial_reorderer(T, Result).
 
 % == == %
 
 
 
 % == [ POLYNOMIAL REORDERER ] == %
+% Si assume che i monomi siano già ordinati chiaramente.
+
+polynomial_reorderer([], []).
+polynomial_reorderer(I, Sorted) :-
+        sort(3, @=<, I, R),
+        sort(2, @=<, R, Sorted).
 
 % == == %
 
@@ -293,9 +298,9 @@ monomials(Poly, Poly) :-
         is_polynomial(Poly).
 
 
-%
-max_degree(Poly, Degree) :-
-        is_polynomial(Poly),
+% TODO
+max_degree(Poly, _) :-
+        is_polynomial(Poly).
 
 
 % Dal momento che il PDA è unico per monomi e polinomi, normalmente il risultato sarebbe una lista di monomi, se mi aspetto di parsare un monomio mi basta prendere il primo elemento.
@@ -303,14 +308,15 @@ as_monomial(Expression, Monomial) :-
         tokenizer(Expression, Tokens),
         grouper(Tokens, Grouped),
         builder(Grouped, Build),
-        reorderer(Build, [Monomial | _]).
+        monomial_reorderer(Build, [Monomial | _]).
 
 % TODO ordinare il polinomio.
 as_polynomial(Expression, Polynomial) :-
         tokenizer(Expression, Tokens),
         grouper(Tokens, Grouped),
         builder(Grouped, Build),
-        reorderer(Build, Polynomial).
+        monomial_reorderer(Build, SM),
+        polynomial_reorderer(SM, Polynomial).
 
 % == == %
 
@@ -337,7 +343,9 @@ p1([3*x, -3*x, -x, +x, x, +3, -3, 3, -36*k^68, -3*x*y^35*z, 0, -0, -3*x*x^3*y*a^
 p2([-3*x*y^35*z, 3*x + 4*r, -3*x*a*y^35*z]).
 p3([3*x + 4*r]).
 p4([-3*x*a*y^35*z, 3*x]).
-
+p5([-3*x^3 + 3*y -6*z^6]).
+p6([y^4*z*x^5 - y*z*r + y^4*r*z^5]).
+p7([a*c + a^2 + a*b + a]).
 
 test__as_polynomial([]).
 test__as_polynomial([H | T]) :-
