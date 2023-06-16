@@ -150,6 +150,8 @@ tokenizer(Expression, Result) :-
 
 % == [ GROUPER ] == %
 % Trova e raggruppa in monomi.
+
+% Se il ritorno non fosse listato darebbe errore con i monomi composti da x, 1,...
 find_monomials([], T, _, [R]) :-
         reverse(T, R).
 
@@ -213,7 +215,6 @@ builder([TokensGroup | T], [m(C, Deg, VarsPowers) | Result]) :-
 % == == %
 
 
-
 % == [ MONOMIAL REORDERER ] == %
 % Riordina i monomi secondo l'ordine richiesto. L'oggetto viene prima ordinato rispetto alla potenza (chiave: 1) poi rispetto alla variabile (chiave: 2). Dalla documentazione l'algoritmo di sorting è il merge sort, quindi stabile.
 sort_vars([], []).
@@ -242,7 +243,6 @@ monomials_reorderer([m(C, Deg, VP) | T], [m(C, Deg, Collapsed) | Result]) :-
         monomials_reorderer(T, Result).
 
 % == == %
-
 
 
 % == [ POLYNOMIAL REORDERER ] == %
