@@ -323,6 +323,10 @@ max_degree(Poly, Degree) :-
         sort(1, @=>, Poly, [m(_, Degree, _) | _]).
 
 
+%
+poly_plus(Poly1, Poly2, Result).
+
+
 % Dal momento che il PDA è unico per monomi e polinomi, normalmente il risultato sarebbe una lista di monomi, se mi aspetto di parsare un monomio mi basta prendere il primo elemento.
 as_monomial(Expression, Monomial) :-
         tokenizer(Expression, Tokens),
