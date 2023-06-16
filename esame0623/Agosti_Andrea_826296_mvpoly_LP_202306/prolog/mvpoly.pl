@@ -124,10 +124,12 @@ parser(AtomicExpr, Result) :-
 
 
 % Predicato high-level per il parsing.
+% Il parser ritorna una versione completamente specchiata dei token del polinomio; il predicato reverse riordina soltanto a livello delle variabili e coefficienti fra loro. Gli esponenti verranno lasciati di fronte alla base, e le cifre dell'esponente di fronte al segno, principalmente perchè la struttura voluta alla fine vi è piú simile.
 % L'input è un COMPOUND in cui gli spazi non contano.
 tokenizer(Expression, Result) :-
         term_to_atom(Expression, AtomicExpr),
-        parser(AtomicExpr, Result).
+        parser(AtomicExpr, Mirrored),
+        reverse(Mirrored, Result).
 
 % == == %
 
@@ -145,8 +147,10 @@ mirror_tokens([H | T], Mirrored) :-
 find_monomials([], T, _, S, [T | S]).
 find_monomials([], [], _, S, [S]).
 
-find_monomials([H | ['%' | Tail]], T, _, S, [[H | T] | [S | NS]]) :- 
-        find_monomials(Tail, [], _, S, NS).
+% Devo rigirare con reverse poichè H all'ultima call del predicato è il fondo del monomio corrente.
+find_monomials([H | ['%' | Tail]], T, _, S, [M | [S | NS]]) :- 
+        find_monomials(Tail, [], _, S, NS),
+        reverse([H | T], M).
 
 find_monomials([H | Tail], T, [H | T], S, NS) :- 
         find_monomials(Tail, [H | T], _, S, NS).
@@ -156,8 +160,7 @@ find_monomials([H | Tail], T, [H | T], S, NS) :-
 % L'input è l'output del PARSER.
 grouper(Tokens, Result) :-
         find_monomials(Tokens, [], _, [], Group),
-        findall([H | T], member([H | T], Group), Clean),
-        mirror_tokens(Clean, Result).
+        findall([H | T], member([H | T], Group), Result).
 
 % == == %
 
@@ -167,8 +170,10 @@ grouper(Tokens, Result) :-
 
 
 % I seguenti predicati uniscono le cifre e rispettivi segni, che al momento sono spearati in tokens appunto, in numeri.
-pack_coefficient(L, [Coefficient]) :- 
-        atomic_list_concat(L, Atom),
+pack_coefficient([], []).
+pack_coefficient([H | T], [Coefficient]) :- 
+        % Devo girare la lista
+        atomic_list_concat([H | T], Atom),
         atom_number(Atom, Coefficient).
 
 pack_vars([], []).
@@ -178,12 +183,13 @@ pack_vars([[VarSymbol | ExpDigits] | Others], [[VarSymbol, Exp] | O]) :-
         pack_vars(Others, O).
 
 % Gestisce le funzioni soprastanti.
-pack_tokens(ML, [Coeff | Vars]) :-
-        mirror_tokens(ML, [NH | NT]),
-        pack_coefficient(NH, [Coeff | _ ]),
-        pack_vars(NT, MirroredVars),
-        mirror_tokens(MirroredVars, V),
-        reverse(V, Vars).
+pack_tokens([], []).
+pack_tokens([[C | Digits] | Vs], [Coeff | Vs]) :-
+        % mirror_tokens(ML, [NH | NT]),
+        pack_coefficient([C | Digits], [Coeff]).
+        % pack_vars(Vs, MirroredVars),
+        % mirror_tokens(MirroredVars, V),
+        % reverse(MirroredVars, Vars).
 
 
 % Data la lista calcola il grado totale e ritorna la struttura dati voluta (o almeno, simile, poiché non è ancora ordinata).
@@ -197,7 +203,7 @@ build_vars([[Power, VarSymbol] | T], D, ND, [v(Power, VarSymbol) | O]) :-
 % L'input è l'output del GROUPER.
 builder([], []).
 builder([TokensGroup | T], [m(C, Deg, VarsPowers) | Result]) :-
-        pack_tokens(TokensGroup, [C | Vars]),
+        pack_tokens(TokensGroup, [C | Vars]), write(18),
         build_vars(Vars, 0, Deg, VarsPowers),
         builder(T, Result).
 
@@ -324,7 +330,7 @@ max_degree(Poly, Degree) :-
 
 
 %
-poly_plus(Poly1, Poly2, Result).
+% poly_plus(Poly1, Poly2, Result).
 
 
 % Dal momento che il PDA è unico per monomi e polinomi, normalmente il risultato sarebbe una lista di monomi, se mi aspetto di parsare un monomio mi basta prendere il primo elemento.
