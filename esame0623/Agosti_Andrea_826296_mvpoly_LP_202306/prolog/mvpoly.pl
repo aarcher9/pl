@@ -27,6 +27,20 @@ clean_push(Item, List, Out) :- push(Item, List, Out).
 
 
 % == [ PARSER ] == %
+% Specchia l'ouput del parser, in modo che sia in direzione lettura. Si tratta di un oggetto tipo: 
+% [[1, y], [1, +], '%', [1, x], [2, +]]
+mirror_children([], []).
+mirror_children(['%' | T], ['%' | Res]) :-
+        mirror_children(T, Res).
+
+mirror_children([H | T], [Block | Others]) :-
+        mirror_children(T, Others),
+        reverse(H, Block).
+
+mirror_tokens([H | T], Result) :-
+        mirror_children([H | T], Temp),
+        reverse(Temp, Result).
+
 % Le cifre arrivano una per volta, verranno poi unite e convertite in tipo numero.
 is_digit(Char) :- 
         atom_codes(Char, [H | _]), 
@@ -124,42 +138,34 @@ parser(AtomicExpr, Result) :-
 
 
 % Predicato high-level per il parsing.
-% Il parser ritorna una versione completamente specchiata dei token del polinomio; il predicato reverse riordina soltanto a livello delle variabili e coefficienti fra loro. Gli esponenti verranno lasciati di fronte alla base, e le cifre dell'esponente di fronte al segno, principalmente perchè la struttura voluta alla fine vi è piú simile.
+% Il parser ritorna una versione completamente specchiata dei token del polinomio; prima di essere ritornato viene rigirato in modo che si legga come stato scritto.
 % L'input è un COMPOUND in cui gli spazi non contano.
 tokenizer(Expression, Result) :-
         term_to_atom(Expression, AtomicExpr),
         parser(AtomicExpr, Mirrored),
-        reverse(Mirrored, Result).
+        mirror_tokens(Mirrored, Result).
 
 % == == %
 
 
 % == [ GROUPER ] == %
-% Fa il reverse di una lista di tokens nestata al massimo di un livello di profondità.
-mirror_tokens([], []).
-mirror_tokens([H | T], Mirrored) :- 
-        mirror_tokens(T, M),
-        reverse(H, Temp),
-        append(M, [Temp], Mirrored).
-
-
 % Trova e raggruppa in monomi.
-find_monomials([], T, _, S, [T | S]).
-find_monomials([], [], _, S, [S]).
+find_monomials([], T, _, [R]) :-
+        reverse(T, R).
 
 % Devo rigirare con reverse poichè H all'ultima call del predicato è il fondo del monomio corrente.
-find_monomials([H | ['%' | Tail]], T, _, S, [M | [S | NS]]) :- 
-        find_monomials(Tail, [], _, S, NS),
-        reverse([H | T], M).
+find_monomials([H | ['%' | Tail]], T, _, [M1 | M2]) :- 
+        find_monomials(Tail, [], _, M2),
+        reverse([H | T], M1).
 
-find_monomials([H | Tail], T, [H | T], S, NS) :- 
-        find_monomials(Tail, [H | T], _, S, NS).
+find_monomials([H | Tail], T, [H | T], Result) :- 
+        find_monomials(Tail, [H | T], _, Result).
         
 
 % Raggruppa in monomi.
 % L'input è l'output del PARSER.
 grouper(Tokens, Result) :-
-        find_monomials(Tokens, [], _, [], Group),
+        find_monomials(Tokens, [], _, Group),
         findall([H | T], member([H | T], Group), Result).
 
 % == == %
@@ -171,25 +177,21 @@ grouper(Tokens, Result) :-
 
 % I seguenti predicati uniscono le cifre e rispettivi segni, che al momento sono spearati in tokens appunto, in numeri.
 pack_coefficient([], []).
-pack_coefficient([H | T], [Coefficient]) :- 
-        % Devo girare la lista
-        atomic_list_concat([H | T], Atom),
-        atom_number(Atom, Coefficient).
+pack_coefficient(CoeffTk, [Coefficient]) :- 
+        atomic_list_concat(CoeffTk, Concat),
+        atom_number(Concat, Coefficient).
 
 pack_vars([], []).
-pack_vars([[VarSymbol | ExpDigits] | Others], [[VarSymbol, Exp] | O]) :- 
+pack_vars([[VarSymbol | ExpDigits] | Others], [[Exp, VarSymbol] | O]) :- 
         atomic_list_concat(ExpDigits, AtomsExp),
         atom_number(AtomsExp, Exp),
         pack_vars(Others, O).
 
 % Gestisce le funzioni soprastanti.
 pack_tokens([], []).
-pack_tokens([[C | Digits] | Vs], [Coeff | Vs]) :-
-        % mirror_tokens(ML, [NH | NT]),
-        pack_coefficient([C | Digits], [Coeff]).
-        % pack_vars(Vs, MirroredVars),
-        % mirror_tokens(MirroredVars, V),
-        % reverse(MirroredVars, Vars).
+pack_tokens([C | V], [Coeff | Vars]) :-
+        pack_coefficient(C, [Coeff]),
+        pack_vars(V, Vars).
 
 
 % Data la lista calcola il grado totale e ritorna la struttura dati voluta (o almeno, simile, poiché non è ancora ordinata).
@@ -203,7 +205,8 @@ build_vars([[Power, VarSymbol] | T], D, ND, [v(Power, VarSymbol) | O]) :-
 % L'input è l'output del GROUPER.
 builder([], []).
 builder([TokensGroup | T], [m(C, Deg, VarsPowers) | Result]) :-
-        pack_tokens(TokensGroup, [C | Vars]), write(18),
+        write(TokensGroup), nl,
+        pack_tokens(TokensGroup, [C | Vars]),
         build_vars(Vars, 0, Deg, VarsPowers),
         builder(T, Result).
 
