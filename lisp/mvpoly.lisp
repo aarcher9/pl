@@ -82,7 +82,7 @@
 
 ;; ===== Creazione del polinomio nella forma richiesta ===== ;;
 (defun expr-to-polynomial (expr)
-        (list `poly (mapcar `expr-to-monomial (rest expr))))
+        (list `poly `-))
 ;; ========== ;;
 
 
