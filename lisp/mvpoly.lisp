@@ -6,6 +6,9 @@
 ;; Ritorna vero se il carattere è a-z
 (defun is-alpha (S-term) (alpha-char-p (coerce S-term 'character)))
 
+;; Ritorna vero se il carattere è 0-9
+(defun is-integer (c) (integerp c))
+
 
 ;; Formatta in esponenziale la singola variabile del monomio. Si aspetta termini EXPT-term o S-term
 (defun term-to-exp (term) 
@@ -64,20 +67,33 @@
 
 
 ;; Crea un monomio a partire da un'espressione
-(defun expr-to-monomial (expr) 
-        (let 
-        ((sorted-V-terms (expr-to-sorted-V-terms (rest (rest expr)))))
-                (list `m (second expr) (get-total-degree sorted-V-terms) sorted-V-terms)))
+(defun expr-to-monomial (expr)
+        (cond 
+        ((atom expr) 
+                (list `m expr 0 nil))
+        ((and (listp expr) (is-integer (second expr))) 
+                (list `m (second expr) (get-total-degree (expr-to-sorted-V-terms (rest (rest expr)))) (expr-to-sorted-V-terms (rest (rest expr)))))
+        ((and (listp expr) (is-alpha (second expr)))
+                (list `m 1 (get-total-degree (expr-to-sorted-V-terms (rest (rest expr)))) (expr-to-sorted-V-terms (rest (rest expr)))))))
+        
 
 ;; ========== ;;
 
 
-;; Esempi di input
+;; Esempi di input ;;
+
+;; Classico
 (defparameter m1 `(* 3 y w (expt t 3)))
-(defparameter m2 42)
-(defparameter m3 `(* y (expt s 3) (expt t 3)))
-(defparameter m4 `(+ (* y (expt s 3) (expt t 3)) -4 (* x y)))
+(defparameter m1_2 `(* -3 y w (expt t 3)))
+
+;; 1 sottinteso
+(defparameter m2 `(* y (expt s 3) (expt t 3)))
+
+;; Termine noto soltanto
+(defparameter m3 42)
+
+(defparameter p1 `(+ (* y (expt s 3) (expt t 3)) -4 (* x y)))
 
 
 ;; Testing ;;
-(print (expr-to-monomial m1))
+(print (expr-to-monomial m1_2))
