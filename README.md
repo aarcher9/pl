@@ -25,6 +25,9 @@ Compile
 
 
 **LISP**
+[https://lispcookbook.github.io/cl-cookbook]
+[http://www.lispworks.com/documentation]
+
 > sbcl --noinform --script main.lisp
 > sbcl --script main.lisp
 
