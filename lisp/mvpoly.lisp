@@ -3,6 +3,7 @@
 ;; S-term: simbolo della forma [a-z]
 ;; EPXT-term: simbolo della forma (expt [a-z] <int>)
 
+
 ;; Ritorna vero se il carattere è a-z
 (defun is-alpha (S-term) (alpha-char-p (coerce S-term 'character)))
 
@@ -81,6 +82,12 @@
 
 
 ;; ===== Creazione del polinomio nella forma richiesta ===== ;;
+
+
+;; Riordina il polinomio come richiesto
+
+
+;; Crea un polinommio a partire da un'espressione
 (defun expr-to-polynomial (expr)
         (list `poly `-))
 ;; ========== ;;
