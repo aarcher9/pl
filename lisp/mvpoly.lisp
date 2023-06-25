@@ -1,40 +1,74 @@
-;; ===== P1 ===== ;;
+;; ===== Monomi ===== ;;
+;; V-term: simbolo della forma (V [a-z] <int>)
+;; S-term: simbolo della forma [a-z]
+;; EPXT-term: simbolo della forma (expt [a-z] <int>)
+
 ;; Ritorna vero se il carattere è a-z
-(defun is-alpha (c) (alpha-char-p (coerce c 'character)))
+(defun is-alpha (S-term) (alpha-char-p (coerce S-term 'character)))
 
 
-;; Formatta in esponenziale la singola variabile del monomio. Si aspetta termini composti da una lettera latina minuscola a-z oppure (expt [a-z] <number>)
-(defun var-to-exp (var) 
+;; Formatta in esponenziale la singola variabile del monomio. Si aspetta termini EXPT-term o S-term
+(defun term-to-exp (term) 
         (cond 
-        ((null var)
+        ((null term)
                 nil)
-        ((and (atom var) (is-alpha var))
-                (list `v var 1))
-        ((listp var)
-                (list `v (second var) (third var)))))
+        ((and (atom term) (is-alpha term))
+                (list `v term 1))
+        ((listp term)
+                (list `v (second term) (third term)))))
 
-(defun vars-to-exp (vars) 
+;; Si aspetta una lista di EXPT-term o S-term o mista
+(defun expr-to-V-terms (terms) 
         (cond
-        ((not (null vars))
-        (cons (var-to-exp (first vars)) (vars-to-exp (rest vars))))))
+        ((not (null terms))
+                (cons (term-to-exp (first terms)) (expr-to-V-terms (rest terms))))))
 
 
-;; Riordina le variabili in un monomio utilizzando una funzione custom. I termini attesi sono della forma (V [a-z] <number>)
-(defun compare-vars (x y) 
-        (< (char-code (character (second x))) (char-code (character (second y)))))
+;; Riordina le variabili in un monomio utilizzando una funzione custom. I termini attesi sono V-term
+(defun compare-V-terms (Vt1 Vt2) 
+        (< (char-code (character (second Vt1))) (char-code (character (second Vt2)))))
 
-(defun sort-vars (vars) 
-        (stable-sort vars #'compare-vars))
-
-
-;; Collassa le variabili uguali in una sola: (V x 5) (V x 6) -> (V x 11)
-(defun collapse-vars (vars) 
-        ())
+;; Si aspetta una lista di V-term
+(defun sort-V-terms (V-terms) 
+        (stable-sort V-terms #'compare-V-terms))
 
 
-;; Formatta in un monomio non ordinato e non collassato
-(defun raw-monomial (expr) 
-        (list `m (second expr) `degree (sort-vars (vars-to-exp (rest (rest expr))))))
+;; Collassa le V-term simili di una lista di V-term in uno sola. Si aspetta che siano già sortate.
+(defun collapse (Vt1 Vt2)
+        (list `V (second Vt1) (+ (third Vt1) (third Vt2))))
+
+(defun collapse-V-terms (V-terms) 
+        (cond
+        ((null (first V-terms)) 
+                nil)
+        ((null (second V-terms)) 
+                V-terms)
+        ((equal (second (first V-terms)) (second (second V-terms)))
+                (cons (collapse (first V-terms) (second V-terms)) (collapse-V-terms (rest (rest V-terms)))))
+        ((not (equal (second (first V-terms)) (second (second V-terms))))
+                (cons (first V-terms) (collapse-V-terms (rest V-terms))))))
+
+
+;; Calcola il grado totale di una lista di V-term
+(defun get-total-degree (V-terms)
+        (cond
+        ((not (null V-terms)) 
+                (+ (third (first V-terms)) (get-total-degree (rest V-terms))))
+        ((null V-terms)
+                0)))
+
+
+;; Crea una list di V-term a partire da una lista mista di EXPT-term e S-term
+(defun expr-to-sorted-V-terms (expr) 
+        (collapse-V-terms (sort-V-terms (expr-to-V-terms expr))))
+
+
+;; Crea un monomio a partire da un'espressione
+(defun expr-to-monomial (expr) 
+        (let 
+        ((sorted-V-terms (expr-to-sorted-V-terms (rest (rest expr)))))
+                (list `m (second expr) (get-total-degree sorted-V-terms) sorted-V-terms)))
+
 ;; ========== ;;
 
 
@@ -46,4 +80,4 @@
 
 
 ;; Testing ;;
-(print (raw-monomial m1))
+(print (expr-to-monomial m1))
