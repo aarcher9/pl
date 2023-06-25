@@ -1,4 +1,4 @@
-;; ===== Monomi ===== ;;
+;; ===== Creazione del monomio nella forma richiesta ===== ;;
 ;; V-term: simbolo della forma (V [a-z] <int>)
 ;; S-term: simbolo della forma [a-z]
 ;; EPXT-term: simbolo della forma (expt [a-z] <int>)
@@ -80,8 +80,16 @@
 ;; ========== ;;
 
 
+;; ===== Creazione del polinomio nella forma richiesta ===== ;;
+(defun expr-to-polynomial (expr)
+        (list `poly (mapcar `expr-to-monomial (rest expr))))
+;; ========== ;;
+
+
 ;; Esempi di input ;;
 
+
+;; Monomio
 ;; Classico
 (defparameter m1 `(* 3 y w (expt t 3)))
 (defparameter m1_2 `(* -3 y w (expt t 3)))
@@ -91,9 +99,14 @@
 
 ;; Termine noto soltanto
 (defparameter m3 42)
+(defparameter m3_2 (* 42))
 
+
+;; Polinomio
+;; Classico
 (defparameter p1 `(+ (* y (expt s 3) (expt t 3)) -4 (* x y)))
 
 
 ;; Testing ;;
-(print (expr-to-monomial m1_2))
+;; (print (expr-to-monomial m3_2))
+(print (expr-to-polynomial p1))
