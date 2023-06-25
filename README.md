@@ -25,7 +25,7 @@ Compile
 
 
 **LISP**
-> sbcl --noinform < main.lisp &
-to abort execution use right arrow.
+> sbcl --noinform --script main.lisp
+> sbcl --script main.lisp
 
 
