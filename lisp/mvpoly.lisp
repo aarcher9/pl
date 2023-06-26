@@ -5,7 +5,9 @@
 
 
 ;; Ritorna vero se il carattere è a-z
-(defun is-alpha (S-term) (alpha-char-p (coerce S-term 'character)))
+(defun is-alpha (S-term) 
+        (handler-case (alpha-char-p (coerce S-term 'character))
+                (error (c) (print S-term) nil)))
 
 ;; Ritorna vero se il carattere è 0-9
 (defun is-integer (c) (integerp c))
@@ -69,27 +71,28 @@
 
 ;; Crea un monomio a partire da un'espressione
 (defun expr-to-monomial (expr)
-        (cond 
-        ((atom expr) 
+        (cond
+        ((is-integer expr) 
                 (list `m expr 0 nil))
-        ((and (listp expr) (is-integer (second expr))) 
+
+        ((and (listp expr) (equal `* (first expr)) (is-integer (second expr)) ) 
                 (list `m (second expr) (get-total-degree (expr-to-sorted-V-terms (rest (rest expr)))) (expr-to-sorted-V-terms (rest (rest expr)))))
-        ((and (listp expr) (is-alpha (second expr)))
-                (list `m 1 (get-total-degree (expr-to-sorted-V-terms (rest (rest expr)))) (expr-to-sorted-V-terms (rest (rest expr)))))))
+
+        ((and (listp expr) (equal `* (first expr)) (not (is-integer (second expr))))
+                (list `m 1 (get-total-degree (expr-to-sorted-V-terms (rest expr))) (expr-to-sorted-V-terms (rest expr))))))
         
 
 ;; ========== ;;
 
 
 ;; ===== Creazione del polinomio nella forma richiesta ===== ;;
-
-
 ;; Riordina il polinomio come richiesto
-
+;;
 
 ;; Crea un polinommio a partire da un'espressione
 (defun expr-to-polynomial (expr)
-        (list `poly `-))
+        (list `poly (mapcar `expr-to-monomial (rest expr))))
+
 ;; ========== ;;
 
 
@@ -99,7 +102,7 @@
 ;; Monomio
 ;; Classico
 (defparameter m1 `(* 3 y w (expt t 3)))
-(defparameter m1_2 `(* -3 y w (expt t 3)))
+(defparameter m1_2 `(* (expt a 2)))
 
 ;; 1 sottinteso
 (defparameter m2 `(* y (expt s 3) (expt t 3)))
@@ -112,8 +115,9 @@
 ;; Polinomio
 ;; Classico
 (defparameter p1 `(+ (* y (expt s 3) (expt t 3)) -4 (* x y)))
+(defparameter p2 `(+ (* a c) (* (expt a 2)) (* a b) (* a)))
 
 
 ;; Testing ;;
-;; (print (expr-to-monomial m3_2))
-(print (expr-to-polynomial p1))
+(print (expr-to-monomial m1_2))
+;; (print (expr-to-polynomial p2))
