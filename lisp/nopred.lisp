@@ -1,7 +1,7 @@
 (defun nopred (p l)
         (cond   ((null l) nil)
                 ((atom l) 
-                        (cond   ((null (funcall p l))
+                        (cond   ((ignore-errors (funcall p l))
                                         l)))
                 ((listp l)
                         (cons (nopred p (first l)) (nopred p (rest l))))))
