@@ -8,5 +8,8 @@
         "*.pl": "prolog",
         "*.h": "c",
         "*.c": "c"
-    }
+},
+"html.format.wrapLineLength": 80,
+"editor.minimap.maxColumn": 80,
+"editor.wordWrap": "wordWrapColumn"
 }
