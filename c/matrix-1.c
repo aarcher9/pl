@@ -34,8 +34,11 @@ int main() {
         Matrix m = new_matrix(3, 3, 2.33);
 
         for(int row = 0; row < m->rows; row++) {
+
+                printf("\n");
+
                 for(int column = 0; column < m->columns; column++) {
-                        printf("%f", m->entries[row][column]);
+                        printf(" %f ", m->entries[row][column]);
                 }
         }
 
