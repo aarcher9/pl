@@ -19,7 +19,7 @@ Matrix* new_matrix(int n_of_rows, int n_of_columns) {
 
         (*m).n_of_rows = n_of_rows;
         (*m).n_of_columns = n_of_columns;
-        (*m).elements = malloc((n_of_rows * n_of_columns) * sizeof(int));
+        (*m).elements = malloc((n_of_rows * n_of_columns) * sizeof(double));
 
         return m;
 };
