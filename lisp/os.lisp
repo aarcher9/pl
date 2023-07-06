@@ -5,4 +5,5 @@
 
 (defun nomefunz (x) (* 2 x))
 
-(print (os `g (list 0 1 2 3)))
+;; Devo usare apply o funcall se non voglio che il passaggio del nome della funzione sia inutile.
+(print (os `ghhh (list 0 1 2 3)))
