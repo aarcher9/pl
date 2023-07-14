@@ -1,46 +1,36 @@
-# pl
+# pl 
+Programming Languages exercises. Exam preparation in c/** and raccolta-*.
 
 
-Programming Languages exercises.
+### Prolog 
 
-
-
-### Prolog
-
-**Non interactive execution**
-
+**Non interactive execution** 
 > $ swipl [FILE] -g 'nl' -t halt
 
 
-**Load file**
-
-> $ swipl -l [FILE]
-
-> $ swipl -q -l [FILE]
+**Load file** 
+> $ swipl -l [FILE] 
+> $ swipl -q -l [FILE] 
 
 
-**Run queries from file (does not print welcome message)**
-
+**Run queries from file (does not print welcome message)** 
 > $ swipl -l db.pl -g 'true' -g 'nl' < [FILE]
 
 
-### C++
+### C++ 
 
-**Compile**
-
-> $ g++ [files.cpp] -o main; ./main
+**Compile** 
+> $ g++ [files.cpp] -o main; ./main 
 
 
 ### LISP
 
-**Docs**
-
+**Docs** 
 [https://lispcookbook.github.io/cl-cookbook]
 [http://www.lispworks.com/documentation]
 
 
-**Run**
-
-> sbcl --script main.lisp
+**Run** 
+> sbcl --script main.lisp 
 
 

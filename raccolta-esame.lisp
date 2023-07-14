@@ -70,5 +70,61 @@
 (defun t_41 () 
         (print (funcall (g 2 2) 2 2)))
 
-(t_40)
-(t_41)
+
+;; ===== nopred / filtra ===== ;;
+;; Se cambio null con un not null ottengo il comportamento opposto dovrei solo implementare un modo per rimuovere in NIL.
+(defun nf (p l)
+        (cond   ((null l) nil)
+                ((atom l) 
+                        (cond ((null (funcall p l)) l)))
+                ((listp l)
+                        (cons (nf p (first l)) (nf p (rest l))))))
+
+(defun p (x) 
+        (or (equal x 2) (equal x 5) (equal x 8)))
+
+(defun t_50 () 
+        (print (nf `p `(2 6 5 (2 4 5) 9))))
+
+
+;; ===== reduce ===== ;;
+(defun h (x y) (+ x y))
+
+;; Combinazione associativa a sinstra degli elementi
+(defun reduce* (fun elements) 
+        (cond   ((>= (length elements) 2)
+                        (reduce* fun (cons (funcall fun (first elements) (second elements)) (rest (rest elements)))))
+                (t (first elements)) ))
+
+(defun t_60 () 
+        (print (reduce* `h `(1 2 3 4 8))))
+
+
+;; ===== aggiungi-42 ===== ;;
+(defun j (x) (eq 3 x))
+(defun aggiungi-42 (x) (+ x 42))
+
+;; Questa struttura si usa spessisimo, memorizzare può essere super utile! 
+(defun tadd (tree) 
+        (cond   ((or (eq (length tree) 0) (null tree)) nil)
+                ((atom (first tree))
+                        (cons (aggiungi-42 (first tree)) (tadd (rest tree))))
+                ((listp (first tree))
+                        (cons (tadd (first tree)) (tadd (rest tree))))
+        ))
+
+(defun t_70 () 
+        (print (tadd `(1 2 (3 5 6 (8)) 4 8))))
+
+
+;; ===== remove-number ===== ;;
+(defun remove-number (n l) 
+        (cond   ((null l) nil)
+                ((eq (first l) n) (rest l))
+                (t (cons (first l) (remove-number n (rest l))))
+        ))
+
+(defun t_80 () 
+        (print (remove-number 3 `(1 3 2 3 5 5 4 8))))
+
+(t_80)
