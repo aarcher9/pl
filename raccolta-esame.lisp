@@ -26,8 +26,10 @@
                 (t (lambda (x) (funcall f (funcall (repeated f (1- n)) x))))))
 
 (defun t_20 ()
-        (print (funcall (repeated `square 2) 3))
+        (print (funcall (repeated `square 2) 4))
         (print (funcall (repeated `square 3) 2)))
+
+(t_20)
 
 
 ;; ===== JSON key-value ===== ;;
@@ -88,8 +90,6 @@
 
 (defun t_50 () 
         (print (nf `p `(2 6 5 (2 7 5) 9))))
-
-(t_50)
 
 
 ;; ===== reduce ===== ;;
