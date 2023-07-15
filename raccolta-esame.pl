@@ -17,7 +17,7 @@ t_10(DN, D) :-
 %% ===== Assoc If ===== %%
 is_three(3).
 
-% Scrivendolo in questo modo appena lo trova ritorna e non cerca oltre.
+% Scrivendolo in questo modo appena lo trova ritorna e non cerca oltre. Importante l'ordine delle regole visto che Prolog usa la tecnica left-most.
 assoc_if(_, [], []).
 assoc_if(Pred, [[K, V] | _], [K, V]) :- 
         call(Pred, K).

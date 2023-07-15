@@ -72,19 +72,24 @@
 
 
 ;; ===== nopred / filtra ===== ;;
-;; Se cambio null con un not null ottengo il comportamento opposto dovrei solo implementare un modo per rimuovere in NIL.
+;; Se cambio null con un not null ottengo il comportamento opposto.
 (defun nf (p l)
         (cond   ((null l) nil)
                 ((atom l) 
                         (cond ((null (funcall p l)) l)))
                 ((listp l)
-                        (cons (nf p (first l)) (nf p (rest l))))))
+                        (if 
+                                (null (nf p (first l)))
+                                (nf p (rest l))
+                                (cons (nf p (first l)) (nf p (rest l))) ))))
 
 (defun p (x) 
         (or (equal x 2) (equal x 5) (equal x 8)))
 
 (defun t_50 () 
-        (print (nf `p `(2 6 5 (2 4 5) 9))))
+        (print (nf `p `(2 6 5 (2 7 5) 9))))
+
+(t_50)
 
 
 ;; ===== reduce ===== ;;
@@ -127,4 +132,3 @@
 (defun t_80 () 
         (print (remove-number 3 `(1 3 2 3 5 5 4 8))))
 
-(t_80)
