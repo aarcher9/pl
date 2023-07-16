@@ -8,7 +8,7 @@ struct _matrix {
 
 typedef struct _matrix* Matrix;
 
-// Ovunque richiesto, dove il passaggio per valore non è permesso, devo usare la malloc per scrivere sull'heap. In caso contrario mi ritrovo con un buon segmentation fault (scrittura su area di memoria non accessibile) a runtime.
+// Ovunque richiesto, dove il passaggio per valore non è permesso, devo usare la malloc per scrivere sull'heap. In caso contrario mi ritrovo con il buon vecchio segmentation fault (scrittura su area di memoria non accessibile, ovvero lo stack fuori dalla call della funzione) a runtime.
 Matrix new_matrix(int r, int c, double initial_value) {
 
         Matrix m = malloc(sizeof(Matrix));
