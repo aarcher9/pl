@@ -7,7 +7,7 @@ int* scoped_var() {
 
         return (int *) malloc(0);
         
-        // Se infatti chiamo la procedura mi avvisa con uno warning, perchè tecnicamente essendo statica una vlta usciti dallo scope di definizione non dovrebbe piú esistere
+        // Se infatti chiamo la return come sotto mi avvisa con uno warning, perchè tecnicamente essendo statica una volta usciti dallo scope di definizione non dovrebbe piú esistere
         // return &c[0];
 };
 
