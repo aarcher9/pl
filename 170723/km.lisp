@@ -6,9 +6,28 @@
 ;; C-x h C-M-\ usare il comando per reindentare tutto il file con Emacs.
 ;; M-q usare il comando per tagliare come impostato tutto il file con Emacs.
 
+;; --- Supporto
+(defun randnum (l)
+        (random l (make-random-state t)))
+
+(defun randlist (n l)
+        (if     (eq n 1) 
+                (cons (randnum l) nil)
+                (cons (randnum l) (randlist (- n 1) l))))
+
 
 ;; --- Operazioni fra vettori
 ;; Ci si rifereisce indistintamente ai vettori come punti e viceversa dal momento che sono strutture equivalenti in questo caso.
+
+;; Calcolo del punto medio fra vettori
+(defun vmean (vs) 
+        ())
+
+;; Sommatoria fra vettori
+(defun vsum (vs)
+        (if     (null (rest vs))
+                (rest vs)
+                (vplus (first vs) (vsum (rest vs)))))
 
 ;; *
 (defun vplus (x y) 
@@ -43,10 +62,13 @@
 
 
 ;; --- Algoritmo k-means
-
-;; Per inizializzare i k centroidi iniziali devo avere a disposizione la dimensione dei punti
-(defun initialize(k n) 
-        ())
+;; Sceglie k tra le osservazioni come centroidi (iniziali, ma lo fa in generale)
+(defun initialize(observations k) 
+        (if     (eq k 1)
+                (cons   (nth (randnum (length observations)) observations) 
+                        nil)
+                (cons   (nth (randnum (length observations)) observations) 
+                        (initialize observations (- k 1)))))
 
 ;; *
 (defun kmeans (observations k) 

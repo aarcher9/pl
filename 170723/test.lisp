@@ -3,6 +3,10 @@
 ;; Prestare attenzione che 8 non equivale a 8.0 (come anche in altri linguaggi)
 ;; Esiste la funzione (coerce ...) per le conversioni
 
+;; (assert (equal (vsum `((1 2) (2 3) (2 3) (6 7))) `()))
+;; (assert (equal (vsum `((1 2) (2 3))) `(3 5)))
+;; (assert (equal (vsum `((1 2))) `(1 2)))
+
 (assert (equal (vplus `(1 2) `(7 8)) `(8 10)))
 (assert (equal (vplus `(-1) `(4)) `(3)))
 (assert (equal (vplus `(0) `(0)) `(0)))
@@ -19,4 +23,5 @@
 
 (assert (equal (distance `(-2 -3) `(-1 -2)) (expt 2 (/ 2))))
 
-
+(initialize Observations 3)
+(print (vsum `((1 2) (1 2))))
