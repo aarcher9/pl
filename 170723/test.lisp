@@ -26,4 +26,4 @@
 (assert (equal (distance `(-2 -3) `(-1 -2)) (expt 2 (/ 2))))
 
 (initialize Observations 3)
-;; (print (vmean `((1 2) (2 3) (2 3) (6 7))))
+(print (nearest `((1 2) (7 3) (0 6) (6 7)) `(1 1)  `((0 6) (1 1))))

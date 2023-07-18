@@ -17,18 +17,6 @@
 
 
 ;; --- Operazioni fra vettori
-;; Ci si rifereisce indistintamente ai vettori come punti e viceversa dal momento che sono strutture equivalenti in questo caso.
-
-;; Calcolo del punto medio fra vettori
-(defun vmean (vs) 
-        (scalarprod (/ (length vs)) (vsum vs)))
-
-;; Sommatoria fra vettori
-(defun vsum (vs)
-        (if     (null (rest vs))
-                (first vs)
-                (vplus (first vs) (vsum (rest vs)))))
-
 ;; *
 (defun vplus (x y) 
         (cond   ((and (not (null x)) (not (null y)))
@@ -45,8 +33,6 @@
                 nil))
 
 ;; *
-;; Note:
-;; - i vettori egualmente lunghi
 (defun innerprod (x y) 
         (if     (not (null x))
                 (+ (* (first x) (first y)) (innerprod (rest x) (rest y)))
@@ -56,19 +42,38 @@
 (defun norm (x) 
         (expt (innerprod x x) (/ 2)))
 
-;;
 (defun distance (x y) 
         (norm (vminus x y)))
 
+(defun vmean (vs) 
+        (scalarprod (/ (length vs)) (vsum vs)))
+
+(defun vsum (vs)
+        (if     (null (rest vs))
+                (first vs)
+                (vplus (first vs) (vsum (rest vs)))))
+
 
 ;; --- Algoritmo k-means
-;; Sceglie k tra le osservazioni come centroidi (iniziali, ma lo fa in generale)
-(defun initialize(observations k) 
+(defun initialize(abs k) 
         (if     (eq k 1)
-                (cons   (nth (randnum (length observations)) observations) 
+                (cons   (nth (randnum (length abs)) abs) 
                         nil)
-                (cons   (nth (randnum (length observations)) observations) 
-                        (initialize observations (- k 1)))))
+                (cons   (nth (randnum (length abs)) abs) 
+                        (initialize abs (- k 1)))))
+
+(defun nearest (c o curr) 
+        (if     (null c)
+                curr
+                (if     (< (distance (first c) o) (distance (second curr) o))
+                        (nearest (rest c) o (cons (first c) o))
+                        (nearest (rest c) o curr))))
+
+;; (defun assign (o cs)
+;;         (nearest cs o (cons (first cs) o)))
+
+(defun partition (abs cs)
+        ())
 
 ;; *
 (defun kmeans (observations k) 
@@ -79,10 +84,7 @@
         (print "centroid"))
 
 
-
 ;; --- Parametri per testing 
-;; I test sono effettuati in un file a parte
-
 (defparameter Observations 
         `(      (3.0 7.0) (0.5 1.0) (0.8 0.5) (1.0 8.0) 
                 (0.9 1.2) (6.0 4.0) (7.0 5.5) (4.0 9.0) 
