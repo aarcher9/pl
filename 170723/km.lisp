@@ -21,12 +21,12 @@
 
 ;; Calcolo del punto medio fra vettori
 (defun vmean (vs) 
-        ())
+        (scalarprod (/ (length vs)) (vsum vs)))
 
 ;; Sommatoria fra vettori
 (defun vsum (vs)
         (if     (null (rest vs))
-                (rest vs)
+                (first vs)
                 (vplus (first vs) (vsum (rest vs)))))
 
 ;; *
