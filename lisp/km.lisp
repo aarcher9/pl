@@ -53,6 +53,7 @@
                 (9.0 4.0)))
 
 (print (vplus `(1 2) `(7 8)))
+(print `ciao)
 
 
 
