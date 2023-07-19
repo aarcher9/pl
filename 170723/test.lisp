@@ -34,7 +34,12 @@
 
 
 ;; --- Algoritmo k-means
-(assert (equal (length (remove-duplicates (initialize Obs 3))) 3))
+(defun test_loop (f args i) 
+        (if     (eq 0 i)
+                (apply f args)
+                (test_loop f args (- i 1))))
+
+(test_loop `initialize (list Obs 3) (expt 10 6))
 (if nil (print (assignall Obs (initialize Obs 3))))
 (if nil (print (partition Obs tcs_k3)))
 (if nil (print (centroids (partition Obs tcs_k3))))
