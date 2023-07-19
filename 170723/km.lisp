@@ -55,6 +55,7 @@
 
 
 ;; --- Algoritmo k-means
+;; Estrae i k centroidi dalle osservazioni pseudo-casualmente
 (defun initialize(obs k) 
         (if     (eq k 1)
                 (cons   (nth (randnum (length obs)) obs) 
@@ -62,19 +63,25 @@
                 (cons   (nth (randnum (length obs)) obs) 
                         (initialize obs (- k 1)))))
 
-;; min può essere passato come parametro iniziale come uno qualunque fra i valori dei centroidi. Si presti attenzione a non passare alcun valore che non sia fra quelli, specialmente se minore di tutti.
-(defun nearest (c o min) 
-        (if     (null c)
+;; Il parametro min deve essere inizialmente SOLTANTO ed ESCLUSIVAMENTE uno dei cs.
+(defun nearest (o cs min) 
+        (if     (null cs)
                 min
-                (if     (< (distance (first c) o) (distance min o))
-                        (nearest (rest c) o (first c))
-                        (nearest (rest c) o min))))
+                (if     (< (distance (first cs) o) (distance min o))
+                        (nearest o (rest cs) (first cs))
+                        (nearest o (rest cs) min))))
 
+;; Wrapper di convenienza per nearest
 (defun assign (o cs)
-        (nearest cs o (cons (first cs) o)))
+        (nearest o cs (first cs)))
 
-(defun partition (obs cs)
-        ())
+;; Accoppia ciascuna osservazione con il suo centroide più vicino
+(defun assignall (obs cs)
+        (if     (null obs)
+                nil
+                (cons 
+                        (cons (first obs) (cons (assign (first obs) cs) nil)) 
+                        (assignall (rest obs) cs))))
 
 ;; *
 (defun kmeans (observations k) 

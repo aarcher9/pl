@@ -9,7 +9,7 @@
 
 (assert (equal (vmean `((1 2) (2 3) (2 3) (6 7))) (list (/ 11 4) (/ 15 4))))
 
-(assert (equal (nearest `((1 2) (7 3) (0 6) (6 7)) `(1 1)  `(6 7)) `(1 2)))
+(assert (equal (nearest `(1 1) `((1 2) (7 3) (0 6) (6 7)) `(6 7)) `(1 2)))
 
 (assert (equal (vplus `(1 2) `(7 8)) `(8 10)))
 (assert (equal (vplus `(-1) `(4)) `(3)))
@@ -27,4 +27,4 @@
 
 (assert (equal (distance `(-2 -3) `(-1 -2)) (expt 2 (/ 2))))
 
-(initialize Observations 3)
+(print (assignall Observations `((1 2) (7 3) (0 6) (6 7))))
