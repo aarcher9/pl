@@ -55,24 +55,25 @@
 
 
 ;; --- Algoritmo k-means
-(defun initialize(abs k) 
+(defun initialize(obs k) 
         (if     (eq k 1)
-                (cons   (nth (randnum (length abs)) abs) 
+                (cons   (nth (randnum (length obs)) obs) 
                         nil)
-                (cons   (nth (randnum (length abs)) abs) 
-                        (initialize abs (- k 1)))))
+                (cons   (nth (randnum (length obs)) obs) 
+                        (initialize obs (- k 1)))))
 
-(defun nearest (c o curr) 
+;; min può essere passato come parametro iniziale come uno qualunque fra i valori dei centroidi. Si presti attenzione a non passare alcun valore che non sia fra quelli, specialmente se minore di tutti.
+(defun nearest (c o min) 
         (if     (null c)
-                curr
-                (if     (< (distance (first c) o) (distance (second curr) o))
-                        (nearest (rest c) o (cons (first c) o))
-                        (nearest (rest c) o curr))))
+                min
+                (if     (< (distance (first c) o) (distance min o))
+                        (nearest (rest c) o (first c))
+                        (nearest (rest c) o min))))
 
-;; (defun assign (o cs)
-;;         (nearest cs o (cons (first cs) o)))
+(defun assign (o cs)
+        (nearest cs o (cons (first cs) o)))
 
-(defun partition (abs cs)
+(defun partition (obs cs)
         ())
 
 ;; *
