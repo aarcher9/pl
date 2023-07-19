@@ -34,22 +34,16 @@
 
 
 ;; --- Algoritmo k-means
-(defun test_loop (f args i) 
-        (if     (eq 0 i)
-                (apply f args)
-                (test_loop f args (- i 1))))
 
-(test_loop `initialize (list Obs 3) (expt 10 6))
-(if nil (print (assignall Obs (initialize Obs 3))))
-(if nil (print (partition Obs tcs_k3)))
-(if nil (print (centroids (partition Obs tcs_k3))))
+;; TODO: testare unicità centroidi estratti casualmente
+
+;; Centroidi che danno risultati diversi da quelli di riferimento
+(defparameter cs_1 `((1.8 1.2) (3.0 7.0) (0.5 1.0)))
+
+;; (print (assignall Obs cs_1))
+;; (print `==========)
+;; (print (repart Obs cs_1 (partition Obs cs_1)))
 
 
-;; (print (kmeans Obs 3))
-;; (print (randset 3 9))
 
-;; Casi da verificare
-;; ((1.8 1.2) (3.0 7.0) (0.5 1.0)) 
-
-;; (((1.8 1.2)) ((3.0 7.0) (1.0 8.0) (6.0 4.0) (7.0 5.5) (4.0 9.0) (9.0 4.0))
-;;  ((0.5 1.0) (0.8 0.5))) 
+(kmeansdbg Obs 3)

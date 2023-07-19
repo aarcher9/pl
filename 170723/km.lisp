@@ -71,17 +71,6 @@
 
 
 ;; --- Algoritmo k-means
-;; Estrae i k centroidi dalle osservazioni pseudo-casualmente
-;; (defun initialize(obs k) 
-;;         (if     (eq k 1)
-;;                 (cons   (nth (randnum (length obs)) obs) 
-;;                         nil)
-;;                 (cons   (nth (randnum (length obs)) obs) 
-;;                         (initialize obs (- k 1)))))
-
-(defun initialize(obs k) 
-        (mapcar (lambda (x) (nth x obs)) (randset k (length obs))))
-
 ;; Il parametro min deve essere inizialmente SOLTANTO ed ESCLUSIVAMENTE uno dei cs.
 (defun nearest (o cs min) 
         (if     (null cs)
@@ -130,17 +119,32 @@
                 nil
                 (cons (centroid (first clss)) (centroids (rest clss)))))
 
-(defun repart (obs oldcs clss) 
-        (if     (equal oldcs (centroids clss))
-                clss
+;; Ritorna i clusters e i centroidi relativi
+(defun repart (obs cs clss) 
+        (if     (equal cs (centroids clss))
+                (cons cs (cons clss nil))
                 (repart obs (centroids clss) (partition obs (centroids clss)))))
 
-(defun lloydkmeans (obs Cs) 
-        (repart Obs Cs (partition Obs Cs)))
+(defun lloydkmeans (obs cs) 
+        (repart Obs cs (partition Obs cs)))
+
+(defun lloydkmeansdbg (obs cs) 
+        (format t "~%Centroid:")
+        (format t "~{~%> ~a~}~%~%" (first (lloydkmeans obs cs)))
+        (format t "Clusters:")
+        (format t "~{~%> ~a~}" (second (lloydkmeans obs cs)))
+        (format t "~%"))
+
+;; Estrae i k centroidi dalle osservazioni pseudo-casualmente
+(defun initialize(obs k) 
+        (mapcar (lambda (x) (nth x obs)) (randset k (length obs))))
+
+(defun kmeansdbg (observations k) 
+        (lloydkmeansdbg observations (initialize observations k)))
 
 ;; *
 (defun kmeans (observations k) 
-        (lloydkmeans observations (initialize observations k)))
+        (second (lloydkmeans observations (initialize observations k))))
 
 
 ;; --- Parametri per testing 
