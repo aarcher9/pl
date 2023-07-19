@@ -7,6 +7,12 @@
 ;; M-q usare il comando per tagliare come impostato tutto il file con Emacs.
 
 ;; --- Supporto
+;; Mi aspetto che la lista items sia più corta di l
+(defun delall (l items) 
+        (if     (null items)
+                l
+                (delall (remove (first items) l) (rest items))))
+
 (defun randnum (l)
         (random l (make-random-state t)))
 
@@ -94,7 +100,9 @@
         (if     (null cs)
                 nil
                 (cons   (group ass (first cs))
-                        (groupall ass (rest cs)))))
+                        (groupall 
+                                (delall ass (group ass (first cs))) 
+                                (rest cs)))))
 
 ;; Crea k = (length cs) clusters attorno ai centroidi cs sulle osservazioni
 (defun partition (obs cs)
@@ -104,10 +112,15 @@
 (defun centroid (observations) 
         (vmean observations))
 
-(defun centroids (clusters) 
-        (if     (null clusters)
+(defun centroids (clss) 
+        (if     (null clss)
                 nil
-                (cons (centroid (first clusters)) (centroids (rest clusters)))))
+                (cons (centroid (first clss)) (centroids (rest clss)))))
+
+(defun repart (obs oldcs clss) 
+        (if     (equal oldcs (centroids clss))
+                clss
+                (repart obs (centroids clss) (partition obs (centroids clss)))))
 
 ;; *
 (defun kmeans (observations k) 

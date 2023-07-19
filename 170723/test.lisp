@@ -3,6 +3,11 @@
 ;; Prestare attenzione che 8 non equivale a 8.0 (come anche in altri linguaggi)
 ;; Esiste la funzione (coerce ...) per le conversioni
 
+;; --- Supporto
+(assert (equal (delall `(1 2 2 1 4 6 4 4) `(1 4)) `(2 2 6)))
+(assert (equal (delall `(1 2) `(8)) `(1 2)))
+(assert (equal (delall `(8) `(8)) `()))
+
 ;; --- Vettori
 (assert (equal (vsum `((1 2) (2 3) (2 3) (6 7))) `(11 15)))
 (assert (equal (vsum `((1 2) (2 3))) `(3 5)))
@@ -28,7 +33,11 @@
 
 
 ;; --- Algoritmo k-means
+(defparameter Cs (initialize Obs 3))
+(if nil (print (initialize Obs 3)))
+(if nil (print (assignall Obs (initialize Obs 3))))
+(if nil (print (partition Obs tcs_k3)))
+(if nil (print (centroids (partition Obs tcs_k3))))
 
-;; Test "visivi"
-(print (partition Obs tcs_k3))
-(print (centroids (partition Obs tcs_k3)))
+;; (print (partition Obs Cs))
+(print (repart Obs Cs (partition Obs Cs)))
