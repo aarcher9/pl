@@ -13,13 +13,23 @@
                 l
                 (delall (remove (first items) l) (rest items))))
 
-(defun randnum (l)
-        (random l (make-random-state t)))
+;; L'intervallo generato di interi è [0, lim)
+(defun randnum (lim)
+        (random lim (make-random-state t)))
 
-(defun randlist (n l)
+(defun randlist (n lim)
         (if     (eq n 1) 
-                (cons (randnum l) nil)
-                (cons (randnum l) (randlist (- n 1) l))))
+                (cons (randnum lim) nil)
+                (cons (randnum lim) (randlist (- n 1) lim))))
+
+;; Si deve fare in modo che sia impossibile estrarre due centroidi uguali
+(defun randlist-clear (n lim rl)
+        (if     (equal (remove-duplicates rl) rl)
+                rl
+                (randlist-clear n lim (randlist n lim))))
+
+(defun randset (n lim)
+        (randlist-clear n lim (randlist n lim)))
 
 
 ;; --- Operazioni fra vettori
@@ -62,12 +72,15 @@
 
 ;; --- Algoritmo k-means
 ;; Estrae i k centroidi dalle osservazioni pseudo-casualmente
+;; (defun initialize(obs k) 
+;;         (if     (eq k 1)
+;;                 (cons   (nth (randnum (length obs)) obs) 
+;;                         nil)
+;;                 (cons   (nth (randnum (length obs)) obs) 
+;;                         (initialize obs (- k 1)))))
+
 (defun initialize(obs k) 
-        (if     (eq k 1)
-                (cons   (nth (randnum (length obs)) obs) 
-                        nil)
-                (cons   (nth (randnum (length obs)) obs) 
-                        (initialize obs (- k 1)))))
+        (mapcar (lambda (x) (nth x obs)) (randset k (length obs))))
 
 ;; Il parametro min deve essere inizialmente SOLTANTO ed ESCLUSIVAMENTE uno dei cs.
 (defun nearest (o cs min) 
@@ -122,9 +135,12 @@
                 clss
                 (repart obs (centroids clss) (partition obs (centroids clss)))))
 
+(defun lloydkmeans (obs Cs) 
+        (repart Obs Cs (partition Obs Cs)))
+
 ;; *
 (defun kmeans (observations k) 
-        (print "kmeans"))
+        (lloydkmeans observations (initialize observations k)))
 
 
 ;; --- Parametri per testing 

@@ -7,6 +7,7 @@
 (assert (equal (delall `(1 2 2 1 4 6 4 4) `(1 4)) `(2 2 6)))
 (assert (equal (delall `(1 2) `(8)) `(1 2)))
 (assert (equal (delall `(8) `(8)) `()))
+(assert (equal (delall `(8) `()) `(8)))
 
 ;; --- Vettori
 (assert (equal (vsum `((1 2) (2 3) (2 3) (6 7))) `(11 15)))
@@ -33,11 +34,17 @@
 
 
 ;; --- Algoritmo k-means
-(defparameter Cs (initialize Obs 3))
-(if nil (print (initialize Obs 3)))
+(assert (equal (length (remove-duplicates (initialize Obs 3))) 3))
 (if nil (print (assignall Obs (initialize Obs 3))))
 (if nil (print (partition Obs tcs_k3)))
 (if nil (print (centroids (partition Obs tcs_k3))))
 
-;; (print (partition Obs Cs))
-(print (repart Obs Cs (partition Obs Cs)))
+
+;; (print (kmeans Obs 3))
+;; (print (randset 3 9))
+
+;; Casi da verificare
+;; ((1.8 1.2) (3.0 7.0) (0.5 1.0)) 
+
+;; (((1.8 1.2)) ((3.0 7.0) (1.0 8.0) (6.0 4.0) (7.0 5.5) (4.0 9.0) (9.0 4.0))
+;;  ((0.5 1.0) (0.8 0.5))) 
