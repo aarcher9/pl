@@ -3,13 +3,12 @@
 ;; Prestare attenzione che 8 non equivale a 8.0 (come anche in altri linguaggi)
 ;; Esiste la funzione (coerce ...) per le conversioni
 
+;; --- Vettori
 (assert (equal (vsum `((1 2) (2 3) (2 3) (6 7))) `(11 15)))
 (assert (equal (vsum `((1 2) (2 3))) `(3 5)))
 (assert (equal (vsum `((1 2))) `(1 2)))
 
 (assert (equal (vmean `((1 2) (2 3) (2 3) (6 7))) (list (/ 11 4) (/ 15 4))))
-
-(assert (equal (nearest `(1 1) `((1 2) (7 3) (0 6) (6 7)) `(6 7)) `(1 2)))
 
 (assert (equal (vplus `(1 2) `(7 8)) `(8 10)))
 (assert (equal (vplus `(-1) `(4)) `(3)))
@@ -27,4 +26,12 @@
 
 (assert (equal (distance `(-2 -3) `(-1 -2)) (expt 2 (/ 2))))
 
-(print (assignall Observations `((1 2) (7 3) (0 6) (6 7))))
+
+;; --- Algoritmo k-means
+(assert (equal (nearest `(1 1) `((1 2) (7 3) (0 6) (6 7)) `(6 7)) `(1 2)))
+
+(assert (equal (assignall `((0 2) (6 4)) `((1 2) (7 3))) `(((0 2) (1 2)) ((6 4) (7 3)))))
+
+(assert (equal (pp `(((1 1) (0 1)) ((1 2) (0 1)) ((3 3) (3 4))) `(0 1)) `((1 1) (1 2))))
+
+;; (print (pp `(((1 1) (0 1)) ((1 2) (0 1)) ((3 3) (3 4))) `(0 1)))

@@ -79,9 +79,23 @@
 (defun assignall (obs cs)
         (if     (null obs)
                 nil
-                (cons 
-                        (cons (first obs) (cons (assign (first obs) cs) nil)) 
+                (cons   (cons (first obs) (cons (assign (first obs) cs) nil)) 
                         (assignall (rest obs) cs))))
+
+;; Raggruppa tutte le osservazioni che condividono lo stesso centroide più vicino a partire da un insieme di coppie già assegnate
+;; Per qualche motivo (last <list>) ritorna una lista e non un singolo elemento
+(defun pp (ass c) 
+        (if     (null ass)
+                nil
+                (if     (equal c (first (last (first ass))))
+                        (cons (first (first ass)) (pp (rest ass) c))
+                        (pp (rest ass) c))))
+
+(defun partition (obs cs)
+        (if     (null cs)
+                nil
+                (cons   (pp (assignall obs cs) (first cs))
+                        (partition obs (rest cs)))))
 
 ;; *
 (defun kmeans (observations k) 
