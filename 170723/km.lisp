@@ -71,7 +71,6 @@
                         (nearest o (rest cs) (first cs))
                         (nearest o (rest cs) min))))
 
-;; Wrapper di convenienza per nearest
 (defun assign (o cs)
         (nearest o cs (first cs)))
 
@@ -84,33 +83,53 @@
 
 ;; Raggruppa tutte le osservazioni che condividono lo stesso centroide più vicino a partire da un insieme di coppie già assegnate
 ;; Per qualche motivo (last <list>) ritorna una lista e non un singolo elemento
-(defun pp (ass c) 
+(defun group (ass c) 
         (if     (null ass)
                 nil
                 (if     (equal c (first (last (first ass))))
-                        (cons (first (first ass)) (pp (rest ass) c))
-                        (pp (rest ass) c))))
+                        (cons (first (first ass)) (group (rest ass) c))
+                        (group (rest ass) c))))
 
-(defun partition (obs cs)
+(defun groupall (ass cs) 
         (if     (null cs)
                 nil
-                (cons   (pp (assignall obs cs) (first cs))
-                        (partition obs (rest cs)))))
+                (cons   (group ass (first cs))
+                        (groupall ass (rest cs)))))
+
+;; Crea k = (length cs) clusters attorno ai centroidi cs sulle osservazioni
+(defun partition (obs cs)
+        (groupall (assignall obs cs) cs))
+
+;; *
+(defun centroid (observations) 
+        (vmean observations))
+
+(defun centroids (clusters) 
+        (if     (null clusters)
+                nil
+                (cons (centroid (first clusters)) (centroids (rest clusters)))))
 
 ;; *
 (defun kmeans (observations k) 
         (print "kmeans"))
 
-;; *
-(defun centroid (observations) 
-        (print "centroid"))
-
 
 ;; --- Parametri per testing 
-(defparameter Observations 
+(defparameter Obs 
         `(      (3.0 7.0) (0.5 1.0) (0.8 0.5) (1.0 8.0) 
-                (0.9 1.2) (6.0 4.0) (7.0 5.5) (4.0 9.0) 
+                (1.8 1.2) (6.0 4.0) (7.0 5.5) (4.0 9.0) 
                 (9.0 4.0)))
+
+(defparameter real-tcs_k3
+        `((2.6666667 8) (1.0333333 0.9) (7.3333335 4.5)))
+
+(defparameter tcs_k3
+        `((2.666 8) (1.033 0.9) (7.333 4.5)))
+
+(defparameter exp-clus_k3 
+        `(      ((3.0 7.0) (1.0 8.0) (4.0 9.0)) 
+                ((0.5 1.0) (0.8 0.5) (1.8 1.2))
+                ((6.0 4.0) (7.0 5.5) (9.0 4.0))))
 
 
 

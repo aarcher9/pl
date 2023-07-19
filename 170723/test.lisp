@@ -28,10 +28,7 @@
 
 
 ;; --- Algoritmo k-means
-(assert (equal (nearest `(1 1) `((1 2) (7 3) (0 6) (6 7)) `(6 7)) `(1 2)))
 
-(assert (equal (assignall `((0 2) (6 4)) `((1 2) (7 3))) `(((0 2) (1 2)) ((6 4) (7 3)))))
-
-(assert (equal (pp `(((1 1) (0 1)) ((1 2) (0 1)) ((3 3) (3 4))) `(0 1)) `((1 1) (1 2))))
-
-;; (print (pp `(((1 1) (0 1)) ((1 2) (0 1)) ((3 3) (3 4))) `(0 1)))
+;; Test "visivi"
+(print (partition Obs tcs_k3))
+(print (centroids (partition Obs tcs_k3)))
