@@ -24,6 +24,12 @@
 
 ;; --- Operazioni fra vettori
 ;; *
+(defun scalarprod (L x) 
+        (if     (not (null x))
+                (cons (* L (first x)) (scalarprod L (rest x)))
+                nil))
+
+;; *
 (defun vplus (x y) 
         (cond   ((and (not (null x)) (not (null y)))
                         (cons (+ (first x) (first y)) (vplus (rest x) (rest y))))))
@@ -31,12 +37,6 @@
 ;; *
 (defun vminus (x y) 
         (vplus x (scalarprod -1 y)))
-
-;; *
-(defun scalarprod (L x) 
-        (if     (not (null x))
-                (cons (* L (first x)) (scalarprod L (rest x)))
-                nil))
 
 ;; *
 (defun innerprod (x y) 

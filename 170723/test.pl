@@ -19,5 +19,14 @@ exp_clus_k3([
 %% --- Supporto
 
 %% --- Vettori
+test_vectors_op :-
+        innerprod([1, 2], [2, 3], 8),
+        scalarprod(10, [1, 2], [10, 20]),
+        vplus([1, 2], [2, 3], [3, 5]),
+        vminus([1, 2], [2, 3], [-1, -1]),
+        distance([-2, -3], [-1, -2], 1.4142135623730951),
+        vsum([[1, 1], [2, 3], [1, 2]], [4, 6]),
+        vmean([[1, 2], [3, 4]], [2.0, 3.0]),
+        norm([3, 4], 5.0).
 
 %% --- Algoritmo k-means
