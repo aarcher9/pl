@@ -28,7 +28,7 @@ vplus([], [], []).
 vplus([X | Tx], [Y | Ty], [H | T]) :- H is X + Y, vplus(Tx, Ty, T).
 
 %% *
-vminus(X, Y, R) :- scalarprod(-1, Y, IY), vplus(X, IY, R).
+vminus(X, Y, R) :- scalarprod(-1, Y, Ny), vplus(X, Ny, R).
 
 %% *
 innerprod([], [], 0).
@@ -42,8 +42,13 @@ distance(X, Y, R) :- vminus(X, Y, Out), norm(Out, R).
 vsum([X], X).
 vsum([X | T], R) :- vsum(T, Out), vplus(X, Out, R).  
 
-vmean(VL, R) :- length(VL, L), Q is 1 / L, vsum(VL, Sum), scalarprod(Q, Sum, R).
+vmean(VS, R) :- length(VS, L), Q is 1 / L, vsum(VS, Sum), scalarprod(Q, Sum, R).
 
 
 %% --- Algoritmo k-means
+nearest(_, [], Curr, Min).
+nearest(O, [C | Cs], Min) :- 
+        distance(C, O, D1), distance(Curr, O, D2),
+        (D1 < D2, nearest(O, Cs, C)) ; nearest(O, Cs, Curr, Min).
 
+assign(O, [C | Cs], Min) :- nearest(O, [C | Cs], C, Min).
