@@ -40,9 +40,9 @@
 
 ;; *
 (defun innerprod (x y) 
-        (if     (not (null x))
-                (+ (* (first x) (first y)) (innerprod (rest x) (rest y)))
-                0))
+        (if     (or (null x) (null y))
+                0.0
+                (+ (* (first x) (first y)) (innerprod (rest x) (rest y)))))
 
 ;; *
 (defun norm (x) 

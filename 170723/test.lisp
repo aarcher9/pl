@@ -27,22 +27,29 @@
 (assert (equal (vsum `((1 2) (2 3) (2 3) (6 7))) `(11 15)))
 (assert (equal (vsum `((1 2) (2 3))) `(3 5)))
 (assert (equal (vsum `((1 2))) `(1 2)))
+(assert (equal (vsum `(nil)) nil))
 
 (assert (equal (vmean `((1 2) (2 3) (2 3) (6 7))) (list (/ 11 4) (/ 15 4))))
 
 (assert (equal (vplus `(1 2) `(7 8)) `(8 10)))
 (assert (equal (vplus `(-1) `(4)) `(3)))
 (assert (equal (vplus `(0) `(0)) `(0)))
+(assert (equal (vplus nil `(9 0)) nil))
 
 (assert (equal (vminus `(1 2) `(7 8)) `(-6 -6)))
 (assert (equal (vminus `(-1) `(4)) `(-5)))
 (assert (equal (vminus `(0) `(0)) `(0)))
+(assert (equal (vminus nil `(0 2)) nil))
+
+(assert (equal (innerprod nil nil) 0.0))
 
 (assert (equal (norm `(3 4)) 5.0))
 (assert (equal (norm `(0)) 0.0))
+(assert (equal (norm nil) 0.0))
 
 (assert (equal (scalarprod 10 `(1 2 3)) `(10 20 30)))
 (assert (equal (scalarprod 10 `(0)) `(0)))
+(assert (equal (scalarprod 10 nil) nil))
 
 (assert (equal (distance `(-2 -3) `(-1 -2)) (expt 2 (/ 2))))
 
@@ -52,3 +59,5 @@
 (kmeansdbg Obs 1)
 (kmeansdbg Obs 9)
 (kmeansdbg Obs 3)
+(kmeansdbg Obs 8)
+;; (kmeansdbg Obs 10) ;; Freeza

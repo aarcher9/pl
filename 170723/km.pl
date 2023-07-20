@@ -3,7 +3,15 @@
 %%%% <>
 
 %% --- Supporto
-randnum(Lim) :- random(0, Lim - 1).
+randnum(Lim, Num) :- Up is Lim - 1, random(0, Up, Num).
+
+randlist(1, Lim, [Num]) :- randnum(Lim, Num).
+randlist(N, Lim, [H | T]) :- 
+        randnum(Lim, H),
+        NN is N - 1,
+        randlist(NN, Lim, T).
+
+randset()
 
 %% --- Operazioni fra vettori
 
