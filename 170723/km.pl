@@ -11,7 +11,10 @@ randlist(N, Lim, [H | T]) :-
         NN is N - 1,
         randlist(NN, Lim, T).
 
-randset()
+rlc(N, Lim, L, S) :-
+        (list_to_set(L, L), S = L) ; (randlist(N, Lim, NL), rlc(N, Lim, NL, S)).
+
+randset(N, Lim, Rs) :- randlist(N, Lim, Init), rlc(N, Lim, Init, Rs).
 
 %% --- Operazioni fra vettori
 
