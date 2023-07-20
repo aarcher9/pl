@@ -89,12 +89,12 @@
                 (cons   (cons (first obs) (cons (assign (first obs) cs) nil)) 
                         (assignall (rest obs) cs))))
 
-;; Raggruppa tutte le osservazioni che condividono lo stesso centroide più vicino a partire da un insieme di coppie già assegnate
+;; Raggruppa tutte le osservazioni che condividono il centroide indicato (più vicino) a partire da un insieme di coppie punto-centroide
 ;; Per qualche motivo (last <list>) ritorna una lista e non un singolo elemento
 (defun group (ass c) 
         (if     (null ass)
                 nil
-                (if     (equal c (first (last (first ass))))
+                (if     (equal (second (first ass)) c)
                         (cons (first (first ass)) (group (rest ass) c))
                         (group (rest ass) c))))
 
@@ -102,9 +102,7 @@
         (if     (null cs)
                 nil
                 (cons   (group ass (first cs))
-                        (groupall 
-                                (delall ass (group ass (first cs))) 
-                                (rest cs)))))
+                        (groupall ass (rest cs)))))
 
 ;; Crea k = (length cs) clusters attorno ai centroidi cs sulle osservazioni
 (defun partition (obs cs)

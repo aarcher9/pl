@@ -36,14 +36,4 @@
 ;; --- Algoritmo k-means
 
 ;; TODO: testare unicità centroidi estratti casualmente
-
-;; Centroidi che danno risultati diversi da quelli di riferimento
-(defparameter cs_1 `((1.8 1.2) (3.0 7.0) (0.5 1.0)))
-
-;; (print (assignall Obs cs_1))
-;; (print `==========)
-;; (print (repart Obs cs_1 (partition Obs cs_1)))
-
-
-
 (kmeansdbg Obs 3)
