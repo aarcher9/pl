@@ -1,13 +1,27 @@
 (load "km.lisp")
 
+;; --- Parametri per testing
+(defparameter Obs 
+        `(      (3.0 7.0) (0.5 1.0) (0.8 0.5) (1.0 8.0) 
+                (1.8 1.2) (6.0 4.0) (7.0 5.5) (4.0 9.0) 
+                (9.0 4.0)))
+
+(defparameter real-tcs_k3
+        `((2.6666667 8) (1.0333333 0.9) (7.3333335 4.5)))
+
+(defparameter tcs_k3
+        `((2.666 8) (1.033 0.9) (7.333 4.5)))
+
+(defparameter exp-clus_k3 
+        `(      ((3.0 7.0) (1.0 8.0) (4.0 9.0)) 
+                ((0.5 1.0) (0.8 0.5) (1.8 1.2))
+                ((6.0 4.0) (7.0 5.5) (9.0 4.0))))
+
 ;; Prestare attenzione che 8 non equivale a 8.0 (come anche in altri linguaggi)
 ;; Esiste la funzione (coerce ...) per le conversioni
 
 ;; --- Supporto
-(assert (equal (delall `(1 2 2 1 4 6 4 4) `(1 4)) `(2 2 6)))
-(assert (equal (delall `(1 2) `(8)) `(1 2)))
-(assert (equal (delall `(8) `(8)) `()))
-(assert (equal (delall `(8) `()) `(8)))
+
 
 ;; --- Vettori
 (assert (equal (vsum `((1 2) (2 3) (2 3) (6 7))) `(11 15)))
@@ -34,6 +48,7 @@
 
 
 ;; --- Algoritmo k-means
-
-;; TODO: testare unicità centroidi estratti casualmente
+;; (kmeansdbg Obs 0) ;; Errore strano
+(kmeansdbg Obs 1)
+(kmeansdbg Obs 9)
 (kmeansdbg Obs 3)
