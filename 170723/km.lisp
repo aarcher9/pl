@@ -80,7 +80,7 @@
                         (assignall (rest obs) cs))))
 
 ;; Raggruppa tutte le osservazioni che condividono il centroide indicato (più vicino) a partire da un insieme di coppie punto-centroide
-;; Per qualche motivo (last <list>) ritorna una lista e non un singolo elemento
+;; Per qualche motivo (last <list>) ritorna una lista e non un singolo elemento meglio usare (second <list>) che in questo caso equivale.
 (defun group (ass c) 
         (if     (null ass)
                 nil

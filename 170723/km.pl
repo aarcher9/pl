@@ -46,9 +46,25 @@ vmean(VS, R) :- length(VS, L), Q is 1 / L, vsum(VS, Sum), scalarprod(Q, Sum, R).
 
 
 %% --- Algoritmo k-means
-nearest(_, [], Curr, Min).
-nearest(O, [C | Cs], Min) :- 
+nearest(_, [], Curr, Curr).
+nearest(O, [C | Cs], Curr, Min) :- 
         distance(C, O, D1), distance(Curr, O, D2),
-        (D1 < D2, nearest(O, Cs, C)) ; nearest(O, Cs, Curr, Min).
+        (D1 < D2, nearest(O, Cs, C, Min)) ; nearest(O, Cs, Curr, Min).
 
+assign(_, [], _).
 assign(O, [C | Cs], Min) :- nearest(O, [C | Cs], C, Min).
+
+assignall([], _, []).
+assignall([O | Os], Cs, [[O, Min] | T]) :-
+        assign(O, Cs, Min),
+        assignall(Os, Cs, T).
+
+group([], _, []).
+group([[O, C] | Ass], C, [O | T]) :- group(Ass, C, T).
+
+groupall(_, [], []).
+groupall(Ass, [C | Cs], [G | Gs]) :- group(Ass, C, G), groupall(Ass, Cs, Gs).
+
+partition(Os, [C | Cs], Clss) :- 
+        assignall(Os, [C | Cs], Ass),
+        group(Ass, C, Clss).
