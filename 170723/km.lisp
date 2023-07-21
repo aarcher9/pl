@@ -4,8 +4,7 @@
 
 ;; --- Supporto
 ;; L'intervallo generato di interi è [0, lim)
-(defun randnum (lim)
-        (random lim (make-random-state t)))
+(defun randnum (lim) (random lim (make-random-state t)))
 
 (defun randlist (n lim)
         (if     (eq n 1) 
@@ -18,8 +17,7 @@
                 rl
                 (randlist-clear n lim (randlist n lim))))
 
-(defun randset (n lim)
-        (randlist-clear n lim (randlist n lim)))
+(defun randset (n lim) (randlist-clear n lim (randlist n lim)))
 
 
 ;; --- Operazioni fra vettori
@@ -35,8 +33,7 @@
                         (cons (+ (first x) (first y)) (vplus (rest x) (rest y))))))
 
 ;; *
-(defun vminus (x y) 
-        (vplus x (scalarprod -1 y)))
+(defun vminus (x y) (vplus x (scalarprod -1 y)))
 
 ;; *
 (defun innerprod (x y) 
@@ -45,14 +42,11 @@
                 (+ (* (first x) (first y)) (innerprod (rest x) (rest y)))))
 
 ;; *
-(defun norm (x) 
-        (expt (innerprod x x) (/ 2)))
+(defun norm (x) (expt (innerprod x x) (/ 2)))
 
-(defun distance (x y) 
-        (norm (vminus x y)))
+(defun distance (x y) (norm (vminus x y)))
 
-(defun vmean (vs) 
-        (scalarprod (/ (length vs)) (vsum vs)))
+(defun vmean (vs) (scalarprod (/ (length vs)) (vsum vs)))
 
 (defun vsum (vs)
         (if     (null (rest vs))
@@ -61,7 +55,7 @@
 
 
 ;; --- Algoritmo k-means
-;; Il parametro min deve essere inizialmente SOLTANTO ed ESCLUSIVAMENTE uno dei cs.
+;; Il parametro min deve essere inizialmente SOLTANTO ed ESCLUSIVAMENTE uno dei centroidi specificati.
 (defun nearest (o cs min) 
         (if     (null cs)
                 min
@@ -69,8 +63,7 @@
                         (nearest o (rest cs) (first cs))
                         (nearest o (rest cs) min))))
 
-(defun assign (o cs)
-        (nearest o cs (first cs)))
+(defun assign (o cs) (nearest o cs (first cs)))
 
 ;; Accoppia ciascuna osservazione con il suo centroide più vicino
 (defun assignall (obs cs)
@@ -81,40 +74,37 @@
 
 ;; Raggruppa tutte le osservazioni che condividono il centroide indicato (più vicino) a partire da un insieme di coppie punto-centroide
 ;; Per qualche motivo (last <list>) ritorna una lista e non un singolo elemento meglio usare (second <list>) che in questo caso equivale.
-(defun group (ass c) 
-        (if     (null ass)
+(defun group (pairs c) 
+        (if     (null pairs)
                 nil
-                (if     (equal (second (first ass)) c)
-                        (cons (first (first ass)) (group (rest ass) c))
-                        (group (rest ass) c))))
+                (if     (equal (second (first pairs)) c)
+                        (cons (first (first pairs)) (group (rest pairs) c))
+                        (group (rest pairs) c))))
 
-(defun groupall (ass cs) 
+(defun groupall (pairs cs) 
         (if     (null cs)
                 nil
-                (cons   (group ass (first cs))
-                        (groupall ass (rest cs)))))
+                (cons   (group pairs (first cs))
+                        (groupall pairs (rest cs)))))
 
-;; Crea k = (length cs) clusters attorno ai centroidi cs sulle osservazioni
-(defun partition (obs cs)
-        (groupall (assignall obs cs) cs))
+;; Crea k = (length <lista di centroidi>) clusters attorno ai centroidi sulle osservazioni
+(defun partition (obs cs) (groupall (assignall obs cs) cs))
 
 ;; *
-(defun centroid (observations) 
-        (vmean observations))
+(defun centroid (observations) (vmean observations))
 
-(defun centroids (clss) 
-        (if     (null clss)
+(defun centroids (klus) 
+        (if     (null klus)
                 nil
-                (cons (centroid (first clss)) (centroids (rest clss)))))
+                (cons (centroid (first klus)) (centroids (rest klus)))))
 
 ;; Ritorna i clusters e i centroidi relativi
-(defun repart (obs cs clss) 
-        (if     (equal cs (centroids clss))
-                (cons cs (cons clss nil))
-                (repart obs (centroids clss) (partition obs (centroids clss)))))
+(defun repart (obs cs klus) 
+        (if     (equal cs (centroids klus))
+                (cons cs (cons klus nil))
+                (repart obs (centroids klus) (partition obs (centroids klus)))))
 
-(defun lloydkmeans (obs cs) 
-        (repart Obs cs (partition Obs cs)))
+(defun lloydkmeans (obs cs) (repart Obs cs (partition Obs cs)))
 
 ;; Estrae i k centroidi dalle osservazioni pseudo-casualmente
 (defun initialize(obs k) 
