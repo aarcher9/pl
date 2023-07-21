@@ -116,20 +116,17 @@
 (defun lloydkmeans (obs cs) 
         (repart Obs cs (partition Obs cs)))
 
-(defun lloydkmeansdbg (obs cs) 
-        (format t "~%Centroid:")
-        (format t "~{~%> ~a~}~%~%" (first (lloydkmeans obs cs)))
-        (format t "Clusters:")
-        (format t "~{~%> ~a~}" (second (lloydkmeans obs cs)))
-        (format t "~%"))
-
 ;; Estrae i k centroidi dalle osservazioni pseudo-casualmente
 (defun initialize(obs k) 
         (mapcar (lambda (x) (nth x obs)) (randset k (length obs))))
 
-(defun kmeansdbg (observations k) 
-        (lloydkmeansdbg observations (initialize observations k)))
-
 ;; *
 (defun kmeans (observations k) 
-        (second (lloydkmeans observations (initialize observations k))))
+        (lloydkmeans observations (initialize observations k)))
+
+(defun kmeansdbg (observations k) 
+        (format t "~%Centroids:")
+        (format t "~{~%> ~a~}~%~%" (first (kmeans observations k)))
+        (format t "Clusters:")
+        (format t "~{~%> ~a~}" (second (kmeans observations k)))
+        (format t "~%"))

@@ -66,6 +66,37 @@ group([[_, _] | Ass], C, T) :- group(Ass, C, T).
 groupall(_, [], []).
 groupall(Ass, [C | Cs], [G | Gs]) :- group(Ass, C, G), groupall(Ass, Cs, Gs).
 
-partition(Os, [C | Cs], Clss) :- 
-        assignall(Os, [C | Cs], Ass),
+partition(Obs, [C | Cs], Clss) :- 
+        assignall(Obs, [C | Cs], Ass),
         groupall(Ass, [C | Cs], Clss).
+
+centroid(Obs, C) :- vmean(Obs, C).
+
+centroids([], []).
+centroids([K | Clss], [C | T]) :- centroid(K, C), centroids(Clss, T).
+
+repart(_, Cs, Clss, [Cs, Clss]) :- centroids(Clss, Cs).
+repart(Obs, _, Clss, R) :- 
+        centroids(Clss, NCs),
+        partition(Obs, NCs, NClss),
+        repart(Obs, NCs, NClss, R).
+
+lloydkmeans(Obs, Cs, R) :- partition(Obs, Cs, Clss), repart(Obs, Cs, Clss, R).
+
+initialize(_, [], []).
+initialize(Obs, [Rn | Rs], [C | Cs]) :- 
+        nth0(Rn, Obs, C),
+        initialize(Obs, Rs, Cs).
+
+kmeans(Obs, Kn, [Cs, Clss]) :-
+        length(Obs, MaxRand),
+        randset(Kn, MaxRand, Rs),
+        initialize(Obs, Rs, ICs),
+        lloydkmeans(Obs, ICs, [Cs, Clss]).
+
+kmeansdbg(Obs, Kn, [Cs, Clss]) :-
+        kmeans(Obs, Kn, [Cs, Clss]),
+        nl, write('Centroids:'), nl,
+        maplist(writeln, Cs), nl,
+        write('Clusters:'), nl,
+        maplist(writeln, Clss).
