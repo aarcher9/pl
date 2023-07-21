@@ -61,10 +61,11 @@ assignall([O | Os], Cs, [[O, Min] | T]) :-
 
 group([], _, []).
 group([[O, C] | Ass], C, [O | T]) :- group(Ass, C, T).
+group([[_, _] | Ass], C, T) :- group(Ass, C, T).
 
 groupall(_, [], []).
 groupall(Ass, [C | Cs], [G | Gs]) :- group(Ass, C, G), groupall(Ass, Cs, Gs).
 
 partition(Os, [C | Cs], Clss) :- 
         assignall(Os, [C | Cs], Ass),
-        group(Ass, C, Clss).
+        groupall(Ass, [C | Cs], Clss).
