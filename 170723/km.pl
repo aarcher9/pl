@@ -55,8 +55,8 @@ assign(_, [], _).
 assign(O, [C | Cs], Min) :- nearest(O, [C | Cs], C, Min).
 
 assignall([], _, []).
-assignall([O | Os], Cs, [[O, Min] | T]) :-
-        assign(O, Cs, Min),
+assignall([O | Os], Cs, [[O, Min] | T]) :- 
+        assign(O, Cs, Min), 
         assignall(Os, Cs, T).
 
 group([], _, []).
@@ -66,37 +66,37 @@ group([[_, _] | Ass], C, T) :- group(Ass, C, T).
 groupall(_, [], []).
 groupall(Ass, [C | Cs], [G | Gs]) :- group(Ass, C, G), groupall(Ass, Cs, Gs).
 
-partition(Obs, [C | Cs], Clss) :- 
+partition(Obs, [C | Cs], Klus) :- 
         assignall(Obs, [C | Cs], Ass),
-        groupall(Ass, [C | Cs], Clss).
+        groupall(Ass, [C | Cs], Klus).
 
-centroid(Obs, C) :- vmean(Obs, C).
+centroid(Observations, C) :- vmean(Observations, C).
 
 centroids([], []).
-centroids([K | Clss], [C | T]) :- centroid(K, C), centroids(Clss, T).
+centroids([K | Klus], [C | T]) :- centroid(K, C), centroids(Klus, T).
 
-repart(_, Cs, Clss, [Cs, Clss]) :- centroids(Clss, Cs).
-repart(Obs, _, Clss, R) :- 
-        centroids(Clss, NCs),
-        partition(Obs, NCs, NClss),
-        repart(Obs, NCs, NClss, R).
+repart(_, Cs, Klus, [Cs, Klus]) :- centroids(Klus, Cs).
+repart(Obs, _, Klus, R) :- 
+        centroids(Klus, NCs),
+        partition(Obs, NCs, NKlus),
+        repart(Obs, NCs, NKlus, R).
 
-lloydkmeans(Obs, Cs, R) :- partition(Obs, Cs, Clss), repart(Obs, Cs, Clss, R).
+lloydkmeans(Obs, Cs, R) :- partition(Obs, Cs, Klus), repart(Obs, Cs, Klus, R).
 
 initialize(_, [], []).
 initialize(Obs, [Rn | Rs], [C | Cs]) :- 
         nth0(Rn, Obs, C),
         initialize(Obs, Rs, Cs).
 
-kmeans(Obs, Kn, [Cs, Clss]) :-
-        length(Obs, MaxRand),
-        randset(Kn, MaxRand, Rs),
-        initialize(Obs, Rs, ICs),
-        lloydkmeans(Obs, ICs, [Cs, Clss]).
+kmeans(Observations, K, [Cs, Klus]) :-
+        length(Observations, MaxRand),
+        randset(K, MaxRand, Rs),
+        initialize(Observations, Rs, ICs),
+        lloydkmeans(Observations, ICs, [Cs, Klus]).
 
-kmeansdbg(Obs, Kn, [Cs, Clss]) :-
-        kmeans(Obs, Kn, [Cs, Clss]),
+kmeansdbg(Obs, Kn, [Cs, Klus]) :-
+        kmeans(Obs, Kn, [Cs, Klus]),
         nl, write('Centroids:'), nl,
         maplist(writeln, Cs), nl,
         write('Clusters:'), nl,
-        maplist(writeln, Clss).
+        maplist(writeln, Klus).
