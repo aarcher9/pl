@@ -1,5 +1,20 @@
 (load "km.lisp")
 
+;; Gestione errori semplice
+(defun base_err_hand ()
+        (handler-case (/ 3 0) 
+                (division-by-zero (c) (format t "Caught division by zero: ~a~%" c))))
+
+;; Gestione errore avanzata
+(defun adv_err_hand () 
+        (restart-case
+                (handler-bind 
+                        ((error #'(lambda (c) 
+                                        (declare (ignore condition))
+                                        (invoke-restart 'my-restart 7))))
+                (error "Foo."))
+                (my-restart (&optional v) (print v))))
+
 ;; --- Parametri per testing
 (defparameter Obs 
         `(      (3.0 7.0) (0.5 1.0) (0.8 0.5) (1.0 8.0) 
@@ -55,9 +70,25 @@
 
 
 ;; --- Algoritmo k-means
-;; (kmeansdbg Obs 0) ;; Errore strano
-(kmeansdbg Obs 1)
-(kmeansdbg Obs 9)
-(kmeansdbg Obs 3)
-(kmeansdbg Obs 8)
-;; (kmeansdbg Obs 10) ;; Freeza
+
+;; Casi normali, input corretto
+(defun test_base () 
+        (kmeansdbg Obs 1)
+        (kmeansdbg Obs 9)
+        (kmeansdbg Obs 3)
+        (kmeansdbg Obs 8))
+
+(defun test_limit_k ()
+        ;; Se non gestito: errore strano
+        (kmeansdbg Obs 0)
+        ;; Se non gestito: freeza 
+        (kmeansdbg Obs 10))
+
+
+(restart-case
+        (handler-bind 
+                ((error #'(lambda (c) 
+                                (declare (ignore condition))
+                                (invoke-restart 'my-restart 7))))
+        (error "Foo."))
+        (my-restart (&optional v) (print v)))
