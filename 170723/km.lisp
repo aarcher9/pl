@@ -2,6 +2,16 @@
 ;;;; 826296 Agosti Andrea
 ;;;; <>
 
+;; --- Gestione condizioni
+(defun handle-klus-n (obs k)
+        (cond   ((> k (length obs)) 
+                        (warn "K deve essere al massimo uguale al numero di osservazioni") 
+                        (length obs))
+                ((<= k 0)
+                        (warn "K deve essere un numero naturale non-zero") 
+                        1)
+                (t k)))
+
 ;; --- Supporto
 ;; L'intervallo generato di interi è [0, lim)
 (defun randnum (lim) (random lim (make-random-state t)))
@@ -112,7 +122,7 @@
 
 ;; *
 (defun kmeans (observations k) 
-        (lloydkmeans observations (initialize observations k)))
+        (lloydkmeans observations (initialize observations (handle-klus-n observations k))))
 
 (defun kmeansdbg (observations k) 
         (format t "~%Centroids:")

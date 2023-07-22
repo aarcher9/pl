@@ -15,6 +15,10 @@
                 (error "Foo."))
                 (my-restart (&optional v) (print v))))
 
+;; Warnings
+(defun warning_throw() (warn "Ignore even number"))
+
+
 ;; --- Parametri per testing
 (defparameter Obs 
         `(      (3.0 7.0) (0.5 1.0) (0.8 0.5) (1.0 8.0) 
@@ -84,11 +88,4 @@
         ;; Se non gestito: freeza 
         (kmeansdbg Obs 10))
 
-
-(restart-case
-        (handler-bind 
-                ((error #'(lambda (c) 
-                                (declare (ignore condition))
-                                (invoke-restart 'my-restart 7))))
-        (error "Foo."))
-        (my-restart (&optional v) (print v)))
+(test_limit_k)
