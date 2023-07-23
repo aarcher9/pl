@@ -3,19 +3,20 @@
 %%%% <>
 
 %% --- Supporto
-randnum(Lim, Num) :- Up is Lim - 1, random(0, Up, Num).
+randnum(Num, Max) :- Up is Max - 1, random(0, Up, Num).
 
-randlist(1, Lim, [Num]) :- randnum(Lim, Num).
-randlist(N, Lim, [H | T]) :- 
-        randnum(Lim, H),
+randlist(1, Max, [Num]) :- randnum(Num, Max).
+randlist(N, Max, [H | T]) :- 
+        randnum(H, Max),
         NN is N - 1,
-        randlist(NN, Lim, T).
+        randlist(NN, Max, T).
 
-randlist_clear(N, Lim, L, S) :-
+randlist_clear(N, Max, L, S) :-
+        write(Max),
         (list_to_set(L, L), S = L) ; 
-        (randlist(N, Lim, NL), randlist_clear(N, Lim, NL, S)).
+        (randlist(N, Max, NL), randlist_clear(N, Max, NL, S)).
 
-randset(N, Lim, Rs) :- randlist(N, Lim, Init), randlist_clear(N, Lim, Init, Rs).
+randset(N, Max, Rs) :- randlist(N, Max, Init), randlist_clear(N, Max, Init, Rs).
 
 
 %% --- Operazioni fra vettori
