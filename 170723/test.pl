@@ -23,20 +23,17 @@ exp_clus_k3([
 %%% --- Vettori
 test_vectors :-
         scalarprod(10, [1, 2], [10, 20]),
-        scalarprod(10, [], _),
+        scalarprod(10, [], []),
 
         vplus([1, 2], [2, 3], [3, 5]),
-        \+ vplus([1], [2, 3], _),
-        \+ vplus([2, 3], [1], _),
-        \+ vplus([2], [], _),
-        \+ vplus([], [1], _),
+        vplus([2, 3], [], [2, 3]),
+        vplus([], [2, 3], [2, 3]),
         vplus([], [], []),
 
         vminus([1, 2], [2, 3], [-1, -1]),
 
         innerprod([1, 2], [2, 3], 8),
-        \+ innerprod([1], [2, 3], _),
-        \+ innerprod([2, 3], [1], _),
+        innerprod([], [2, 3], 0),
         innerprod([], [], 0),
 
         norm([3, 4], 5.0),
@@ -44,21 +41,18 @@ test_vectors :-
         norm([], 0),
 
         distance([-2, -3], [-1, -2], 1.4142135623730951),
-        \+ distance([1], [-1, -2], _),
-        \+ distance([1, 5], [-1], _),
-        \+ distance([], [-1, -2], _),
-        \+ distance([-1, -2], [], _),
+        distance([], [0, 2], 2.0),
         distance([], [], 0),
 
         vsum([[1, 1], [2, 3], [1, 2]], [4, 6]),
-        \+ vsum([[1, 1], [2], [1, 2]], _),
+        vsum([[1, 2], []], [1, 2]),
         vsum([[], []], []),
         vsum([], []),
 
         vmean([[1, 2], [3, 4]], [2.0, 3.0]),
+        vmean([[1, 2], []], [0.5, 1.0]),
         vmean([[], []], []),
-        vmean([], []),
-        \+ vmean([[1], [3, 4]], _).
+        vmean([], []).
 
 %%% --- Algoritmo k-means
 %%% Casi normali, input corretto

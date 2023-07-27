@@ -38,6 +38,8 @@ scalarprod(L, [X | Tx], [H | T]) :- H is L * X, scalarprod(L, Tx, T).
 
 %%% *
 vplus([], [], []).
+vplus([H | T], [], [H | T]).
+vplus([], [H | T], [H | T]).
 vplus([X | Tx], [Y | Ty], [H | T]) :- H is X + Y, vplus(Tx, Ty, T).
 
 %%% *
@@ -45,6 +47,8 @@ vminus(X, Y, R) :- scalarprod(-1, Y, Ny), vplus(X, Ny, R).
 
 %%% *
 innerprod([], [], 0).
+innerprod([], [_ | _], 0).
+innerprod([_ | _], [], 0).
 innerprod([X | Tx], [Y | Ty], R) :- innerprod(Tx, Ty, Out), R is (X * Y + Out).
 
 %%% *
