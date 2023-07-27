@@ -55,29 +55,12 @@ test_vectors :-
         vmean([], []).
 
 %%% --- Algoritmo k-means
-%%% Predicato di supporto per il debugging
-kmeansdbg(_, K, []) :- 
-        K =< 0,
-        write('K deve essere un numero positivo non-zero'),
-        nl, write('Centroids:'), nl,
-        maplist(writeln, []), nl,
-        write('Clusters:'), nl,
-        maplist(writeln, []).
-
-kmeansdbg(Observations, K, []) :- 
-        length(Observations, OL), 
-        K > OL,
-        write('K deve essere minore o al massimo uguale del numero di osservazioni').
-
-kmeansdbg(Observations, K, [Cs, Klus]) :-
-        length(Observations, MaxRand),
-        randset(K, MaxRand, Rs),
-        initialize(Observations, Rs, ICs),
-        lloydkmeans(Observations, ICs, [Cs, Klus]),
-        nl, write('Centroids:'), nl,
-        maplist(writeln, Cs), nl,
-        write('Clusters:'), nl,
-        maplist(writeln, Klus).
+%%% Test generico
+%% K = 0, se non gestito: loop
+%% K > #Obs, se non gestito: loop
+test_kmeans0(K, Cs, Klus) :- 
+        obs(Obs), 
+        kmeans0(Obs, K, [Cs, Klus]).
 
 %%% Casi normali, input corretto
 test_base :-
@@ -87,13 +70,3 @@ test_base :-
         kmeansdbg(Obs, 5, _), !, 
         kmeansdbg(Obs, 9, _), !, 
         kmeansdbg(Obs, 1, _), !.
-
-%% TODO
-test_limit_k :-
-        obs(Obs),
-
-        %% Se non gestito: loop
-        kmeansdbg(Obs, 0, _), !.
-
-        %% Se non gestito: loop
-        % kmeansdbg(Obs, 10, _), !.

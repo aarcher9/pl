@@ -112,12 +112,15 @@ initialize(Obs, [Rn | Rs], [C | Cs]) :-
         nth0(Rn, Obs, C),
         initialize(Obs, Rs, Cs).
 
-%%% *
-kmeans(_, K, []) :- K =< 0.
-kmeans(Observations, K, []) :- length(Observations, OL), K > OL.
-
-kmeans(Observations, K, Klus) :-
+%%% Predicato di supporto per kmeans/3
+kmeans0(Observations, K, [Cs, Klus]) :-
+        K > 0,
         length(Observations, MaxRand),
+        K =< MaxRand,
         randset(K, MaxRand, Rs),
         initialize(Observations, Rs, ICs),
-        lloydkmeans(Observations, ICs, [_, Klus]).
+        lloydkmeans(Observations, ICs, [Cs, Klus]).
+
+%%% *
+kmeans(Observations, K, Klus) :- 
+        kmeans0(Observations, K, [_, Klus]).
