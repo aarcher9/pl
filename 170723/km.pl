@@ -2,23 +2,10 @@
 %%%% 826296 Agosti Andrea
 %%%% <>
 
-%% --- Gestione errori & casi limite
-handle_klus_n(Obs, K) :- 
-        length(Obs, NObs), 
-        K > 0, 
-        K =< NObs.
+%%% --- Gestione errori & casi limite
 
-handle_klus_n(_, K) :-
-        K =< 0,
-        write('K deve essere un numero naturale non-zero'),
-        fail.
 
-handle_klus_n(Obs, K) :- 
-        length(Obs, NObs), 
-        K > NObs,
-        write('K deve essere al massimo uguale al numero di osservazioni'), fail.
-
-%% --- Supporto
+%%% --- Supporto
 randnum(Max, Num) :- Up is (Max - 1), random(0, Up, Num).
 
 randlist(1, Max, [Num]) :- randnum(Max, Num).
@@ -31,35 +18,35 @@ randlist_clear(N, Max, L, S) :-
         (list_to_set(L, L), S = L) ; 
         (randlist(N, Max, NL), randlist_clear(N, Max, NL, S)).
 
-% Quando N == Max, va in loop infinito, devo gestire correttamente il caso
+%%% Quando N == Max, va in loop infinito, devo gestire correttamente il caso
 randset(N, N, R) :- N1 is N + 1, randset(N, N1, R).
 randset(N, Max, Rs) :- randlist(N, Max, Init), randlist_clear(N, Max, Init, Rs).
 
 
-%% --- Operazioni fra vettori
-%% *
-%% Ne inserisco uno di esempio per evitare di ricevere errori se volessi interrogare la base di dati prima di aver chiamato new_vector/2
+%%% --- Operazioni fra vettori
+%%% *
+%%% Ne inserisco uno di esempio per evitare di ricevere errori se volessi interrogare la base di dati prima di aver chiamato new_vector/2
 vector(v0, [0, 0, 0]).
 
-%% *
+%%% *
 new_vector(Name, Value) :- assert(vector(Name, Value)).
 
-%% *
+%%% *
 scalarprod(_, [], []).
 scalarprod(L, [X | Tx], [H | T]) :- H is L * X, scalarprod(L, Tx, T).
 
-%% *
+%%% *
 vplus([], [], []).
 vplus([X | Tx], [Y | Ty], [H | T]) :- H is X + Y, vplus(Tx, Ty, T).
 
-%% *
+%%% *
 vminus(X, Y, R) :- scalarprod(-1, Y, Ny), vplus(X, Ny, R).
 
-%% *
+%%% *
 innerprod([], [], 0).
 innerprod([X | Tx], [Y | Ty], R) :- innerprod(Tx, Ty, Out), R is (X * Y + Out).
 
-%% *
+%%% *
 norm(X, R) :- innerprod(X, X, Out), R is Out ** 0.5.
 
 distance(X, Y, R) :- vminus(X, Y, Out), norm(Out, R).
@@ -70,7 +57,7 @@ vsum([X | T], R) :- vsum(T, Out), vplus(X, Out, R).
 vmean(VS, R) :- length(VS, L), Q is 1 / L, vsum(VS, Sum), scalarprod(Q, Sum, R).
 
 
-%% --- Algoritmo k-means
+%%% --- Algoritmo k-means
 nearest(_, [], Curr, Curr).
 nearest(O, [C | Cs], Curr, Min) :- 
         distance(C, O, D1), distance(Curr, O, D2),
@@ -95,7 +82,7 @@ partition(Obs, [C | Cs], Klus) :-
         assignall(Obs, [C | Cs], Ass),
         groupall(Ass, [C | Cs], Klus).
 
-%% *
+%%% *
 centroid(Observations, C) :- vmean(Observations, C).
 
 centroids([], []).
@@ -114,10 +101,9 @@ initialize(Obs, [Rn | Rs], [C | Cs]) :-
         nth0(Rn, Obs, C),
         initialize(Obs, Rs, Cs).
 
-%% *
+%%% *
 kmeans(Observations, K, [Cs, Klus]) :-
         length(Observations, MaxRand),
-        handle_klus_n(Observations, K),
         randset(K, MaxRand, Rs),
         initialize(Observations, Rs, ICs),
         lloydkmeans(Observations, ICs, [Cs, Klus]).

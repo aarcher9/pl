@@ -1,6 +1,6 @@
 (load "km.lisp")
 
-;; --- Parametri per testing
+;;; --- Parametri per testing
 (defparameter Obs 
         `(      (3.0 7.0) (0.5 1.0) (0.8 0.5) (1.0 8.0) 
                 (1.8 1.2) (6.0 4.0) (7.0 5.5) (4.0 9.0) 
@@ -17,13 +17,13 @@
                 ((0.5 1.0) (0.8 0.5) (1.8 1.2))
                 ((6.0 4.0) (7.0 5.5) (9.0 4.0))))
 
-;; Prestare attenzione che 8 non equivale a 8.0 (come anche in altri linguaggi)
-;; Esiste la funzione (coerce ...) per le conversioni
+;;; Prestare attenzione che 8 non equivale a 8.0 (come anche in altri linguaggi)
+;;; Esiste la funzione (coerce ...) per le conversioni
 
-;; --- Supporto
+;;; --- Supporto
 
 
-;; --- Vettori
+;;; --- Vettori
 (assert (equal (scalarprod 10 `(1 2 3)) `(10 20 30)))
 (assert (equal (scalarprod 10 `(0)) `(0)))
 (assert (equal (scalarprod 10 nil) nil))
@@ -57,8 +57,8 @@
 (assert (equal (vmean `((1 2) (2 3) (2 3) (6 7))) (list (/ 11 4) (/ 15 4))))
 
 
-;; --- Algoritmo k-means
-;; Casi normali, input corretto
+;;; --- Algoritmo k-means
+;;; Casi normali, input corretto
 (defun test_base () 
         (kmeansdbg Obs 1)
         (kmeansdbg Obs 9)
