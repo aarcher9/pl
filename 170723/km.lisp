@@ -2,21 +2,13 @@
 ;;;; 826296 Agosti Andrea
 ;;;; <>
 
-;; --- Gestione condizioni & casi limite
-(defun handle-klus-n (obs k)
-        (cond   ((> k (length obs)) 
-                        (warn "K deve essere al massimo uguale al numero di osservazioni") 
-                        (length obs))
-                ((<= k 0)
-                        (warn "K deve essere un numero naturale non-zero") 
-                        1)
-                (t k)))
-
-(defun notify-vect-length-mismatch (x y)
-        (if     (eq (length x) (length y))
-                t
-                (error "~A e ~A hanno lunghezze diverse" x y)))
-
+;; --- Gestione casi limite
+(defun vectors-length-matches (x y)
+        (cond   ((not (eq (length x) (length y))) 
+                        nil)
+                ((and (null x) (null y)) 
+                        nil)
+                (t t)))
 
 ;; --- Supporto
 ;; L'intervallo generato di interi è [0, lim)
@@ -39,25 +31,24 @@
 ;; --- Operazioni fra vettori
 ;; *
 (defun scalarprod (L vector) 
-        (if     (not (null vector))
+        (if     (and (not (null vector)) (not (null L)))
                 (cons (* L (first vector)) (scalarprod L (rest vector)))
                 nil))
 
 ;; *
 (defun vplus (vector1 vector2) 
-        (notify-vect-length-mismatch vector1 vector2)
-        (cond   ((and (not (null vector1)) (not (null vector2)))
-                        (cons (+ (first vector1) (first vector2)) (vplus (rest vector1) (rest vector2))))))
+        (if     (vectors-length-matches vector1 vector2)
+                (cons (+ (first vector1) (first vector2)) (vplus (rest vector1) (rest vector2)))
+                nil))
 
 ;; *
 (defun vminus (vector1 vector2) (vplus vector1 (scalarprod -1 vector2)))
 
 ;; *
 (defun innerprod (vector1 vector2) 
-        (notify-vect-length-mismatch vector1 vector2)
-        (if     (or (null vector1) (null vector2))
-                0.0
-                (+ (* (first vector1) (first vector2)) (innerprod (rest vector1) (rest vector2)))))
+        (if     (vectors-length-matches vector1 vector2)
+                (+ (* (first vector1) (first vector2)) (innerprod (rest vector1) (rest vector2)))
+                0.0))
 
 ;; *
 (defun norm (vector) (expt (innerprod vector vector) (/ 2)))
@@ -130,7 +121,7 @@
 
 ;; *
 (defun kmeans (observations k) 
-        (lloydkmeans observations (initialize observations (handle-klus-n observations k))))
+        (lloydkmeans observations (initialize observations k)))
 
 (defun kmeansdbg (observations k) 
         (format t "~%Centroids:")

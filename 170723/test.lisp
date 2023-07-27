@@ -1,24 +1,5 @@
 (load "km.lisp")
 
-;; Gestione errori semplice
-(defun base_err_hand ()
-        (handler-case (/ 3 0) 
-                (division-by-zero (c) (format t "Caught division by zero: ~a~%" c))))
-
-;; Gestione errore avanzata
-(defun adv_err_hand () 
-        (restart-case
-                (handler-bind 
-                        ((error #'(lambda (c) 
-                                        (declare (ignore condition))
-                                        (invoke-restart 'my-restart 7))))
-                (error "Foo."))
-                (my-restart (&optional v) (print v))))
-
-;; Warnings
-(defun warning_throw() (warn "Ignore even number"))
-
-
 ;; --- Parametri per testing
 (defparameter Obs 
         `(      (3.0 7.0) (0.5 1.0) (0.8 0.5) (1.0 8.0) 
@@ -43,38 +24,37 @@
 
 
 ;; --- Vettori
+(assert (equal (scalarprod 10 `(1 2 3)) `(10 20 30)))
+(assert (equal (scalarprod 10 `(0)) `(0)))
+(assert (equal (scalarprod 10 nil) nil))
+(assert (equal (scalarprod nil `(1 2)) nil))
+
+(assert (equal (vplus `(1 2) `(7 8)) `(8 10)))
+(assert (equal (vplus `(-1) `(4)) `(3)))
+(assert (equal (vplus `(0) `(0)) `(0)))
+(assert (equal (vplus `(1 2) `(1)) nil))
+(assert (equal (vplus `(1) `(1 2)) nil))
+(assert (equal (vplus nil `(1)) nil))
+(assert (equal (vplus `(1) nil) nil))
+
+(assert (equal (vminus `(1 2) `(7 8)) `(-6 -6)))
+(assert (equal (vminus `(-1) `(4)) `(-5)))
+(assert (equal (vminus `(0) `(0)) `(0)))
+
+(assert (equal (innerprod nil nil) 0.0))
+
+(assert (equal (norm `(3 4)) 5.0))
+(assert (equal (norm `(0)) 0.0))
+(assert (equal (norm nil) 0.0))
+
+(assert (equal (distance `(-2 -3) `(-1 -2)) (expt 2 (/ 2))))
+
 (assert (equal (vsum `((1 2) (2 3) (2 3) (6 7))) `(11 15)))
 (assert (equal (vsum `((1 2) (2 3))) `(3 5)))
 (assert (equal (vsum `((1 2))) `(1 2)))
 (assert (equal (vsum `(nil)) nil))
 
 (assert (equal (vmean `((1 2) (2 3) (2 3) (6 7))) (list (/ 11 4) (/ 15 4))))
-
-(assert (equal (vplus `(1 2) `(7 8)) `(8 10)))
-(assert (equal (vplus `(-1) `(4)) `(3)))
-(assert (equal (vplus `(0) `(0)) `(0)))
-(defun vplus-err ()
-        (print (vplus `(1 2) `(1))))
-
-(assert (equal (vminus `(1 2) `(7 8)) `(-6 -6)))
-(assert (equal (vminus `(-1) `(4)) `(-5)))
-(assert (equal (vminus `(0) `(0)) `(0)))
-(defun vminus-err ()
-        (print (vminus `(1 2) `(1))))
-
-(assert (equal (innerprod nil nil) 0.0))
-(defun innerprod-err ()
-        (print (innerprod `(1 2) `(1))))
-
-(assert (equal (norm `(3 4)) 5.0))
-(assert (equal (norm `(0)) 0.0))
-(assert (equal (norm nil) 0.0))
-
-(assert (equal (scalarprod 10 `(1 2 3)) `(10 20 30)))
-(assert (equal (scalarprod 10 `(0)) `(0)))
-(assert (equal (scalarprod 10 nil) nil))
-
-(assert (equal (distance `(-2 -3) `(-1 -2)) (expt 2 (/ 2))))
 
 
 ;; --- Algoritmo k-means
@@ -92,3 +72,4 @@
         ;; Se non gestito: freeza 
         (kmeansdbg Obs 10))
 
+(test_base)
