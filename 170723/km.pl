@@ -52,9 +52,11 @@ norm(X, R) :- innerprod(X, X, Out), R is Out ** 0.5.
 
 distance(X, Y, R) :- vminus(X, Y, Out), norm(Out, R).
 
+vsum([], []).
 vsum([X], X).
 vsum([X | T], R) :- vsum(T, Out), vplus(X, Out, R).  
 
+vmean([], []).
 vmean(VS, R) :- length(VS, L), Q is 1 / L, vsum(VS, Sum), scalarprod(Q, Sum, R).
 
 

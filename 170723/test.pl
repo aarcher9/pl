@@ -28,6 +28,8 @@ test_vectors :-
         vplus([1, 2], [2, 3], [3, 5]),
         \+ vplus([1], [2, 3], _),
         \+ vplus([2, 3], [1], _),
+        \+ vplus([2], [], _),
+        \+ vplus([], [1], _),
         vplus([], [], []),
 
         vminus([1, 2], [2, 3], [-1, -1]),
@@ -42,8 +44,21 @@ test_vectors :-
         norm([], 0),
 
         distance([-2, -3], [-1, -2], 1.4142135623730951),
+        \+ distance([1], [-1, -2], _),
+        \+ distance([1, 5], [-1], _),
+        \+ distance([], [-1, -2], _),
+        \+ distance([-1, -2], [], _),
+        distance([], [], 0),
+
         vsum([[1, 1], [2, 3], [1, 2]], [4, 6]),
-        vmean([[1, 2], [3, 4]], [2.0, 3.0]).
+        \+ vsum([[1, 1], [2], [1, 2]], _),
+        vsum([[], []], []),
+        vsum([], []),
+
+        vmean([[1, 2], [3, 4]], [2.0, 3.0]),
+        vmean([[], []], []),
+        vmean([], []),
+        \+ vmean([[1], [3, 4]], _).
 
 %%% --- Algoritmo k-means
 %%% Casi normali, input corretto
@@ -52,4 +67,15 @@ test_base :-
         kmeansdbg(Obs, 3, _), !, 
         kmeansdbg(Obs, 8, _), !, 
         kmeansdbg(Obs, 5, _), !, 
-        kmeansdbg(Obs, 1, _), !. 
+        kmeansdbg(Obs, 9, _), !, 
+        kmeansdbg(Obs, 1, _), !.
+
+%% TODO
+test_limit_k :-
+        obs(Obs),
+
+        %% Se non gestito: loop
+        kmeansdbg(Obs, 0, _), !,
+
+        %% Se non gestito: loop
+        kmeansdbg(Obs, 10, _), !.

@@ -42,12 +42,17 @@
 (assert (equal (vminus `(0) `(0)) `(0)))
 
 (assert (equal (innerprod nil nil) 0.0))
+(assert (equal (innerprod nil `(1)) 0.0))
+(assert (equal (innerprod `(1 4) nil) 0.0))
+(assert (equal (innerprod `(1 4) `(1)) 0.0))
 
 (assert (equal (norm `(3 4)) 5.0))
 (assert (equal (norm `(0)) 0.0))
 (assert (equal (norm nil) 0.0))
 
 (assert (equal (distance `(-2 -3) `(-1 -2)) (expt 2 (/ 2))))
+(assert (equal (distance nil `(-1 -2)) 0.0))
+(assert (equal (distance `(-1 -2) nil) 0.0))
 
 (assert (equal (vsum `((1 2) (2 3) (2 3) (6 7))) `(11 15)))
 (assert (equal (vsum `((1 2) (2 3))) `(3 5)))
@@ -71,5 +76,3 @@
 
         ;; Se non gestito: freeza 
         (kmeansdbg Obs 10))
-
-(test_base)
