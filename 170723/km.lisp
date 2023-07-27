@@ -38,31 +38,31 @@
 
 ;; --- Operazioni fra vettori
 ;; *
-(defun scalarprod (L x) 
-        (if     (not (null x))
-                (cons (* L (first x)) (scalarprod L (rest x)))
+(defun scalarprod (L vector) 
+        (if     (not (null vector))
+                (cons (* L (first vector)) (scalarprod L (rest vector)))
                 nil))
 
 ;; *
-(defun vplus (x y) 
-        (notify-vect-length-mismatch x y)
-        (cond   ((and (not (null x)) (not (null y)))
-                        (cons (+ (first x) (first y)) (vplus (rest x) (rest y))))))
+(defun vplus (vector1 vector2) 
+        (notify-vect-length-mismatch vector1 vector2)
+        (cond   ((and (not (null vector1)) (not (null vector2)))
+                        (cons (+ (first vector1) (first vector2)) (vplus (rest vector1) (rest vector2))))))
 
 ;; *
-(defun vminus (x y) (vplus x (scalarprod -1 y)))
+(defun vminus (vector1 vector2) (vplus vector1 (scalarprod -1 vector2)))
 
 ;; *
-(defun innerprod (x y) 
-        (notify-vect-length-mismatch x y)
-        (if     (or (null x) (null y))
+(defun innerprod (vector1 vector2) 
+        (notify-vect-length-mismatch vector1 vector2)
+        (if     (or (null vector1) (null vector2))
                 0.0
-                (+ (* (first x) (first y)) (innerprod (rest x) (rest y)))))
+                (+ (* (first vector1) (first vector2)) (innerprod (rest vector1) (rest vector2)))))
 
 ;; *
-(defun norm (x) (expt (innerprod x x) (/ 2)))
+(defun norm (vector) (expt (innerprod vector vector) (/ 2)))
 
-(defun distance (x y) (norm (vminus x y)))
+(defun distance (vector1 vector2) (norm (vminus vector1 vector2)))
 
 (defun vmean (vs) (scalarprod (/ (length vs)) (vsum vs)))
 
