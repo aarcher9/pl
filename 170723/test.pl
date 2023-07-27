@@ -21,15 +21,29 @@ exp_clus_k3([
 %% --- Supporto
 
 %% --- Vettori
-test_vectors_op :-
-        innerprod([1, 2], [2, 3], 8),
+test_vectors :-
         scalarprod(10, [1, 2], [10, 20]),
+        scalarprod(10, [], _),
+
         vplus([1, 2], [2, 3], [3, 5]),
+        \+ vplus([1], [2, 3], _),
+        \+ vplus([2, 3], [1], _),
+        vplus([], [], []),
+
         vminus([1, 2], [2, 3], [-1, -1]),
+
+        innerprod([1, 2], [2, 3], 8),
+        \+ innerprod([1], [2, 3], _),
+        \+ innerprod([2, 3], [1], _),
+        innerprod([], [], 0),
+
+        norm([3, 4], 5.0),
+        norm([0], 0),
+        norm([], 0),
+
         distance([-2, -3], [-1, -2], 1.4142135623730951),
         vsum([[1, 1], [2, 3], [1, 2]], [4, 6]),
-        vmean([[1, 2], [3, 4]], [2.0, 3.0]),
-        norm([3, 4], 5.0).
+        vmean([[1, 2], [3, 4]], [2.0, 3.0]).
 
 %% --- Algoritmo k-means
 test_partition(Clss) :- 
