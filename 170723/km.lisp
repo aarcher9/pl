@@ -12,6 +12,12 @@
                         1)
                 (t k)))
 
+(defun notify-vect-length-mismatch (x y)
+        (if     (eq (length x) (length y))
+                t
+                (error "~A e ~A hanno lunghezze diverse" x y)))
+
+
 ;; --- Supporto
 ;; L'intervallo generato di interi è [0, lim)
 (defun randnum (lim) (random lim (make-random-state t)))
@@ -39,6 +45,7 @@
 
 ;; *
 (defun vplus (x y) 
+        (notify-vect-length-mismatch x y)
         (cond   ((and (not (null x)) (not (null y)))
                         (cons (+ (first x) (first y)) (vplus (rest x) (rest y))))))
 
@@ -47,6 +54,7 @@
 
 ;; *
 (defun innerprod (x y) 
+        (notify-vect-length-mismatch x y)
         (if     (or (null x) (null y))
                 0.0
                 (+ (* (first x) (first y)) (innerprod (rest x) (rest y)))))

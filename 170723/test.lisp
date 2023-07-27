@@ -53,14 +53,18 @@
 (assert (equal (vplus `(1 2) `(7 8)) `(8 10)))
 (assert (equal (vplus `(-1) `(4)) `(3)))
 (assert (equal (vplus `(0) `(0)) `(0)))
-(assert (equal (vplus nil `(9 0)) nil))
+(defun vplus-err ()
+        (print (vplus `(1 2) `(1))))
 
 (assert (equal (vminus `(1 2) `(7 8)) `(-6 -6)))
 (assert (equal (vminus `(-1) `(4)) `(-5)))
 (assert (equal (vminus `(0) `(0)) `(0)))
-(assert (equal (vminus nil `(0 2)) nil))
+(defun vminus-err ()
+        (print (vminus `(1 2) `(1))))
 
 (assert (equal (innerprod nil nil) 0.0))
+(defun innerprod-err ()
+        (print (innerprod `(1 2) `(1))))
 
 (assert (equal (norm `(3 4)) 5.0))
 (assert (equal (norm `(0)) 0.0))
@@ -74,7 +78,6 @@
 
 
 ;; --- Algoritmo k-means
-
 ;; Casi normali, input corretto
 (defun test_base () 
         (kmeansdbg Obs 1)
@@ -85,7 +88,7 @@
 (defun test_limit_k ()
         ;; Se non gestito: errore strano
         (kmeansdbg Obs 0)
+
         ;; Se non gestito: freeza 
         (kmeansdbg Obs 10))
 
-;; (test_limit_k)
