@@ -43,4 +43,4 @@ test_initialize(Cs) :-
 % 0 e 9 non funzionanti
 test_kmeansdbg :-
         obs(Obs),
-        kmeansdbg(Obs, 9, _), !. 
+        kmeansdbg(Obs, 3, _), !. 

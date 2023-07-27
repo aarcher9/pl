@@ -3,19 +3,19 @@
 %%%% <>
 
 %% --- Supporto
-randnum(Num, Max) :- Up is Max - 1, random(0, Up, Num).
+randnum(Max, Num) :- Up is (Max - 1), random(0, Up, Num).
 
-randlist(1, Max, [Num]) :- randnum(Num, Max).
+randlist(1, Max, [Num]) :- randnum(Max, Num).
 randlist(N, Max, [H | T]) :- 
-        randnum(H, Max),
+        randnum(Max, H),
         NN is N - 1,
         randlist(NN, Max, T).
 
 randlist_clear(N, Max, L, S) :-
-        write(Max),
         (list_to_set(L, L), S = L) ; 
         (randlist(N, Max, NL), randlist_clear(N, Max, NL, S)).
 
+randset(N, N, R) :- N1 is N + 1, randset(N, N1, R).
 randset(N, Max, Rs) :- randlist(N, Max, Init), randlist_clear(N, Max, Init, Rs).
 
 
