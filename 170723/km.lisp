@@ -107,7 +107,7 @@
                 nil
                 (cons (centroid (first klus)) (centroids (rest klus)))))
 
-;;; Ritorna i clusters e i centroidi relativi
+;;; Il core del programma, ricomputa clusters e ricalcola i centroidi fino a che la condizione di terminazione non sia raggiunta
 (defun repart (obs cs klus) 
         (if     (equal cs (centroids klus))
                 (cons cs (cons klus nil))

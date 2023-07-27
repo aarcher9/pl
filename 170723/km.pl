@@ -6,6 +6,7 @@
 
 
 %%% --- Supporto
+%%% L'intervallo generato di interi è [0, Up]
 randnum(Max, Num) :- Up is (Max - 1), random(0, Up, Num).
 
 randlist(1, Max, [Num]) :- randnum(Max, Num).
@@ -66,6 +67,7 @@ nearest(O, [C | Cs], Curr, Min) :-
 assign(_, [], _).
 assign(O, [C | Cs], Min) :- nearest(O, [C | Cs], C, Min).
 
+%%% Accoppia ciascuna osservazione con il suo centroide più vicino
 assignall([], _, []).
 assignall([O | Os], Cs, [[O, Min] | T]) :- 
         assign(O, Cs, Min), 
@@ -78,6 +80,7 @@ group([[_, _] | Ass], C, T) :- group(Ass, C, T).
 groupall(_, [], []).
 groupall(Ass, [C | Cs], [G | Gs]) :- group(Ass, C, G), groupall(Ass, Cs, Gs).
 
+%%% Crea length(<lista di centroidi>, K) K clusters attorno ai centroidi sulle osservazioni
 partition(Obs, [C | Cs], Klus) :- 
         assignall(Obs, [C | Cs], Ass),
         groupall(Ass, [C | Cs], Klus).
@@ -88,6 +91,7 @@ centroid(Observations, C) :- vmean(Observations, C).
 centroids([], []).
 centroids([K | Klus], [C | T]) :- centroid(K, C), centroids(Klus, T).
 
+%%% Il core del programma, ricomputa clusters e ricalcola i centroidi fino a che la condizione di terminazione non sia raggiunta
 repart(_, Cs, Klus, [Cs, Klus]) :- centroids(Klus, Cs).
 repart(Obs, _, Klus, R) :- 
         centroids(Klus, NCs),
@@ -96,6 +100,7 @@ repart(Obs, _, Klus, R) :-
 
 lloydkmeans(Obs, Cs, R) :- partition(Obs, Cs, Klus), repart(Obs, Cs, Klus, R).
 
+%%% Estrae i k centroidi dalle osservazioni pseudo-casualmente
 initialize(_, [], []).
 initialize(Obs, [Rn | Rs], [C | Cs]) :- 
         nth0(Rn, Obs, C),
