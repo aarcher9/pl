@@ -69,7 +69,7 @@ test_limit_k :-
         obs(Obs),
 
         %% Se non gestito: loop
-        kmeansdbg(Obs, 0, _), !,
+        kmeansdbg(Obs, 0, _), !.
 
         %% Se non gestito: loop
-        kmeansdbg(Obs, 10, _), !.
+        % kmeansdbg(Obs, 10, _), !.

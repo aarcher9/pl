@@ -113,6 +113,8 @@ initialize(Obs, [Rn | Rs], [C | Cs]) :-
         initialize(Obs, Rs, Cs).
 
 %%% *
+kmeans(_, K, []) :- write('okoko'), K =< 0.
+kmeans(Observations, K, []) :- length(Observations, OL), K > OL.
 kmeans(Observations, K, [Cs, Klus]) :-
         length(Observations, MaxRand),
         randset(K, MaxRand, Rs),
