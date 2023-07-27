@@ -37,9 +37,19 @@
 
 ;;; *
 (defun vplus (vector1 vector2) 
-        (if     (vectors-length-matches vector1 vector2)
-                (cons (+ (first vector1) (first vector2)) (vplus (rest vector1) (rest vector2)))
-                nil))
+        (cond   ((and (null vector1) (null vector2))
+                        nil)
+                ((null vector1)
+                        vector2)
+                ((null vector2)
+                        vector1)
+                ((not (eq (length vector1) (length vector2)))
+                        nil)
+                (t
+                        (cons (+ (first vector1) (first vector2)) (vplus (rest vector1) (rest vector2))))))
+        ;; (if     (vectors-length-matches vector1 vector2)
+        ;;         (cons (+ (first vector1) (first vector2)) (vplus (rest vector1) (rest vector2)))
+        ;;         nil))
 
 ;;; *
 (defun vminus (vector1 vector2) (vplus vector1 (scalarprod -1 vector2)))
