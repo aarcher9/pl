@@ -88,4 +88,4 @@
         ;; Se non gestito: freeza 
         (kmeansdbg Obs 10))
 
-(test_limit_k)
+;; (test_limit_k)

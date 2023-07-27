@@ -19,6 +19,6 @@ exp_clus_k3([
 
 
 %% --- Algoritmo k-means
-test_kmeans(Klus) :-
+test_kmeansdbg :-
         obs(Obs),
-        kmeans(Obs, 3, Klus), !. 
+        kmeans(Obs, 3, _), !. 

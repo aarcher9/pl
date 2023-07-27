@@ -2,7 +2,7 @@
 ;;;; 826296 Agosti Andrea
 ;;;; <>
 
-;; --- Gestione condizioni
+;; --- Gestione condizioni & casi limite
 (defun handle-klus-n (obs k)
         (cond   ((> k (length obs)) 
                         (warn "K deve essere al massimo uguale al numero di osservazioni") 

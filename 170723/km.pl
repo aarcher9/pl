@@ -2,6 +2,22 @@
 %%%% 826296 Agosti Andrea
 %%%% <>
 
+%% --- Gestione errori & casi limite
+handle_klus_n(Obs, K) :- 
+        length(Obs, NObs), 
+        K > 0, 
+        K =< NObs.
+
+handle_klus_n(_, K) :-
+        K =< 0,
+        write('K deve essere un numero naturale non-zero'),
+        fail.
+
+handle_klus_n(Obs, K) :- 
+        length(Obs, NObs), 
+        K > NObs,
+        write('K deve essere al massimo uguale al numero di osservazioni'), fail.
+
 %% --- Supporto
 randnum(Max, Num) :- Up is (Max - 1), random(0, Up, Num).
 
@@ -15,11 +31,19 @@ randlist_clear(N, Max, L, S) :-
         (list_to_set(L, L), S = L) ; 
         (randlist(N, Max, NL), randlist_clear(N, Max, NL, S)).
 
+% Quando N == Max, va in loop infinito, devo gestire correttamente il caso
 randset(N, N, R) :- N1 is N + 1, randset(N, N1, R).
 randset(N, Max, Rs) :- randlist(N, Max, Init), randlist_clear(N, Max, Init, Rs).
 
 
 %% --- Operazioni fra vettori
+%% *
+%% Ne inserisco uno di esempio per evitare di ricevere errori se volessi interrogare la base di dati prima di aver chiamato new_vector/2
+vector(v0, [0, 0, 0]).
+
+%% *
+new_vector(Name, Value) :- assert(vector(Name, Value)).
+
 %% *
 scalarprod(_, [], []).
 scalarprod(L, [X | Tx], [H | T]) :- H is L * X, scalarprod(L, Tx, T).
@@ -71,6 +95,7 @@ partition(Obs, [C | Cs], Klus) :-
         assignall(Obs, [C | Cs], Ass),
         groupall(Ass, [C | Cs], Klus).
 
+%% *
 centroid(Observations, C) :- vmean(Observations, C).
 
 centroids([], []).
@@ -89,8 +114,10 @@ initialize(Obs, [Rn | Rs], [C | Cs]) :-
         nth0(Rn, Obs, C),
         initialize(Obs, Rs, Cs).
 
+%% *
 kmeans(Observations, K, [Cs, Klus]) :-
         length(Observations, MaxRand),
+        handle_klus_n(Observations, K),
         randset(K, MaxRand, Rs),
         initialize(Observations, Rs, ICs),
         lloydkmeans(Observations, ICs, [Cs, Klus]).

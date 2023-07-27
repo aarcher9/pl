@@ -40,7 +40,6 @@ test_initialize(Cs) :-
         randset(3, 9, Rs),
         initialize(Obs, Rs, Cs).
 
-% 0 e 9 non funzionanti
 test_kmeansdbg :-
         obs(Obs),
-        kmeansdbg(Obs, 3, _), !. 
+        kmeansdbg(Obs, 0, _), !. 

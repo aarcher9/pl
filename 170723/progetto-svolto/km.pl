@@ -10,6 +10,14 @@ kmeans(O,K,R):-
 	partitions(O,CS,Clusters),
 	kmeans0(O,[],Clusters,R).
 
+% Aggiunta
+kmeansdbg(Obs, Kn, [Cs, Klus]) :-
+        kmeans(Obs, Kn, [Cs, Klus]),
+        nl, write('Centroids:'), nl,
+        maplist(writeln, Cs), nl,
+        write('Clusters:'), nl,
+        maplist(writeln, Klus).
+
 
 /* kmeans0(Obs,Clusters,NewClusters): iterates until a solution is found */
 
