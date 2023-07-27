@@ -113,17 +113,11 @@ initialize(Obs, [Rn | Rs], [C | Cs]) :-
         initialize(Obs, Rs, Cs).
 
 %%% *
-kmeans(_, K, []) :- write('okoko'), K =< 0.
+kmeans(_, K, []) :- K =< 0.
 kmeans(Observations, K, []) :- length(Observations, OL), K > OL.
-kmeans(Observations, K, [Cs, Klus]) :-
+
+kmeans(Observations, K, Klus) :-
         length(Observations, MaxRand),
         randset(K, MaxRand, Rs),
         initialize(Observations, Rs, ICs),
-        lloydkmeans(Observations, ICs, [Cs, Klus]).
-
-kmeansdbg(Obs, Kn, [Cs, Klus]) :-
-        kmeans(Obs, Kn, [Cs, Klus]),
-        nl, write('Centroids:'), nl,
-        maplist(writeln, Cs), nl,
-        write('Clusters:'), nl,
-        maplist(writeln, Klus).
+        lloydkmeans(Observations, ICs, [_, Klus]).

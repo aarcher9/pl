@@ -55,6 +55,30 @@ test_vectors :-
         vmean([], []).
 
 %%% --- Algoritmo k-means
+%%% Predicato di supporto per il debugging
+kmeansdbg(_, K, []) :- 
+        K =< 0,
+        write('K deve essere un numero positivo non-zero'),
+        nl, write('Centroids:'), nl,
+        maplist(writeln, []), nl,
+        write('Clusters:'), nl,
+        maplist(writeln, []).
+
+kmeansdbg(Observations, K, []) :- 
+        length(Observations, OL), 
+        K > OL,
+        write('K deve essere minore o al massimo uguale del numero di osservazioni').
+
+kmeansdbg(Observations, K, [Cs, Klus]) :-
+        length(Observations, MaxRand),
+        randset(K, MaxRand, Rs),
+        initialize(Observations, Rs, ICs),
+        lloydkmeans(Observations, ICs, [Cs, Klus]),
+        nl, write('Centroids:'), nl,
+        maplist(writeln, Cs), nl,
+        write('Clusters:'), nl,
+        maplist(writeln, Klus).
+
 %%% Casi normali, input corretto
 test_base :-
         obs(Obs),
