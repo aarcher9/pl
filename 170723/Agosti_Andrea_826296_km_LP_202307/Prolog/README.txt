@@ -29,7 +29,15 @@ Riguarda l'implementazione dell'algoritmo di clustering. Si è mantenuta quasi t
 - si raggruppano, sempre usando liste, tutti quei vettori che hanno lo stesso centroide comune
 - si ricomputa il centroide di ciascun gruppo
 - si riparte con l'operazione di generazione delle coppie e via discorrendo
-- quando durante la computazione dei nuovi centroidi si riscontri che questa sia uguale ai centroidi precedenti, il calcolo termina 
+- quando durante la computazione dei nuovi centroidi si riscontri che questa sia uguale ai centroidi precedenti, il calcolo termina.
+
+Funzioni e predicati e il loro scopo:
+[] assign / assignall = generazione delle coppie
+[] group / groupall = creazione dei gruppi a partire dalle coppie
+[] partition = gestisce assignall e groupall per creare una partizione (quindi clusters della computazione in corso)
+[] repart = core del programma, gestisce la routine principale di controllo dell'algoritmo
+[] lloydkmeans = funzione / predicato di convenienza per startare il programma
+[] kmeans0 = anche questo per convenienza, viene usato da kmeans; ritorna sia i centroidi computati che i clusters ottenuti
 
 In entrambi i linguaggi si è aggiunto un predicato/funzione kmeans0 che se invocato fornisce sia centroidi finali che cluster in una lista. kmeans si appoggia su questo per fornire il risultato richiesto. 
 
