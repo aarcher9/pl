@@ -57,6 +57,13 @@
 (assert (equal (vmean `((1 2) (2 3) (2 3) (6 7))) (list (/ 11 4) (/ 15 4))))
 (assert (equal (vmean `((1 2) nil)) (list (/ 1 2) 1)))
 
+(defun test_example_vectors ()
+        (print v3)
+        (print (sqrt (innerprod v3 v3)))
+        (print (norm v3))
+        (print (vplus v3 (list 10 0 42)))
+        (format t "~%"))
+
 
 ;;; --- Algoritmo k-means
 (defun kmeansdbg (km0) 
@@ -67,36 +74,23 @@
         (format t "~%"))
 
 ;;; Casi normali, input corretto
-(defun test_base () 
-        (print "----- K = 1")
-        (kmeansdbg (kmeans0 Obs 1))
-        (print "----- K = 9")
-        (kmeansdbg (kmeans0 Obs 9))
-        (print "----- K = 3")
-        (kmeansdbg (kmeans0 Obs 3))
-        (print "----- K = 8")
-        (kmeansdbg (kmeans0 Obs 8)))
+(defun test_base (obs k)
+        (format t "~%----- K = ~a" k)
+        (kmeansdbg (kmeans0 obs k)))
 
-(defun test_example ()
-        (print v3)
-        (print (sqrt (innerprod v3 v3)))
-        (print (norm v3))
-        (print (vplus v3 (list 10 0 42))))
+(defun test_kmeans (obs ks) 
+        (if     (null ks)
+                "Done!"
+                (progn (test_base obs (first ks)) (test_kmeans obs (rest ks)))))
 
 (defun test_limit_k0 ()
-        (kmeansdbg (kmeans0 Obs 0)))
+        (kmeans (kmeans0 Obs 0)))
 
 (defun test_limit_k10 () 
-        (kmeansdbg (kmeans0 Obs 10)))
+        (kmeans (kmeans0 Obs 10)))
 
-(defun other_test ()
-        (kmeansdbg (kmeans0 `(()) 1))
-        (kmeansdbg (kmeans0 `((1) (2)) 1)))
-
-;; (test_base)
-;; (other_test)
-;; (test_example)
-;; (print (kmeans Obs 3))
-;; (print (kmeans Obs 9))
-;; (print (kmeans Obs 0))
-;; (print (kmeans Obs 10))
+;; (test_example_vectors)
+;; (test_kmeans Obs `(3 1 8 5 9))
+;; (test_kmeans Obs1 `(1 2 3 4))
+;; (test_limit_k0)
+;; (test_limit_k10)

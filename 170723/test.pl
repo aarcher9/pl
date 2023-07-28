@@ -56,40 +56,25 @@ test_vectors :-
         vmean([[], []], []),
         vmean([], []).
 
-%%% --- Algoritmo k-means
-%%% Casi normali, input corretto
-test_base0_0(Cs, Klus) :-
-        obs(Obs),
-        kmeans0(Obs, 3, [Cs, Klus]).
-
-test_base0_1(Cs, Klus) :-
-        obs(Obs),
-        \+ kmeans0(Obs, 0, [Cs, Klus]).
-
-test_base0_2(Cs, Klus) :-
-        obs(Obs),
-        \+ kmeans0(Obs, 10, [Cs, Klus]).
-
-test_base0_3(Cs, Klus) :-
-        obs(Obs),
-        kmeans0(Obs, 1, [Cs, Klus]).
-
-test_base0_4(Cs, Klus) :-
-        obs(Obs),
-        kmeans0(Obs, 9, [Cs, Klus]).
-
-
-test_base1_0(Cs, Klus) :-
-        obs1(Obs),
-        kmeans0(Obs, 2, [Cs, Klus]).
-
-
-test_example(V, IP, N, S) :-
+test_example_vectors(V, IP, N, S) :-
         new_vector(v3, [1, 2, 3]),
         vector(v3, V),
         vector(v3, V), innerprod(V, V, IP), N is sqrt(IP),
         vector(v3, V), norm(V, N),
         vector(v3, V), vplus(V, [10, 0, 42], S).
+
+
+%%% --- Algoritmo k-means
+%%% Casi normali, input corretto
+test_kmeans(_, []).
+test_kmeans(Obs, [K | Ks]) :-
+        kmeans0(Obs, K, [Cs, Klus]),
+        write("----- K = "), write(K), nl,
+        write("C:"), nl,
+        write(Cs), nl,
+        write("Clusters:"), nl,
+        write(Klus), nl, nl,
+        test_kmeans(Obs, Ks).
 
 test_limit_k :-
         obs(Obs),
