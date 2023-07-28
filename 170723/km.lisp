@@ -21,7 +21,8 @@
         (if     (null (rest ord-seq))
                 (cons (first ord-seq) nil)
                 (cons   (nth i ord-seq) 
-                        (new_randset (remove (nth i ord-seq) ord-seq) (randnum (- (length ord-seq) 1))))))
+                        (new_randset    (remove (nth i ord-seq) ord-seq) 
+                                        (randnum (- (length ord-seq) 1))))))
 
 (defun randset (n lim) 
         (pick-first-n (new_randset (make-seq lim) (randnum lim)) n))
@@ -45,7 +46,8 @@
                 ((not (eq (length vector1) (length vector2)))
                         nil)
                 (t
-                        (cons (+ (first vector1) (first vector2)) (vplus (rest vector1) (rest vector2))))))
+                        (cons   (+ (first vector1) (first vector2)) 
+                                (vplus (rest vector1) (rest vector2))))))
 
 ;;; *
 (defun vminus (vector1 vector2) (vplus vector1 (scalarprod -1 vector2)))
@@ -57,7 +59,8 @@
             ((and (null vector1) (null vector2)) 
                     0.0)
             (t
-                (+ (* (first vector1) (first vector2)) (innerprod (rest vector1) (rest vector2))))))
+                (+  (* (first vector1) (first vector2)) 
+                    (innerprod (rest vector1) (rest vector2))))))
 
 ;;; *
 (defun norm (vector) (expt (innerprod vector vector) (/ 2)))
@@ -73,7 +76,8 @@
 
 
 ;;; --- Algoritmo k-means
-;;; Il parametro min deve essere inizialmente SOLTANTO ed ESCLUSIVAMENTE uno dei centroidi specificati.
+;;; Il parametro min deve essere inizialmente 
+;;; SOLTANTO ed ESCLUSIVAMENTE uno dei centroidi specificati.
 (defun nearest (o cs min) 
         (if     (null cs)
                 min
@@ -90,8 +94,11 @@
                 (cons   (cons (first obs) (cons (assign (first obs) cs) nil)) 
                         (assignall (rest obs) cs))))
 
-;;; Raggruppa tutte le osservazioni che condividono il centroide indicato (più vicino) a partire da un insieme di coppie punto-centroide
-;;; Per qualche motivo (last <list>) ritorna una lista e non un singolo elemento meglio usare (second <list>) che in questo caso equivale.
+;;; Raggruppa tutte le osservazioni che condividono il centroide 
+;;; indicato (più vicino) a partire da un insieme di coppie punto-centroide
+;;; Per qualche motivo (last <list>) ritorna una lista e 
+;;; non un singolo elemento meglio usare (second <list>) 
+;;; che in questo caso equivale.
 (defun group (pairs c) 
         (if     (null pairs)
                 nil
@@ -105,7 +112,8 @@
                 (cons   (group pairs (first cs))
                         (groupall pairs (rest cs)))))
 
-;;; Crea k = (length <lista di centroidi>) clusters attorno ai centroidi sulle osservazioni
+;;; Crea k = (length <lista di centroidi>) clusters attorno 
+;;; ai centroidi sulle osservazioni
 (defun partition (obs cs) (groupall (assignall obs cs) cs))
 
 ;;; *
@@ -116,7 +124,8 @@
                 nil
                 (cons (centroid (first klus)) (centroids (rest klus)))))
 
-;;; Il core del programma, ricomputa clusters e ricalcola i centroidi fino a che la condizione di terminazione non sia raggiunta
+;;; Il core del programma, ricomputa clusters e ricalcola i centroidi 
+;;; fino a che la condizione di terminazione non sia raggiunta
 (defun repart (obs cs klus) 
         (if     (equal cs (centroids klus))
                 (cons cs (cons klus nil))
@@ -131,7 +140,9 @@
 (defun kmeans0 (obs k) 
         (if     (and (> k 0) (<= k (length obs)))
                 (lloydkmeans obs (initialize obs k))
-                (error "Il valore di K deve essere un numero positivo non-zero minore o uguale del numero di osservazioni")))
+                (error "Il valore di K deve 
+                    essere un numero positivo non-zero minore o 
+                    uguale del numero di osservazioni")))
 
 ;;; *
 (defun kmeans (observations k) 
