@@ -56,16 +56,26 @@
 
 
 ;;; --- Algoritmo k-means
+(defun kmeansdbg (res) 
+        (format t "~%Centroids:")
+        (format t "~{~%> ~a~}~%~%" (first res))
+        (format t "Clusters:")
+        (format t "~{~%> ~a~}" (second res))
+        (format t "~%"))
+
 ;;; Casi normali, input corretto
 (defun test_base () 
-        (kmeansdbg Obs 1)
-        (kmeansdbg Obs 9)
-        (kmeansdbg Obs 3)
-        (kmeansdbg Obs 8))
+        (kmeansdbg (kmeans0 Obs 1))
+        (kmeansdbg (kmeans0 Obs 9))
+        (kmeansdbg (kmeans0 Obs 3))
+        (kmeansdbg (kmeans0 Obs 8)))
 
 (defun test_limit_k ()
         ;; Se non gestito: errore strano
-        (kmeansdbg Obs 0)
+        (kmeansdbg (kmeans0 Obs 0))
 
         ;; Se non gestito: freeza 
-        (kmeansdbg Obs 10))
+        (kmeansdbg (kmeans0 Obs 10)))
+
+(print (kmeans Obs 10))
+(print (kmeans Obs 0))

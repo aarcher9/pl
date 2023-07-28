@@ -129,13 +129,11 @@
 (defun initialize(obs k) 
         (mapcar (lambda (x) (nth x obs)) (randset k (length obs))))
 
+(defun kmeans0 (obs k) 
+        (if     (and (> k 0) (<= k (length obs)))
+                (lloydkmeans obs (initialize obs k))
+                nil))
+
 ;;; *
 (defun kmeans (observations k) 
-        (lloydkmeans observations (initialize observations k)))
-
-(defun kmeansdbg (observations k) 
-        (format t "~%Centroids:")
-        (format t "~{~%> ~a~}~%~%" (first (kmeans observations k)))
-        (format t "Clusters:")
-        (format t "~{~%> ~a~}" (second (kmeans observations k)))
-        (format t "~%"))
+        (kmeans0 observations k))
