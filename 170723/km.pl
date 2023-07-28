@@ -1,4 +1,3 @@
-%%%% -*- Mode: Prolog -*-
 % Agosti Andrea 826296
 % <>
 
