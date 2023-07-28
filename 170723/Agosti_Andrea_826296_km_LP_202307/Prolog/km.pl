@@ -1,6 +1,5 @@
-%%%% -*- Mode: Prolog -*-
-%%%% 826296 Agosti Andrea
-%%%% <>
+% Agosti Andrea 826296
+% <>
 
 %%% --- Supporto
 %%% L'intervallo generato di interi è [0, Up)

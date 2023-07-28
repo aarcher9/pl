@@ -4,15 +4,16 @@ Il vettore nullo n-dimensionale, per esempio in caso n = 2 [0, 0] nelle operazio
 
 La scelta si motiva con una più facile gestione dei calcoli da cui si vorrebbe far conseguire un codice più solido ed espressivo; inoltre sebbene tipograficamente le rappresentazioni siano diverse, risulta utile considerarle concettualmente la stessa cosa.
 
-Si riportano in calce i relativi codici usati come test per meglio esemplificare.
-
 
 
 # Trattamento del numero di cluster in relazione al numero di osservazioni
 
-La funzione kmeans lancia un errore con un messaggio custom, quando il K inserito è minore o uguale a 0 o maggiore strettamente del numero di osservazioni.
+Il predicato kmeans/3 fallisce quando il K inserito è minore o uguale a 0 o maggiore strettamente del numero di osservazioni.
+
+
 
 # Breve descrizione della funzionalità
+
 Il codice è suddiviso tramite brevi commenti in sezioni, ciascuna delle quali assolve un determinato compito. Sono inseriti dei commenti sopra ciascuna funzione che si è ritenuto di dover spiegare meglio.
 
 ## Sezione 1
@@ -30,4 +31,12 @@ Riguarda l'implementazione dell'algoritmo di clustering. Si è mantenuta quasi t
 - si riparte con l'operazione di generazione delle coppie e via discorrendo
 - quando durante la computazione dei nuovi centroidi si riscontri che questa sia uguale ai centroidi precedenti, il calcolo termina 
 
-In entrambi i linguaggi si è aggiunto un predicato/funzione kmeans0 che se invocato fornisce sia centroidi finali che cluster in una lista. kmeans si appoggia su questo per fornire il risultato richiesto.
+In entrambi i linguaggi si è aggiunto un predicato/funzione kmeans0 che se invocato fornisce sia centroidi finali che cluster in una lista. kmeans si appoggia su questo per fornire il risultato richiesto. 
+
+Qualunque input scorretto che non riguardi quanto citato precedentemente dovrebbe sollevare eccezioni "native" nel programma (ad esempio se in un vettore appare qualcosa che non sia un numero) o comunque fallire.
+
+
+
+# Altro 
+Come suggerito (ed anche riscontrato personalmente) dal prof. Fabio Sartori, si è utilizzato il grafico come riferimento per i centroidi e cluster corretti.
+Riferimento alla discussione [https://elearning.unimib.it/mod/forum/discuss.php?d=241822].
