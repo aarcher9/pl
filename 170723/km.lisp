@@ -1,5 +1,4 @@
-;;;; -*- Mode: Lisp -*-
-;;;; 826296 Agosti Andrea
+;;;; Agosti Andrea 826296
 ;;;; <>
 
 ;;; --- Supporto

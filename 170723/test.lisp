@@ -89,8 +89,8 @@
 (defun test_limit_k10 () 
         (kmeans Obs 10))
 
-;; (test_example_vectors)
-;; (test_kmeans Obs `(3 1 8 5 9))
-;; (test_kmeans Obs1 `(1 2 3 4))
+(test_example_vectors)
+(test_kmeans Obs `(3 1 8 5 9))
+(test_kmeans Obs1 `(1 2 3 4))
 ;; (test_limit_k0)
 ;; (test_limit_k10)
