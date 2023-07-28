@@ -84,13 +84,13 @@
                 (progn (test_base obs (first ks)) (test_kmeans obs (rest ks)))))
 
 (defun test_limit_k0 ()
-        (kmeans (kmeans0 Obs 0)))
+        (kmeans Obs 0))
 
 (defun test_limit_k10 () 
-        (kmeans (kmeans0 Obs 10)))
+        (kmeans Obs 10))
 
-;; (test_example_vectors)
-;; (test_kmeans Obs `(3 1 8 5 9))
-;; (test_kmeans Obs1 `(1 2 3 4))
+(test_example_vectors)
+(test_kmeans Obs `(3 1 8 5 9))
+(test_kmeans Obs1 `(1 2 3 4))
 ;; (test_limit_k0)
 ;; (test_limit_k10)
