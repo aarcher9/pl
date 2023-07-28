@@ -80,12 +80,10 @@
         (print (vplus v3 (list 10 0 42))))
 
 (defun test_limit_k ()
+        (kmeansdbg (kmeans0 `() 0))
         (kmeansdbg (kmeans0 observations 0))
         (kmeansdbg (kmeans0 observations 10)))
 
 (defun other_test ()
-        (kmeansdbg (kmeans0 `() 0))
         (kmeansdbg (kmeans0 `(()) 1))
         (kmeansdbg (kmeans0 `((1) (2)) 1)))
-
-(print (kmeans observations 9))

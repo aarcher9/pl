@@ -19,6 +19,7 @@
                 (cons (randnum lim) nil)
                 (cons (randnum lim) (randlist (- n 1) lim))))
 
+;;; DA ELIMINARE
 ;;; Si deve fare in modo che sia impossibile estrarre due centroidi uguali
 (defun randlist-clear (n lim rl)
         (if     (equal (remove-duplicates rl) rl)
@@ -26,6 +27,27 @@
                 (randlist-clear n lim (randlist n lim))))
 
 (defun randset (n lim) (randlist-clear n lim (randlist n lim)))
+;;;;
+
+;;; Genera una sequenza di numeri (quindi diversi) in [0, n)
+(defun make-seq (n) 
+        (if     (> n 0)
+                (cons (- n 1) (make-seq (- n 1)))
+                nil))
+
+(defun pick-first-n (l n)
+        (if     (> n 0)
+                (cons (first l) (pick-first-n (rest l) (- n 1)))
+                nil))
+
+(defun new_randset (ord-seq i)
+        (if     (null (rest ord-seq))
+                (cons (first ord-seq) nil)
+                (cons   (nth i ord-seq) 
+                        (new_randset (remove (nth i ord-seq) ord-seq) (randnum (- (length ord-seq) 1))))))
+
+(defun randset_ (n lim) 
+        (pick-first-n (new_randset (make-seq lim) (randnum lim)) n))
 
 
 ;;; --- Operazioni fra vettori
@@ -124,7 +146,7 @@
 
 ;;; Estrae i k centroidi dalle osservazioni pseudo-casualmente
 (defun initialize(obs k) 
-        (mapcar (lambda (x) (nth x obs)) (randset k (length obs))))
+        (mapcar (lambda (x) (nth x obs)) (randset_ k (length obs))))
 
 (defun kmeans0 (obs k) 
         (if     (and (> k 0) (<= k (length obs)))
