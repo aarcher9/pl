@@ -1,7 +1,7 @@
 (load "km.lisp")
 
 ;;; --- Parametri per testing
-(defparameter observations 
+(defparameter Obs 
         `(      (3.0 7.0) (0.5 1.0) (0.8 0.5) (1.0 8.0) 
                 (1.8 1.2) (6.0 4.0) (7.0 5.5) (4.0 9.0) 
                 (9.0 4.0)))
@@ -60,18 +60,22 @@
 
 ;;; --- Algoritmo k-means
 (defun kmeansdbg (km0) 
-        (format t "~%Centroids:")
-        (format t "~{~%> ~a~}~%~%" (first km0))
+        (format t "~%C:")
+        (format t "~{~%> ~a~}~%" (first km0))
         (format t "Clusters:")
         (format t "~{~%> ~a~}" (second km0))
         (format t "~%"))
 
 ;;; Casi normali, input corretto
 (defun test_base () 
-        (kmeansdbg (kmeans0 observations 1))
-        (kmeansdbg (kmeans0 observations 9))
-        (kmeansdbg (kmeans0 observations 3))
-        (kmeansdbg (kmeans0 observations 8)))
+        (print "----- K = 1")
+        (kmeansdbg (kmeans0 Obs 1))
+        (print "----- K = 9")
+        (kmeansdbg (kmeans0 Obs 9))
+        (print "----- K = 3")
+        (kmeansdbg (kmeans0 Obs 3))
+        (print "----- K = 8")
+        (kmeansdbg (kmeans0 Obs 8)))
 
 (defun test_example ()
         (print v3)
@@ -79,15 +83,20 @@
         (print (norm v3))
         (print (vplus v3 (list 10 0 42))))
 
-(defun test_limit_k ()
-        (kmeansdbg (kmeans0 `() 0))
-        (kmeansdbg (kmeans0 observations 0))
-        (kmeansdbg (kmeans0 observations 10)))
+(defun test_limit_k0 ()
+        (kmeansdbg (kmeans0 Obs 0)))
+
+(defun test_limit_k10 () 
+        (kmeansdbg (kmeans0 Obs 10)))
 
 (defun other_test ()
         (kmeansdbg (kmeans0 `(()) 1))
         (kmeansdbg (kmeans0 `((1) (2)) 1)))
 
-(test_base)
-(other_test)
-(test_example)
+;; (test_base)
+;; (other_test)
+;; (test_example)
+;; (print (kmeans Obs 3))
+;; (print (kmeans Obs 9))
+;; (print (kmeans Obs 0))
+;; (print (kmeans Obs 10))

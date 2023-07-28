@@ -58,13 +58,31 @@ test_vectors :-
 
 %%% --- Algoritmo k-means
 %%% Casi normali, input corretto
-test_base(Cs, Klus) :-
+test_base0_0(Cs, Klus) :-
         obs(Obs),
         kmeans0(Obs, 3, [Cs, Klus]).
 
-test_base_1(Cs, Klus) :-
+test_base0_1(Cs, Klus) :-
+        obs(Obs),
+        \+ kmeans0(Obs, 0, [Cs, Klus]).
+
+test_base0_2(Cs, Klus) :-
+        obs(Obs),
+        \+ kmeans0(Obs, 10, [Cs, Klus]).
+
+test_base0_3(Cs, Klus) :-
+        obs(Obs),
+        kmeans0(Obs, 1, [Cs, Klus]).
+
+test_base0_4(Cs, Klus) :-
+        obs(Obs),
+        kmeans0(Obs, 9, [Cs, Klus]).
+
+
+test_base1_0(Cs, Klus) :-
         obs1(Obs),
         kmeans0(Obs, 2, [Cs, Klus]).
+
 
 test_example(V, IP, N, S) :-
         new_vector(v3, [1, 2, 3]),
