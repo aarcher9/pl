@@ -10,22 +10,6 @@
 randnum(1, 0).
 randnum(Max, Num) :- Up is (Max - 1), random(0, Up, Num).
 
-%%% DA ELIMINARE
-randlist(1, Max, [Num]) :- randnum(Max, Num).
-randlist(N, Max, [H | T]) :- 
-        randnum(Max, H),
-        NN is N - 1,
-        randlist(NN, Max, T).
-
-randlist_clear(N, Max, L, S) :-
-        (list_to_set(L, L), S = L) ; 
-        (randlist(N, Max, NL), randlist_clear(N, Max, NL, S)).
-
-%%% Quando N == Max, va in loop infinito, devo gestire correttamente il caso
-randset(N, N, R) :- N1 is N + 1, randset(N, N1, R).
-randset(N, Max, Rs) :- randlist(N, Max, Init), randlist_clear(N, Max, Init, Rs).
-%%%
-
 make_seq(E, E, []).
 make_seq(S, E, [S | Seq]) :-
         NS is S + 1,
