@@ -2,9 +2,6 @@
 %%%% 826296 Agosti Andrea
 %%%% <>
 
-%%% --- Gestione errori & casi limite
-
-
 %%% --- Supporto
 %%% L'intervallo generato di interi è [0, Up)
 randnum(1, 0).

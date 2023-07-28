@@ -62,6 +62,10 @@ test_base(Cs, Klus) :-
         obs(Obs),
         kmeans0(Obs, 3, [Cs, Klus]).
 
+test_base_1(Cs, Klus) :-
+        obs1(Obs),
+        kmeans0(Obs, 2, [Cs, Klus]).
+
 test_example(V, IP, N, S) :-
         new_vector(v3, [1, 2, 3]),
         vector(v3, V),
