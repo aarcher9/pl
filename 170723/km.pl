@@ -6,9 +6,11 @@
 
 
 %%% --- Supporto
-%%% L'intervallo generato di interi è [0, Up]
+%%% L'intervallo generato di interi è [0, Up)
+randnum(1, 0).
 randnum(Max, Num) :- Up is (Max - 1), random(0, Up, Num).
 
+%%% DA ELIMINARE
 randlist(1, Max, [Num]) :- randnum(Max, Num).
 randlist(N, Max, [H | T]) :- 
         randnum(Max, H),
@@ -22,6 +24,32 @@ randlist_clear(N, Max, L, S) :-
 %%% Quando N == Max, va in loop infinito, devo gestire correttamente il caso
 randset(N, N, R) :- N1 is N + 1, randset(N, N1, R).
 randset(N, Max, Rs) :- randlist(N, Max, Init), randlist_clear(N, Max, Init, Rs).
+%%%
+
+make_seq(E, E, []).
+make_seq(S, E, [S | Seq]) :-
+        NS is S + 1,
+        make_seq(NS, E, Seq).
+
+pick_first_n(_, E, E, []).
+pick_first_n([I | Seq], S, E, [I | Rest]) :-
+        NS is S + 1,
+        pick_first_n(Seq, NS, E, Rest).
+
+new_randset([S], _, [S]).
+new_randset(Seq, I, [Item | Rest]) :-
+        nth0(I, Seq, Item),
+        select(Item, Seq, NSeq),
+        length(Seq, SL),
+        L is SL - 1,
+        randnum(L, Num),
+        new_randset(NSeq, Num, Rest).
+
+randset_(N, Max, Rs) :-
+        make_seq(0, Max, Seq),
+        randnum(Max, Num),
+        new_randset(Seq, Num, NRS),
+        pick_first_n(NRS, 0, N, Rs).
 
 
 %%% --- Operazioni fra vettori
