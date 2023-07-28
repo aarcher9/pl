@@ -136,4 +136,4 @@
 
 ;;; *
 (defun kmeans (observations k) 
-        (kmeans0 observations k))
+        (second (kmeans0 observations k)))
