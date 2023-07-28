@@ -6,6 +6,8 @@
                 (1.8 1.2) (6.0 4.0) (7.0 5.5) (4.0 9.0) 
                 (9.0 4.0)))
 
+(defparameter Obs1 `((1 1) (2 1) (4 3) (5 4)))
+
 (defparameter exp-cs_k3
         `((2.666 8) (1.033 0.9) (7.333 4.5)))
 
@@ -77,5 +79,4 @@
         ;; Se non gestito: freeza 
         (kmeansdbg (kmeans0 Obs 10)))
 
-(print (kmeans Obs 10))
-(print (kmeans Obs 0))
+(kmeansdbg (kmeans Obs1 4))
