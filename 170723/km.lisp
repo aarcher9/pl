@@ -67,12 +67,12 @@
 
 (defun distance (vector1 vector2) (norm (vminus vector1 vector2)))
 
-(defun vmean (vs) (scalarprod (/ (length vs)) (vsum vs)))
-
 (defun vsum (vs)
         (if     (null (rest vs))
                 (first vs)
                 (vplus (first vs) (vsum (rest vs)))))
+
+(defun vmean (vs) (scalarprod (/ (length vs)) (vsum vs)))
 
 
 ;;; --- Algoritmo k-means
