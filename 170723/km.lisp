@@ -24,7 +24,7 @@
 			 (randnum (- (length ord-seq) 1))))))
 
 (defun randset (n lim) 
-        (pick-first-n (new_randset (make-seq lim) (randnum lim)) n))
+  (pick-first-n (new_randset (make-seq lim) (randnum lim)) n))
 
 
 ;;; --- Operazioni fra vettori
@@ -35,22 +35,22 @@
 
 ;;; *
 (defun vplus (vector1 vector2) 
-        (cond ((and (null vector1) (null vector2)) nil)
-              ((null vector1) vector2)
-              ((null vector2) vector1)
-              ((not (eq (length vector1) (length vector2))) nil)
-              (t (cons (+ (first vector1) (first vector2))
-		       (vplus (rest vector1) (rest vector2))))))
+  (cond ((and (null vector1) (null vector2)) nil)
+        ((null vector1) vector2)
+        ((null vector2) vector1)
+        ((not (eq (length vector1) (length vector2))) nil)
+        (t (cons (+ (first vector1) (first vector2))
+		 (vplus (rest vector1) (rest vector2))))))
 
 ;;; *
 (defun vminus (vector1 vector2) (vplus vector1 (scalarprod -1 vector2)))
 
 ;;; *
 (defun innerprod (vector1 vector2) 
-        (cond ((not (eq (length vector1) (length vector2))) 0.0)
-              ((and (null vector1) (null vector2)) 0.0)
-              (t (+  (* (first vector1) (first vector2)) 
-                        (innerprod (rest vector1) (rest vector2))))))
+  (cond ((not (eq (length vector1) (length vector2))) 0.0)
+        ((and (null vector1) (null vector2)) 0.0)
+        (t (+  (* (first vector1) (first vector2)) 
+               (innerprod (rest vector1) (rest vector2))))))
 
 ;;; *
 (defun norm (vector) (expt (innerprod vector vector) (/ 2)))
@@ -126,7 +126,7 @@
 
 ;;; Estrae i k centroidi dalle osservazioni pseudo-casualmente
 (defun initialize(obs k) 
-        (mapcar (lambda (x) (nth x obs)) (randset k (length obs))))
+  (mapcar (lambda (x) (nth x obs)) (randset k (length obs))))
 
 (defun kmeans0 (obs k) 
   (if (and (> k 0) (<= k (length obs)))
@@ -137,4 +137,4 @@ numero di osservazioni")))
 
 ;;; *
 (defun kmeans (observations k) 
-        (second (kmeans0 observations k)))
+  (second (kmeans0 observations k)))

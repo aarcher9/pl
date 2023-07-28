@@ -33,7 +33,7 @@ Riguarda l'implementazione dell'algoritmo di clustering. Si è mantenuta quasi t
 
 In entrambi i linguaggi si è aggiunto un predicato/funzione kmeans0 che se invocato fornisce sia centroidi finali che cluster in una lista. kmeans si appoggia su questo per fornire il risultato richiesto. 
 
-Qualunque input scorretto che non riguardi quanto citato precedentemente dovrebbe sollevare eccezioni "native" nel programma (ad esempio se in un vettore appare qualcosa che non sia un numero) o comunque fallire.
+Qualunque input scorretto che non riguardi quanto citato precedentemente dovrebbe sollevare eccezioni "native" nel programma (ad esempio se in un vettore appare qualcosa che non sia un numero) o comunque fallire (nel solo caso Prolog).
 
 
 
