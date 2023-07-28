@@ -2,14 +2,6 @@
 ;;;; 826296 Agosti Andrea
 ;;;; <>
 
-;;; --- Gestione casi limite
-(defun vectors-length-matches (x y)
-        (cond   ((not (eq (length x) (length y))) 
-                        nil)
-                ((and (null x) (null y)) 
-                        nil)
-                (t t)))
-
 ;;; --- Supporto
 ;;; L'intervallo generato di interi è [0, lim)
 (defun randnum (lim) (random lim (make-random-state t)))
@@ -60,9 +52,12 @@
 
 ;;; *
 (defun innerprod (vector1 vector2) 
-        (if     (vectors-length-matches vector1 vector2)
-                (+ (* (first vector1) (first vector2)) (innerprod (rest vector1) (rest vector2)))
-                0.0))
+        (cond   ((not (eq (length vector1) (length vector2))) 
+                    0.0)
+            ((and (null vector1) (null vector2)) 
+                    0.0)
+            (t
+                (+ (* (first vector1) (first vector2)) (innerprod (rest vector1) (rest vector2))))))
 
 ;;; *
 (defun norm (vector) (expt (innerprod vector vector) (/ 2)))
