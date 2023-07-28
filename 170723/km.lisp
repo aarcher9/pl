@@ -82,8 +82,8 @@
   (if (null obs)
       nil
       (cons (cons (first obs)
-		  (cons (assign (first obs) cs) nil)) 
-                        (assignall (rest obs) cs))))
+		  (cons (assign (first obs) cs) nil))
+	    (assignall (rest obs) cs))))
 
 ;;; Raggruppa tutte le osservazioni che condividono il centroide 
 ;;; indicato (più vicino) a partire da un insieme di coppie punto-centroide
