@@ -1,9 +1,13 @@
 #!/bin/bash
-cp ../km.lisp ./km.lisp
-cp ../km.pl ./km.pl
+cp ../km.lisp km-c.lisp
+cp ../test.lisp test.lisp
+cp ../km.pl km-c.pl
+cp ../test.pl test.pl
 
-cut -c 1-80 km.lisp > km-cut.lisp
-sbcl --script km-cut.lisp 
+echo "Copy done. When km-c.* files are indented press return."
+read $v
+cut -c 1-80 km-c.lisp > km.lisp
+cut -c 1-80 km-c.pl > km.pl
 
-cut -c 1-80 km.pl > km-cut.pl
-swipl -q -l km-cut.pl
+rm km-c.lisp
+rm km-c.pl
