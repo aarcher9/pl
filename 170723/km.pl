@@ -26,11 +26,7 @@ randset(N, Max, Rs) :- randlist(N, Max, Init), randlist_clear(N, Max, Init, Rs).
 
 %%% --- Operazioni fra vettori
 %%% *
-%%% Ne inserisco uno di esempio per evitare di ricevere errori se volessi interrogare la base di dati prima di aver chiamato new_vector/2
-vector(v0, [0, 0, 0]).
-
-%%% *
-new_vector(Name, Value) :- assert(vector(Name, Value)).
+new_vector(Name, Vector) :- assert(vector(Name, Vector)).
 
 %%% *
 scalarprod(_, [], []).
@@ -43,7 +39,9 @@ vplus([], [H | T], [H | T]).
 vplus([X | Tx], [Y | Ty], [H | T]) :- H is X + Y, vplus(Tx, Ty, T).
 
 %%% *
-vminus(X, Y, R) :- scalarprod(-1, Y, Ny), vplus(X, Ny, R).
+vminus(Vector1, Vector2, V) :- 
+        scalarprod(-1, Vector2, NV2), 
+        vplus(Vector1, NV2, V).
 
 %%% *
 innerprod([], [], 0).
@@ -52,7 +50,7 @@ innerprod([_ | _], [], 0).
 innerprod([X | Tx], [Y | Ty], R) :- innerprod(Tx, Ty, Out), R is (X * Y + Out).
 
 %%% *
-norm(X, R) :- innerprod(X, X, Out), R is Out ** 0.5.
+norm(Vector, N) :- innerprod(Vector, Vector, Out), N is Out ** 0.5.
 
 distance(X, Y, R) :- vminus(X, Y, Out), norm(Out, R).
 
@@ -92,7 +90,7 @@ partition(Obs, [C | Cs], Klus) :-
         groupall(Ass, [C | Cs], Klus).
 
 %%% *
-centroid(Observations, C) :- vmean(Observations, C).
+centroid(Observations, Centroid) :- vmean(Observations, Centroid).
 
 centroids([], []).
 centroids([K | Klus], [C | T]) :- centroid(K, C), centroids(Klus, T).
@@ -122,5 +120,5 @@ kmeans0(Obs, K, [Cs, Klus]) :-
         lloydkmeans(Obs, ICs, [Cs, Klus]).
 
 %%% *
-kmeans(Observations, K, Klus) :- 
-        kmeans0(Observations, K, [_, Klus]).
+kmeans(Observations, K, Clusters) :- 
+        kmeans0(Observations, K, [_, Clusters]).

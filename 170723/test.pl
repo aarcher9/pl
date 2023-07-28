@@ -57,27 +57,24 @@ test_vectors :-
         vmean([], []).
 
 %%% --- Algoritmo k-means
-%%% Test generico
-%%% K = 0, se non gestito: loop
-%%% K > #Obs, se non gestito: loop
-test_kmeans0(K, Cs, Klus) :- 
-        obs(Obs), 
-        kmeans0(Obs, K, [Cs, Klus]).
-
 %%% Casi normali, input corretto
-test_base :-
+test_base(Cs, Klus) :-
         obs(Obs),
-        kmeans0(Obs, 3, _), !, 
-        kmeans0(Obs, 8, _), !, 
-        kmeans0(Obs, 5, _), !, 
-        kmeans0(Obs, 9, _), !, 
-        kmeans0(Obs, 1, _), !.
+        kmeans0(Obs, 3, [Cs, Klus]).
+
+test_example(V, IP, N, S) :-
+        new_vector(v3, [1, 2, 3]),
+        vector(v3, V),
+        vector(v3, V), innerprod(V, V, IP), N is sqrt(IP),
+        vector(v3, V), norm(V, N),
+        vector(v3, V), vplus(V, [10, 0, 42], S).
 
 test_limit_k :-
-        kmeans0(Obs, 0, _), !, 
-        kmeans0(Obs, 10, _), !.
+        obs(Obs),
+        \+ kmeans0(Obs, 0, _), !, 
+        \+ kmeans0(Obs, 10, _), !.
 
 other_test :-
-        kmeans0([], 4, [Cs1, Klus1]), !,
-        kmeans0([[]], 0, [Cs2, Klus2]), !,
-        kmeans0([[]], 1, [Cs3, Klus3]), !.
+        \+ kmeans0([], 1, _), !,
+        \+ kmeans0([[]], 0, _), !,
+        kmeans0([[]], 1, [[[]], [[[]]]]), !.

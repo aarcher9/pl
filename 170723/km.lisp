@@ -47,9 +47,6 @@
                         nil)
                 (t
                         (cons (+ (first vector1) (first vector2)) (vplus (rest vector1) (rest vector2))))))
-        ;; (if     (vectors-length-matches vector1 vector2)
-        ;;         (cons (+ (first vector1) (first vector2)) (vplus (rest vector1) (rest vector2)))
-        ;;         nil))
 
 ;;; *
 (defun vminus (vector1 vector2) (vplus vector1 (scalarprod -1 vector2)))
@@ -132,7 +129,7 @@
 (defun kmeans0 (obs k) 
         (if     (and (> k 0) (<= k (length obs)))
                 (lloydkmeans obs (initialize obs k))
-                nil))
+                (error "Il valore di K deve essere un numero positivo non-zero minore o uguale del numero di osservazioni")))
 
 ;;; *
 (defun kmeans (observations k) 
