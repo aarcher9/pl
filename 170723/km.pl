@@ -143,7 +143,7 @@ kmeans0(Obs, K, [Cs, Klus]) :-
         K > 0,
         length(Obs, MaxRand),
         K =< MaxRand,
-        randset(K, MaxRand, Rs),
+        randset_(K, MaxRand, Rs),
         initialize(Obs, Rs, ICs),
         lloydkmeans(Obs, ICs, [Cs, Klus]).
 
