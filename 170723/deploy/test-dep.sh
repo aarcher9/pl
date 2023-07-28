@@ -1,8 +1,11 @@
 #!/bin/bash
 cp ../km.lisp km-c.lisp
 cp ../test.lisp test.lisp
+cp ../test-lisp.sh test-lisp.sh
+
 cp ../km.pl km-c.pl
 cp ../test.pl test.pl
+cp ../test-prolog.sh test-prolog.sh
 
 echo "Copy done. When km-c.* files are indented press return."
 read $v
