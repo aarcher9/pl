@@ -87,3 +87,7 @@
 (defun other_test ()
         (kmeansdbg (kmeans0 `(()) 1))
         (kmeansdbg (kmeans0 `((1) (2)) 1)))
+
+(test_base)
+(other_test)
+(test_example)
