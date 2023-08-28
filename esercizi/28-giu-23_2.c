@@ -105,11 +105,5 @@ int main() {
     d[0][0] = -1;
     printf("Proprietà valida? : %i\n", controllaProprieta(d));
 
-    // int** matrice;
-    // *matrice = malloc(RIGHE * sizeof(int));
-    // **matrice = malloc(COLONNE * sizeof(int));
-
-    // int* c = matrice[0];
-
     return 0;
 };
