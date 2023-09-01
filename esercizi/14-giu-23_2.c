@@ -68,9 +68,9 @@ int verificaProprieta(Matrice* m) {
             // printf("%i", k);
 
             if (k != i) {
-                curr = elementiInComune(m, k, i);
-                max = curr;
-                printf("ciao");
+                // curr = elementiInComune(m, k, i);
+                // max = curr;
+                // printf("ciao");
             }
         }
         // printf("\n");

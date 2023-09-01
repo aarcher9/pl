@@ -66,7 +66,8 @@ void assegnaOmbrellone(struct Spiaggia* s, int ombrellone, int clienteNumero, in
 
 // Richieste
 struct Cliente inputCliente() {
-    struct Cliente* _cliente = malloc(sizeof(struct Cliente));
+    // struct Cliente* _cliente = malloc(sizeof(struct Cliente));
+    struct Cliente* _cliente;
 
     printf("Inserisci nome cliente: ");
     scanf("%s", _cliente->nome);
@@ -86,13 +87,13 @@ void aggiungiCliente(struct Spiaggia* s, struct Cliente c) {
 };
 
 int presenteCliente(struct Spiaggia* s, struct Cliente c) {
-    for (int cliente = 0; cliente < s->numeroClienti; cliente++) {
-        struct Cliente inEsame = s->clienti[cliente];
+    for (int k = 0; k < s->numeroClienti; k++) {
+        struct Cliente inEsame = s->clienti[k];
 
         if (strcmp(inEsame.nome, c.nome) == 0) {
             if (strcmp(inEsame.cognome, c.cognome) == 0) {
                 if (inEsame.numeroDiTelefono == c.numeroDiTelefono) {
-                    return cliente;
+                    return k;
                 }
             }
         }
@@ -100,7 +101,6 @@ int presenteCliente(struct Spiaggia* s, struct Cliente c) {
 
     return -1;
 };
-
 
 int prenota(struct Spiaggia* s, struct Cliente c, int g1, int g2) {
     int presenza = presenteCliente(s, c);
@@ -125,6 +125,13 @@ int prenota(struct Spiaggia* s, struct Cliente c, int g1, int g2) {
 };
 
 int main() {
+
+    struct Cliente c = inputCliente();
+    struct Spiaggia* s;
+    int p = presenteCliente(s, c);
+    aggiungiCliente(s, c);
+    int omb = prenota(s, c, 10, 70);
+
 
     return 0;
 };
