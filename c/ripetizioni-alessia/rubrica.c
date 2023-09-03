@@ -18,7 +18,7 @@ struct Persona {
     char nome[30];
     char cognome[20];
     int numeriMemorizzati;
-    struct NumeroDiTelefono numeri[];
+    struct NumeroDiTelefono numeri[MAX_NUMERI_MEMORIZZABILI];
 };
 
 struct Rubrica {
@@ -26,93 +26,98 @@ struct Rubrica {
     struct Persona contatti[MAX_CONTATTI];
 };
 
-void mostraNumero(struct NumeroDiTelefono n) {
+void mostraNumero(struct NumeroDiTelefono* n) {
     char* tipo;
 
-    if (n.tipo == 0) {
+    if (n->tipo == 0) {
         tipo = "UFFICIO";
-    } if (n.tipo == 1) {
+    } if (n->tipo == 1) {
         tipo = "CASA";
-    } if (n.tipo == 2) {
+    } if (n->tipo == 2) {
         tipo = "CELLULARE";
-    } if (n.tipo == 3) {
+    } if (n->tipo == 3) {
         tipo = "ALTRO";
     }
 
-    printf("%i %s", n.numero, tipo);
+    printf("%s %i", tipo, n->numero);
 }
 
-void mostraPersona(struct Persona persona) {
-    printf("Nome: %s\n", persona.nome);
-    printf("Cognome: %s\n", persona.cognome);
+// Informazioni persona
+void mostraNominativoPersona(struct Persona* persona) {
+    printf("Nome: %s\n", persona->nome);
+    printf("Cognome: %s\n", persona->cognome);
+}
+
+void mostraNumeriDiTelefonoPersona(struct Persona* persona) {
     int n = 0;
 
-    while (n < persona.numeriMemorizzati) {
-        printf("Numero (%i / 10): ", n + 1);
-        mostraNumero(persona.numeri[n]);
+    while (n < persona->numeriMemorizzati) {
+        printf("[%i / 10]: ", n + 1);
+        mostraNumero(&(persona->numeri[n]));
         printf("\n");
         ++n;
     }
 }
 
-void acquisisciNumeroDiTelefono(struct NumeroDiTelefono* numero) {
-    printf("\tInserisci numero: ");
+void mostraPersona(struct Persona* persona) {
+    printf("=== Informazioni persona ===\n");
+    mostraNominativoPersona(persona);
+    mostraNumeriDiTelefonoPersona(persona);
+}
+
+// Acquisizione numero di telefono
+void setNumeroTelefonico(struct NumeroDiTelefono* numero) {
+    printf("Inserisci numero: ");
     scanf("%i", &(numero->numero));
-    printf("\tInserisci tipo: ");
-    printf("\t\n\t\t0: UFFICIO\n\t\t1: CASA\n\t\t2: CELLULARE\n\t\t3: ALTRO\n\t\t: ");
+}
+
+void setTipoNumeroTelefonico(struct NumeroDiTelefono* numero) {
     int input;
+    printf("Inserisci tipo: ");
+    printf("0: UFFICIO | 1: CASA | 2: CELLULARE | 3: ALTRO: ");
+    scanf("%u", &input);
 
-    while (true) {
-        scanf("%i", &input);
-
-        if (0 <= input && input <= 3) {
-            if (input == 0) {
-                numero->tipo = UFFICIO;
-            } if (input == 1) {
-                numero->tipo = CASA;
-            } if (input == 2) {
-                numero->tipo = CELLULARE;
-            } if (input == 3) {
-                numero->tipo = ALTRO;
-            }
-            break;
-        } else {
-            printf("\t\tNumero non valido, riprova... : ");
-        }
+    if (input == 0) {
+        numero->tipo = UFFICIO;
+    } if (input == 1) {
+        numero->tipo = CASA;
+    } if (input == 2) {
+        numero->tipo = CELLULARE;
+    } if (input == 3) {
+        numero->tipo = ALTRO;
     }
+}
+
+void acquisisciNumeroDiTelefono(struct NumeroDiTelefono* numero) {
+    setNumeroTelefonico(numero);
+    setTipoNumeroTelefonico(numero);
+}
+
+// Acquisizione persona
+void setNominativoPersona(struct Persona* persona) {
+    printf("Inserisci nome: ");
+    scanf("%s", persona->nome);
+
+    printf("Inserisci cognome: ");
+    scanf("%s", persona->cognome);
 }
 
 struct Persona acquisisciPersona() {
     struct Persona* persona = malloc(sizeof(struct Persona));
-    printf("Inserisci nome: ");
-    scanf("%s", persona->nome);
-    printf("Inserisci cognome: ");
-    scanf("%s", persona->cognome);
-    int n = 0;
-    char* stop;
+    setNominativoPersona(persona);
 
-    while (n < 1) {
-        printf("Numero (%i / 10) \n", n + 1);
-        struct NumeroDiTelefono* numeroCorrente = malloc(sizeof(struct NumeroDiTelefono));
-        acquisisciNumeroDiTelefono(numeroCorrente);
-        (persona->numeri)[n] = *numeroCorrente;
-        ++(persona->numeriMemorizzati);
-        ++n;
-
-        // printf("Proseguire? [Y/n]: \n");
-        // scanf("%s", stop);
-
-        // if (strcmp(stop, "Y") == 0) {
-        //     n = 10;
-        // }
-    }
+    int n = persona->numeriMemorizzati;
+    acquisisciNumeroDiTelefono(&((persona->numeri)[n]));
+    ++(persona->numeriMemorizzati);
 
     return *persona;
 }
 
 int main() {
     struct Persona persona = acquisisciPersona();
-    mostraPersona(persona);
+    struct Persona* p_persona = &persona;
+
+    mostraPersona(p_persona);
 
     return 0;
 };
