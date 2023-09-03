@@ -32,12 +32,34 @@ void stampaInfoStanza(struct Stanza* stanza) {
 
 // Aggiungi stampante alla stanza
 void aggiungiStampanteAllaStanza(struct Stanza* stanza, struct Stampante stampante) {
-
+    int s = 0;
+    while (true) {
+        if (stanza->stampanti[0].marca[0] == '\0') {
+            if (s < 5) {
+                stanza->stampanti[s] = stampante;
+            }
+            break;
+        }
+    }
 }
 
 // Numero stampanti con toner minore di una certa soglia
 int numeroStampantiEdificioConTonerMinoreDi(struct Edificio* edificio, int sogliaLimiteToner) {
-    return 0;
+    int num = 0;
+
+    for (int p = 0; p < 10; p++) {
+        for (int s = 0; s < 30; s++) {
+            for (int stamp = 0; stamp < 5; stamp++) {
+                if (
+                    edificio->piani[p].stanze[s].stampanti[stamp].marca[0] != '\0'
+                    &&
+                    edificio->piani[p].stanze[s].stampanti[stamp].livelloToner < sogliaLimiteToner) {
+                    num++;
+                }
+            }
+        }
+    }
+    return num;
 }
 
 // stampante
@@ -133,12 +155,22 @@ void realizzaEdificioManualmente(struct Edificio* edificio) {
 }
 
 int main() {
+    // Le malloc sono necessarie
 
-    // La malloc è necessaria!
-    struct Edificio* edificio_1 = malloc(sizeof(struct Edificio*));
+    struct Edificio* edificio_1 = malloc(sizeof(struct Edificio));
 
-    realizzaEdificioManualmente(edificio_1);
-    mostraInformazioniEdificio(edificio_1);
+    // realizzaEdificioManualmente(edificio_1);
+    // mostraInformazioniEdificio(edificio_1);
+
+    struct Stanza* stanza_1 = malloc(sizeof(struct Stanza));
+    struct Stampante* stampante_1 = malloc(sizeof(struct Stampante));
+
+    stampante_1->livelloToner = 20;
+    stampante_1->marca[0] = 'H';
+    aggiungiStampanteAllaStanza(stanza_1, *stampante_1);
+    edificio_1->piani[0].stanze[0] = *stanza_1;
+    int n = numeroStampantiEdificioConTonerMinoreDi(edificio_1, 10);
+    printf("%i\n", n);
 
     return 0;
 };
