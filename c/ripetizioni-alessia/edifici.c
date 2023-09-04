@@ -158,7 +158,6 @@ int main() {
     // Le malloc sono necessarie
 
     struct Edificio* edificio_1 = malloc(sizeof(struct Edificio));
-
     // realizzaEdificioManualmente(edificio_1);
     // mostraInformazioniEdificio(edificio_1);
 
